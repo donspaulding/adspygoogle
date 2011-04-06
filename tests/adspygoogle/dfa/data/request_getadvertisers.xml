@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:Envelope ns0:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns0="http://schemas.xmlsoap.org/soap/envelope/">
+ <ns0:Header>
+  <ns1:Security xmlns:ns1="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+   <ns1:UsernameToken>
+    <ns1:Username ns2:type="xsd3:string" xmlns:ns2="http://www.w3.org/2001/XMLSchema-instance">xxxxxx</ns1:Username>
+    <ns1:Password ns2:type="xsd3:string" xmlns:ns2="http://www.w3.org/2001/XMLSchema-instance">xxxxxx</ns1:Password>
+   </ns1:UsernameToken>
+  </ns1:Security>
+ </ns0:Header>
+ <ns0:Body>
+  <getAdvertisers>
+   <v1>
+    <pageSize>10</pageSize>
+   </v1>
+  </getAdvertisers>
+ </ns0:Body>
+</ns0:Envelope>
