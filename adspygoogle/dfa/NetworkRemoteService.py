@@ -16,14 +16,15 @@
 
 """Methods to access NetworkRemoteService service."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
 
@@ -50,14 +51,20 @@ class NetworkRemoteService(ApiService):
            'api/dfa-api/network']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(NetworkRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def GetAdministratorPermissions(self):
-    """Return list of administrator permissions.
+    """Returns a list of administrator permissions.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getAdministratorPermissions'
     if self._config['soap_lib'] == SOAPPY:
@@ -69,11 +76,16 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetAllNetworkPermissions(self):
-    """Return list of supported network permissions which are accessible to
-    user.
+    """Returns a list of supported network permissions.
+
+    Will only return permissions which are accessible to the user.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getAllNetworkPermissions'
     if self._config['soap_lib'] == SOAPPY:
@@ -85,10 +97,14 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetAllPermissions(self):
-    """Return list of supported permissions
+    """Returns a list of supported permissions.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getAllPermissions'
     if self._config['soap_lib'] == SOAPPY:
@@ -100,21 +116,25 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetAssignedNetworkPermissions(self, network_id):
-    """Return list of network permissions assigned to given network.
+    """Returns a list of network permissions assigned to given network.
 
     Args:
       network_id: str Network id.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((network_id, (str, unicode)),))
 
     method_name = 'getAssignedNetworkPermissions'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(network_id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(network_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -122,10 +142,14 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetCurrencies(self):
-    """Return list of supported currencies.
+    """Returns a list of supported currencies.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getCurrencies'
     if self._config['soap_lib'] == SOAPPY:
@@ -137,10 +161,14 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetLanguageEncodingList(self):
-    """Return list of supported language encodings.
+    """Returns a list of supported language encodings.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getLanguageEncodingList'
     if self._config['soap_lib'] == SOAPPY:
@@ -152,21 +180,25 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetNetwork(self, network_id):
-    """Return network matching given network id.
+    """Returns the network matching given network id.
 
     Args:
       network_id: str Network id.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((network_id, (str, unicode)),))
 
     method_name = 'getNetwork'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(network_id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(network_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -174,23 +206,28 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetNetworks(self, network_search_criteria):
-    """Return a single page of networks matching the given criteria.
+    """Returns a single page of networks matching the given criteria.
 
     Args:
       network_search_criteria: dict Search criteria to match networks.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateNetworkSearchCriteria(network_search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, network_search_criteria, 'NetworkSearchCriteria')
 
     method_name = 'getNetworks'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(network_search_criteria,
-                                                  'networkSearchCriteria',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  network_search_criteria, 'networkSearchCriteria',
+                  self._wsdl_types_map, True, 'NetworkSearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -198,10 +235,14 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetTimeZoneList(self):
-    """Return list of supported time zones.
+    """Returns a list of supported time zones.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getTimeZoneList'
     if self._config['soap_lib'] == SOAPPY:
@@ -213,22 +254,27 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SaveNetwork(self, network):
-    """Create or update network.
+    """Creates or updates a network.
 
     Args:
       network: dict Network to create or update.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateNetwork(network)
+    SanityCheck.NewSanityCheck(self._wsdl_types_map, network, 'Network')
 
     method_name = 'saveNetwork'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(network, 'network', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  network, 'network',
+                  self._wsdl_types_map, True, 'Network'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -236,22 +282,28 @@ class NetworkRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def UploadNetworkWidgetImage(self, request):
-    """Upload widget buckup image for a network level.
+    """Uploads a widget backup image for a network level.
 
     Args:
       request: dict Image upload request.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateWidgetImageUploadRequest(request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, request, 'WidgetImageUploadRequest')
 
     method_name = 'uploadNetworkWidgetImage'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(request, 'request', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  request, 'request', self._wsdl_types_map, True,
+                  'WidgetImageUploadRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

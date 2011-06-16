@@ -16,14 +16,15 @@
 
 """Methods to access PlacementRemoteService service."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
 
@@ -51,22 +52,28 @@ class PlacementRemoteService(ApiService):
            'api/dfa-api/placement']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(PlacementRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def DeletePlacement(self, id):
-    """Delete the placement with the given id.
+    """Deletes the placement with the given id.
 
     Args:
       id: str Id of the placement to delete.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((id, (str, unicode)),))
 
     method_name = 'deletePlacement'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(id, 'id'))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -74,18 +81,22 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def DeletePlacementGroup(self, id):
-    """Delete the placement group with the given id.
+    """Deletes the placement group with the given id.
 
     Args:
       id: str Id of the placement group to delete.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((id, (str, unicode)),))
 
     method_name = 'deletePlacementGroup'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(id, 'id'))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -93,10 +104,14 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetInterstitialPlacementTagOptions(self):
-    """Return types of regular placement tag options.
+    """Returns the types of regular placement tag options.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getInterstitialPlacementTagOptions'
     if self._config['soap_lib'] == SOAPPY:
@@ -108,10 +123,14 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetInStreamVideoPlacementTagOptions(self):
-    """Return types of in-stream video placement tag options.
+    """Returns the types of in-stream video placement tag options.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getInStreamVideoPlacementTagOptions'
     if self._config['soap_lib'] == SOAPPY:
@@ -123,10 +142,14 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetMobilePlacementTagOptions(self):
-    """Return types of mobile placement tag options.
+    """Returns the types of mobile placement tag options.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getMobilePlacementTagOptions'
     if self._config['soap_lib'] == SOAPPY:
@@ -138,21 +161,25 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetPlacement(self, id):
-    """Return placement for a given id.
+    """Returns the placement for a given id.
 
     Args:
       id: str Id of the placement to return.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((id, (str, unicode)),))
 
     method_name = 'getPlacement'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -160,21 +187,25 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetPlacementGroup(self, id):
-    """Return placement group for a given id.
+    """Returns the placement group for a given id.
 
     Args:
       id: str Id of the placement group to return.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((id, (str, unicode)),))
 
     method_name = 'getPlacementGroup'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -182,10 +213,14 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetPlacementGroupTypes(self):
-    """Return types of placement group.
+    """Returns the types of placement group.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getPlacementGroupTypes'
     if self._config['soap_lib'] == SOAPPY:
@@ -197,23 +232,28 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetPlacementGroupsByCriteria(self, search_criteria):
-    """Return placement groups matching the given criteria.
+    """Returns the placement groups matching the given criteria.
 
     Args:
       search_criteria: dict Search criteria to match placement groups.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidatePlacementGroupSearchCriteria(search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, search_criteria, 'PlacementGroupSearchCriteria')
 
     method_name = 'getPlacementGroupsByCriteria'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(search_criteria,
-                                                 'placementGroupSearchCriteria',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  search_criteria, 'placementGroupSearchCriteria',
+                  self._wsdl_types_map, True, 'PlacementGroupSearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -221,23 +261,28 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetPlacementsByCriteria(self, search_criteria):
-    """Return placements matching the given criteria.
+    """Returns the placements matching the given criteria.
 
     Args:
       search_criteria: dict Search criteria to match placements.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidatePlacementSearchCriteria(search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, search_criteria, 'PlacementSearchCriteria')
 
     method_name = 'getPlacementsByCriteria'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(search_criteria,
-                                                  'placementSearchCriteria', [],
-                                                  [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  search_criteria, 'placementSearchCriteria',
+                  self._wsdl_types_map, True, 'PlacementSearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -245,7 +290,7 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetPlacementTagData(self, campaign_id, placement_tag_criteria):
-    """Replace a rich media asset for a rich media creative.
+    """Replaces a rich media asset for a rich media creative.
 
     Args:
       campaign_id: str Id of the campaign
@@ -253,21 +298,27 @@ class PlacementRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((campaign_id, (str, unicode)),
                                (placement_tag_criteria, list)))
     for item in placement_tag_criteria:
-      self._sanity_check.ValidatePlacementTagCriteria(item)
+      SanityCheck.NewSanityCheck(
+          self._wsdl_types_map, item, 'PlacementTagCriteria')
 
     method_name = 'getPlacementTagData'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(campaign_id, 'campaignId')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(placement_tag_criteria,
-                                                  'PlacementTagCriteria',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(campaign_id, 'campaignId')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                placement_tag_criteria, 'placementTagCriteria',
+                                self._wsdl_types_map, True,
+                                'ArrayOfPlacementTagCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -275,10 +326,14 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetPlacementTypes(self):
-    """Return types of placement.
+    """Returns the types of placement.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getPlacementTypes'
     if self._config['soap_lib'] == SOAPPY:
@@ -290,10 +345,14 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetPricingTypes(self):
-    """Return types of pricing.
+    """Returns the types of pricing.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getPricingTypes'
     if self._config['soap_lib'] == SOAPPY:
@@ -305,10 +364,14 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetRegularPlacementTagOptions(self):
-    """Return types of regular placement tag options.
+    """Returns the types of regular placement tag options.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getRegularPlacementTagOptions'
     if self._config['soap_lib'] == SOAPPY:
@@ -320,22 +383,27 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SavePlacement(self, placement):
-    """Save given placement.
+    """Saves the given placement.
 
     Args:
       placement: dict Placement to save.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidatePlacement(placement)
+    SanityCheck.NewSanityCheck(self._wsdl_types_map, placement, 'Placement')
 
     method_name = 'savePlacement'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(placement, 'placement', [],
-                                                  [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  placement, 'placement',
+                  self._wsdl_types_map, True, 'Placement'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -343,23 +411,28 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SavePlacementGroup(self, placement_group):
-    """Save given placement group.
+    """Saves the given placement group.
 
     Args:
       placement_group: dict Placement group to save.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidatePlacementGroup(placement_group)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, placement_group, 'PlacementGroup')
 
     method_name = 'savePlacementGroup'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(placement_group,
-                                                  'placementGroup', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  placement_group, 'PlacementGroup', self._wsdl_types_map, True,
+                  'PlacementGroup'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -367,22 +440,28 @@ class PlacementRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def UpdatePlacements(self, request):
-    """Update properties of placement.
+    """Updates the properties of placement.
 
     Args:
       request: dict Placement update request.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidatePlacementUpdateRequest(request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, request, 'PlacementUpdateRequest')
 
     method_name = 'updatePlacements'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(request, 'request', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  request, 'request', self._wsdl_types_map, True,
+                  'PlacementUpdateRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

@@ -16,12 +16,13 @@
 
 """Settings and configurations for the client library."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import os
+import pickle
 
-from adspygoogle.common import VERSION
 from adspygoogle.common import Utils
+from adspygoogle.common import VERSION
 from adspygoogle.common.Errors import MissingPackageError
 
 
@@ -29,10 +30,10 @@ LIB_HOME = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 LIB_NAME = 'DoubleClick for Advertisers API Python Client Library'
 LIB_SHORT_NAME = 'DfaApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python/'
-LIB_AUTHOR = 'Stan Grinberg'
-LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '1.0.0'
-LIB_MIN_COMMON_VERSION = '1.1.5'
+LIB_AUTHOR = 'Joseph DiLallo'
+LIB_AUTHOR_EMAIL = 'api.jdilallo@gmail.com'
+LIB_VERSION = '1.2.0'
+LIB_MIN_COMMON_VERSION = '2.0.0'
 LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION > LIB_MIN_COMMON_VERSION:
@@ -42,14 +43,20 @@ if VERSION > LIB_MIN_COMMON_VERSION:
 
 # Tuple of tuples representing API versions, where each inner tuple is a
 # combination of the API vesrion and whether API used JAXB.
-API_VERSIONS_MAP = (('v1.11', False), ('v1.12', False), ('v1.13', False))
+API_VERSIONS_MAP = (('v1.12', False), ('v1.13', False), ('v1.14', False))
 API_VERSIONS = [version for version, is_jaxb_api in API_VERSIONS_MAP]
 MIN_API_VERSION = API_VERSIONS[2]
 
 # Accepted combinations of headers which user has to provide. Either one of
 # these is required in order to make a succesful API request.
 REQUIRED_SOAP_HEADERS = (('Username', 'Password'),
-                         ('AuthToken',))
+                         ('Username', 'AuthToken',))
 
 WSSE_NS = ('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-'
            'secext-1.0.xsd')
+
+# Ready the defintions from the WSDL.
+WSDL_MAP = pickle.load(open(os.path.join(LIB_HOME, 'data',
+                                         'wsdl_type_defs.pkl'), 'r'))
+OPERATIONS_MAP = pickle.load(open(os.path.join(LIB_HOME, 'data',
+                                               'wsdl_ops_defs.pkl'), 'r'))

@@ -1,2 +1,12 @@
+1.2.0:
+- Added support for v1.14, removed support for v1.11.
+- Added flags to turn off unit tests for the selected versions. By default,
+  tests for the deprecated version are turned off. These flags are located in
+  the DFA unit test's __init__.py module.
+
+1.1.0:
+- Updated adspygoogle.common module to v2.0.0.
+- Added support for validation against the WSDL.
+
 1.0.0:
 - Initial release.

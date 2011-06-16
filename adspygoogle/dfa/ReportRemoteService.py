@@ -18,12 +18,13 @@
 
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
 
@@ -50,29 +51,34 @@ class ReportRemoteService(ApiService):
     url = [op_config['server'], op_config['version'], 'api/dfa-api/report']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(ReportRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def GetReportsByCriteria(self, report_search_criteria):
-    """Return a record set with information on reports that satisfy the given
-    search criteria.
+    """Returns a record set of reports that satisfy the given search criteria.
 
     Args:
       report_search_criteria: dict Search criteria.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateReportSearchCriteria(
-        report_search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, report_search_criteria, 'ReportSearchCriteria')
 
     method_name = 'getReportsByCriteria'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
-                  report_search_criteria, 'reportSearchCriteria', [], [],
-                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  report_search_criteria, 'reportSearchCriteria',
+                  self._wsdl_types_map, True, 'ReportSearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -80,22 +86,28 @@ class ReportRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetReport(self, report_request):
-    """Return information about the specified report.
+    """Returns information about the specified report.
 
     Args:
       report_request: dict Request specifying which report to fetch.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateReportRequest(report_request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, report_request, 'ReportRequest')
 
     method_name = 'getReport'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
-                  report_request, 'reportRequest', [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  report_request, 'reportRequest', self._wsdl_types_map, True,
+                  'ReportRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -110,15 +122,21 @@ class ReportRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateReportRequest(report_request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, report_request, 'ReportRequest')
 
     method_name = 'runDeferredReport'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
-                  report_request, 'reportRequest', [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  report_request, 'reportRequest', self._wsdl_types_map, True,
+                  'ReportRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

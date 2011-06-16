@@ -16,14 +16,15 @@
 
 """Methods to access UserRemoteService service."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
 
@@ -50,25 +51,31 @@ class UserRemoteService(ApiService):
            'api/dfa-api/user']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(UserRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def GenerateUniqueUsername(self, user_name):
-    """Generate unique username.
+    """Generates a unique username.
 
     Args:
       user_name: str Username to generate.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((user_name, (str, unicode)),))
 
     method_name = 'generateUniqueUsername'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(user_name, 'username'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(user_name, 'username'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -76,10 +83,14 @@ class UserRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetAvailableTraffickerTypes(self):
-    """Return available trafficker types.
+    """Returns the available trafficker types.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getAvailableTraffickerTypes'
     if self._config['soap_lib'] == SOAPPY:
@@ -91,10 +102,14 @@ class UserRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetAvailableUserFilterCriteriaTypes(self):
-    """Return available user filter criteria types.
+    """Returns the available user filter criteria types.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getAvailableUserFilterCriteriaTypes'
     if self._config['soap_lib'] == SOAPPY:
@@ -106,10 +121,14 @@ class UserRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetAvailableUserFilterTypes(self):
-    """Return available user filter types.
+    """Returns the available user filter types.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getAvailableUserFilterTypes'
     if self._config['soap_lib'] == SOAPPY:
@@ -121,21 +140,25 @@ class UserRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetUser(self, user_id):
-    """Return user for given id.
+    """Returns the user for given id.
 
     Args:
       user_id: str Id of the user to return.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((user_id, (str, unicode)),))
 
     method_name = 'getUser'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(user_id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(user_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -143,23 +166,28 @@ class UserRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetUsersByCriteria(self, search_criteria):
-    """Return users matching given criteria.
+    """Returns the users matching given criteria.
 
     Args:
       search_criteria: dict Search criteria to match users.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateUserSearchCriteria(search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, search_criteria, 'UserSearchCriteria')
 
     method_name = 'getUsersByCriteria'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(search_criteria,
-                                                  'userSearchCriteria', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  search_criteria, 'userSearchCriteria', self._wsdl_types_map,
+                  True, 'UserSearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -167,21 +195,26 @@ class UserRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SaveUser(self, user):
-    """Save given user.
+    """Saves the given user.
 
     Args:
       user: dict User to save.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateUser(user)
+    SanityCheck.NewSanityCheck(self._wsdl_types_map, user, 'User')
 
     method_name = 'saveUser'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(user, 'user', [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  user, 'user', self._wsdl_types_map, True, 'User'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -189,22 +222,28 @@ class UserRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SendUserInvitationEmail(self, email_request):
-    """Send user invitation email.
+    """Sends a user invitation email.
 
     Args:
       email_request: dict Email request to send.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateUserInvitationEmailRequest(email_request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, email_request, 'UserInvitationEmailRequest')
 
     method_name = 'sendUserInvitationEmail'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(email_request, 'emailRequest',
-                                                  [], [], True))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  email_request, 'emailRequest', self._wsdl_types_map, True,
+                  'UserInvitationEmailRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

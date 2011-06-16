@@ -16,14 +16,15 @@
 
 """Methods to access ChangeLogRemoteService service."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
 
@@ -50,14 +51,20 @@ class ChangeLogRemoteService(ApiService):
            'api/dfa-api/changelog']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(ChangeLogRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def GetChangeLogObjectTypes(self):
-    """Return list of object types that support change logs.
+    """Returns a list of object types that support change logs.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getChangeLogObjectTypes'
     if self._config['soap_lib'] == SOAPPY:
@@ -68,27 +75,31 @@ class ChangeLogRemoteService(ApiService):
                                         self._op_config['version']))
       raise ApiVersionNotSupportedError(msg)
 
-  def GetChangeLogRecordForObjectType(self, id, object_type_id):
-    """Return change log record for given id and object type.
+  def GetChangeLogRecordForObjectType(self, object_id, object_type_id):
+    """Returns the change log records for given id and object type.
 
     Args:
-      id: str Id of the change log record.
+      object_id: str Id of the change log record.
       object_type_id: str Id of the object type.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    SanityCheck.ValidateTypes(((id, (str, unicode)),
+    SanityCheck.ValidateTypes(((object_id, (str, unicode)),
                                (object_type_id, (str, unicode))))
 
     method_name = 'getChangeLogRecordForObjectType'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(id, 'objectId')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(object_type_id,
-                                                  'objectTypeId'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(object_id, 'objectId')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                object_type_id, 'objectTypeId'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -96,21 +107,25 @@ class ChangeLogRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetChangeLogRecord(self, change_log_record_id):
-    """Return change log record for a given id.
+    """Returns the change log record for a given id.
 
     Args:
       change_log_record_id: str Id of the change log record.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((change_log_record_id, (str, unicode)),))
 
     method_name = 'getChangeLogRecord'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(change_log_record_id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(change_log_record_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -118,24 +133,31 @@ class ChangeLogRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetChangeLogRecords(self, change_log_record_search_criteria):
-    """Return change log records matching the given criteria.
+    """Returns the change log records matching the given criteria.
 
     Args:
       change_log_record_search_criteria: dict Change log record search crtieria.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateChangeLogRecordSearchCriteria(
-        change_log_record_search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, change_log_record_search_criteria,
+        'ChangeLogRecordSearchCriteria')
 
     method_name = 'getChangeLogRecords'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
                   change_log_record_search_criteria,
-                  'changeLogRecordSearchCriteria', [], [], True))))
+                  'changeLogRecordSearchCriteria',
+                  self._wsdl_types_map, True,
+                  'ChangeLogRecordSearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -143,22 +165,27 @@ class ChangeLogRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def UpdateChangeLogRecordComments(self, change_log_record_id, comments):
-    """Update comments for the given change log record.
+    """Updates the comments for the given change log record.
 
     Args:
       change_log_record_id: str Id of the change log record.
       comments: str Comments to assign to a change record.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((change_log_record_id, (str, unicode)),
                                (comments, (str, unicode))))
 
     method_name = 'updateChangeLogRecordComments'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(change_log_record_id, 'id')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(comments, 'comments'))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(change_log_record_id, 'id')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                comments, 'comments'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -167,12 +194,16 @@ class ChangeLogRemoteService(ApiService):
 
   def UpdateChangeLogRecordCommentsForObjectType(self, change_log_record_id,
                                                  comments, object_type_id):
-    """Update comments for the given change log record.
+    """Updates the comments for the given change log record.
 
     Args:
       change_log_record_id: str Id of the change log record.
       comments: str Comments to assign to a change record.
       object_type_id: str Id of the object type.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((change_log_record_id, (str, unicode)),
                                (comments, (str, unicode)),
@@ -180,15 +211,16 @@ class ChangeLogRemoteService(ApiService):
 
     method_name = 'updateChangeLogRecordCommentsForObjectType'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(change_log_record_id,
-                                                  'changeLogRecordId')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(comments, 'comments')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(object_type_id,
-                                                  'objectTypeId'))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(change_log_record_id,
+                                                 'changeLogRecordId')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                comments, 'comments')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                object_type_id, 'objectTypeId'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

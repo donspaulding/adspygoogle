@@ -18,23 +18,22 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
-import re
 import time
 
 from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
 from adspygoogle.common.Errors import Error
-from adspygoogle.common.Errors import ValidationError
-from adspygoogle.common.WebService import WebService
 from adspygoogle.common.soappy import MessageHandler
-from adspygoogle.common.soappy.HTTPTransportHandler import HTTPTransportHandler
+from adspygoogle.common.WebService import WebService
+from adspygoogle.dfa import DfaSanityCheck
 from adspygoogle.dfa import LIB_SIG
 from adspygoogle.dfa import LIB_URL
+from adspygoogle.dfa import OPERATIONS_MAP
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa import WSSE_NS
-from adspygoogle.dfa import DfaSanityCheck
-from adspygoogle.dfa.DfaErrors import ERRORS
 from adspygoogle.dfa.DfaErrors import DfaApiError
 from adspygoogle.dfa.DfaErrors import DfaError
+from adspygoogle.dfa.DfaErrors import ERRORS
 from adspygoogle.dfa.DfaSoapBuffer import DfaSoapBuffer
 
 
@@ -127,6 +126,9 @@ class DfaWebService(WebService):
       if error: e = error
       raise Error(e)
 
+  def _GetServiceName(self):
+    return self.__service
+
   def CallMethod(self, method_name, params, service_name=None, loc=None,
                  request=None):
     """Make an API call to specified method.
@@ -146,6 +148,8 @@ class DfaWebService(WebService):
     self._lock.acquire()
 
     try:
+      if not service_name and self.__service:
+        service_name = self.__service
       headers = self._headers
       config = self._config
       config['data_injects'] = ()
@@ -167,7 +171,7 @@ class DfaWebService(WebService):
       default_ns = '/'.join(['http://www.doubleclick.net/dfa-api',
                              self._op_config['version']])
 
-      if (config['soap_lib'] == SOAPPY):
+      if config['soap_lib'] == SOAPPY:
         data_injects = []
         # If the version is not v1.11, inject the RequestHeader header in before
         # the Header section ends.
@@ -180,7 +184,7 @@ class DfaWebService(WebService):
                                        (LIB_SIG, config['app_name']))))
 
         # Remove the automatic SOAPpy wrapping of variables with <v1>, <v2>,
-        # etc. Our MessageHandler.PackDictAsXml function will provide all the
+        # etc. Our MessageHandler.PackVarAsXml function will provide all the
         # wrapping necessary.
         data_injects.append(('<v1>', ''))
         data_injects.append(('</v1>', ''))
@@ -212,12 +216,14 @@ class DfaWebService(WebService):
           LIB_URL, service_name, loc, request)
       stop_time = time.strftime('%Y-%m-%d %H:%M:%S')
 
-      # Restore list type which was overwritten by SOAPpy.
-      if config['soap_lib'] == SOAPPY and isinstance(response, tuple):
-        holder = []
-        for element in response:
-          holder.append(MessageHandler.RestoreListType(element, ('value',)))
-        response = tuple(holder)
+      # Restore list type which was overwritten by SOAPpy. Only possible if a
+      # service name was specified.
+      if (config['soap_lib'] == SOAPPY and isinstance(response, tuple) and
+          service_name):
+        response = MessageHandler.RestoreListTypeWithWsdl(
+            response, WSDL_MAP[self._op_config['version']][service_name],
+            OPERATIONS_MAP[self._op_config['version']][service_name][
+                method_name])
 
       if isinstance(response, dict) or isinstance(response, Error):
         error = response
@@ -231,7 +237,6 @@ class DfaWebService(WebService):
     if Utils.BoolTypeConvert(self._config['raw_response']):
       return response
     return response
-
 
   def CallRawMethod(self, soap_message):
     """Make an API call by posting raw SOAP XML message.

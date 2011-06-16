@@ -16,14 +16,15 @@
 
 """Methods to access AdvertiserGroupRemoteService service."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
 
@@ -51,16 +52,22 @@ class AdvertiserGroupRemoteService(ApiService):
            'api/dfa-api/advertisergroup']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(AdvertiserGroupRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def AssignAdvertisersToAdvertiserGroup(self, advertiser_group_id,
                                          advertiser_ids):
-    """Assign one or more advertisers to one or more advertiser groups.
+    """Assigns one or more advertisers to one or more advertiser groups.
 
     Args:
       advertiser_group_id: str Advertiser group id.
       advertiser_ids: list Advertiser ids.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((advertiser_group_id, (str, unicode)),))
     SanityCheck.ValidateTypes(((advertiser_ids, list),))
@@ -69,32 +76,35 @@ class AdvertiserGroupRemoteService(ApiService):
 
     method_name = 'assignAdvertisersToAdvertiserGroup'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(advertiser_group_id, 'id')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(advertiser_ids, 'ids', [], [],
-                                                  True))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(advertiser_group_id, 'id')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                advertiser_ids, 'ids', [], True))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
                                         self._op_config['version']))
       raise ApiVersionNotSupportedError(msg)
 
-
   def DeleteAdvertiserGroup(self, advertiser_group_id):
-    """Delete advertiser group with the given id.
+    """Deletes the advertiser group with the given id.
 
     Args:
       advertiser_group_id: str Advertiser group id.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((advertiser_group_id, (str, unicode)),))
 
     method_name = 'deleteAdvertiserGroup'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(advertiser_group_id, 'id'))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(advertiser_group_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -102,21 +112,25 @@ class AdvertiserGroupRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetAdvertiserGroup(self, advertiser_group_id):
-    """Return advertiser group with the given id.
+    """Returns the advertiser group with the given id.
 
     Args:
       advertiser_group_id: str Id of the advertiser group to return.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((advertiser_group_id, (str, unicode)),))
 
     method_name = 'getAdvertiserGroup'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(advertiser_group_id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(advertiser_group_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -124,8 +138,7 @@ class AdvertiserGroupRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetAdvertiserGroups(self, advertiser_group_search_criteria):
-    """Return advertiser groups in the user's network based on the criteria
-    object passed in.
+    """Return advertiser groups in the user's network based on given criteria.
 
     Args:
       advertiser_group_search_criteria: dict Search criteria for retrieving
@@ -133,17 +146,23 @@ class AdvertiserGroupRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateAdvertiserGroupSearchCriteria(
-        advertiser_group_search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, advertiser_group_search_criteria,
+        'AdvertiserGroupSearchCriteria')
 
     method_name = 'getAdvertiserGroups'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
                   advertiser_group_search_criteria,
-                  'advertiserGroupSearchCriteria', [], [], True))))
+                  'advertiserGroupSearchCriteria', self._wsdl_types_map, True,
+                  'AdvertiserGroupSearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -151,23 +170,28 @@ class AdvertiserGroupRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SaveAdvertiserGroup(self, advertiser_group):
-    """Save given advertiser group object.
+    """Saves the given advertiser group object.
 
     Args:
       advertiser_group: dict Advertiser group object to save.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateAdvertiserGroup(advertiser_group)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, advertiser_group, 'AdvertiserGroup')
 
     method_name = 'saveAdvertiserGroup'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(advertiser_group,
-                                                  'advertiserGroup', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  advertiser_group, 'advertiserGroup', self._wsdl_types_map,
+                  True, 'AdvertiserGroup'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

@@ -16,15 +16,18 @@
 
 """Methods to access CreativeRemoteService service."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import DfaUtils
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
+
 
 class CreativeRemoteService(ApiService):
 
@@ -50,17 +53,23 @@ class CreativeRemoteService(ApiService):
            'api/dfa-api/creative']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(CreativeRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def AssignCreativeGroupsToCreative(self, campaign_id, creative_id,
                                      creative_group_ids):
-    """Assign creative groups to creative within the campaign.
+    """Assigns creative groups to a creative within the campaign.
 
     Args:
       campaign_id: str Id of the campaign.
       creative_id: str Id of the creative.
       creative_group_ids: list Creative group ids to assign.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((campaign_id, (str, unicode)),
                                (creative_id, (str, unicode)),
@@ -70,15 +79,16 @@ class CreativeRemoteService(ApiService):
 
     method_name = 'assignCreativeGroupsToCreative'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(campaign_id, 'campaignId')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_id, 'creativeId')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_group_ids,
-                                                  'creativeGroupIds', [], [],
-                                                  True)),))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(campaign_id, 'campaignId')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                creative_id, 'creativeId')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                creative_group_ids, 'creativeGroupIds', [],
+                                True)),))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -86,26 +96,33 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def AssignCreativesToPlacements(self, creative_placement_assignments):
-    """Assign the creatives to placements and create a unique ad for each such
-    assignment.
+    """Assigns the creatives to placements.
+
+    A unique ad will be created for each such assignment.
 
     Args:
       creative_placement_assignments: list Creative placement assignments.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((creative_placement_assignments, list),))
     for item in creative_placement_assignments:
-      self._sanity_check.ValidateCreativePlacementAssignment(item)
+      SanityCheck.NewSanityCheck(
+          self._wsdl_types_map, item, 'CreativePlacementAssignment')
 
     method_name = 'assignCreativesToPlacements'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
                   creative_placement_assignments, 'creativePlacementAssignment',
-                  [], [], True))))
+                  self._wsdl_types_map, True,
+                  'ArrayOfCreativePlacementAssignment'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -113,7 +130,7 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def AssociateCreativesToCampaign(self, campaign_id, creative_ids):
-    """Associate the given creatives to the campaign.
+    """Associates the given creatives to the campaign.
 
     Args:
       campaign_id: str Id of the campaign to which creatives to be assigned.
@@ -121,6 +138,10 @@ class CreativeRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((campaign_id, (str, unicode)),
                                (creative_ids, list)))
@@ -129,12 +150,12 @@ class CreativeRemoteService(ApiService):
 
     method_name = 'associateCreativesToCampaign'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(campaign_id, 'campaignId')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_ids, 'creativeIds',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(campaign_id, 'campaignId')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                creative_ids, 'creativeIds', [], True))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -142,25 +163,30 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def CopyCreative(self, copy_requests):
-    """Create copies for given creatives.
+    """Creates copies for given creatives.
 
     Args:
       copy_requests: list Creative copy requests.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((copy_requests, list),))
     for item in copy_requests:
-      self._sanity_check.ValidateCreativeCopyRequest(item)
+      SanityCheck.NewSanityCheck(
+          self._wsdl_types_map, item, 'CreativeCopyRequest')
 
     method_name = 'copyCreative'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(copy_requests,
-                                                  'creativeCopyRequest', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  copy_requests, 'creativeCopyRequests', self._wsdl_types_map,
+                  True, 'ArrayOfCreativeCopyRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -168,23 +194,30 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def CreateCreativesFromCreativeUploadSession(self, creative_upload_session):
-    """Create creatives from files uploaded in a creative upload session.
+    """Creates creatives from files uploaded in a creative upload session.
 
     Args:
       creative_upload_session: dict Creative upload session.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateCreativeUploadSession(creative_upload_session)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map,
+        creative_upload_session,
+        'CreativeUploadSession')
 
     method_name = 'createCreativesFromCreativeUploadSession'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_upload_session,
-                                                  'creativeUploadSession',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  creative_upload_session, 'creativeUploadSession',
+                  self._wsdl_types_map, True, 'CreativeUploadSession'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -192,18 +225,22 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def DeleteCreative(self, creative_id):
-    """Delete the creative with the given id.
+    """Deletes the creative with the given id.
 
     Args:
       creative_id: str Id of the creative to delete.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((creative_id, (str, unicode)),))
 
     method_name = 'deleteCreative'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_id, 'id'))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(creative_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -211,7 +248,7 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def DeleteRichMediaAsset(self, creative_id, asset_file_name):
-    """Delete the rich media asset.
+    """Deletes the rich media asset.
 
     Args:
       creative_id: str Id of the creative from which to delete asset.
@@ -219,18 +256,22 @@ class CreativeRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((creative_id, (str, unicode)),
                                (asset_file_name, (str, unicode))))
 
     method_name = 'deleteRichMediaAsset'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_id, 'id')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(asset_file_name,
-                                                  'assetFileName'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(creative_id, 'id')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                asset_file_name, 'assetFileName'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -238,7 +279,9 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GenerateCreativeUploadSession(self, creative_upload_session_request):
-    """Generate new creative upload session given the advertiser identifier
+    """Generates new creative upload session.
+
+    A new session can be created based off of a advertiser identifier
     (advertiser level) or campaign identifier (campaign level).
 
     Args:
@@ -247,17 +290,23 @@ class CreativeRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateCreativeUploadSessionRequest(
-        creative_upload_session_request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, creative_upload_session_request,
+        'CreativeUploadSessionRequest')
 
     method_name = 'generateCreativeUploadSession'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
                   creative_upload_session_request,
-                  'creativeUploadSessionRequest', [], [], True))))
+                  'creativeUploadSessionRequest', self._wsdl_types_map, True,
+                  'CreativeUploadSessionRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -265,7 +314,7 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetAssignedCreativeGroupsToCreative(self, campaign_id, creative_id):
-    """Return assigned creative group to the given creative in a campaign.
+    """Returns assigned creative group to the given creative in a campaign.
 
     Args:
       campaign_id: str Id of the campaign.
@@ -273,17 +322,22 @@ class CreativeRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((campaign_id, (str, unicode)),
                                (creative_id, (str, unicode))))
 
     method_name = 'getAssignedCreativeGroupsToCreative'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(campaign_id, 'campaignId')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_id, 'creativeId'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(campaign_id, 'campaignId')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                creative_id, 'creativeId'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -291,23 +345,28 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetCompleteCreativeUploadSession(self, upload_session):
-    """Return complete creative upload session information.
+    """Returns complete creative upload session information.
 
     Args:
       upload_session: dict Creative upload session.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateCreativeUploadSession(upload_session)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, upload_session, 'CreativeUploadSessionSummary')
 
     method_name = 'getCompleteCreativeUploadSession'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(upload_session,
-                                                  'creativeUploadSession', [],
-                                                  [], True)),))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  upload_session, 'uploadSession', self._wsdl_types_map, True,
+                  'CreativeUploadSessionSummary'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -315,21 +374,25 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetCreative(self, creative_id):
-    """Return creative for a given id.
+    """Returns the creative for a given id.
 
     Args:
       creative_id: str Id of the creative to return.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((creative_id, (str, unicode)),))
 
     method_name = 'getCreative'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(creative_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -337,7 +400,7 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetCreativeAssets(self, creative_asset_search_criteria):
-    """Return the assets matching the given criteria.
+    """Returns the assets matching the given criteria.
 
     Args:
       creative_asset_search_criteria: dict Search criteria to match creatives
@@ -345,17 +408,22 @@ class CreativeRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateCreativeAssetSearchCriteria(
-        creative_asset_search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, creative_asset_search_criteria,
+        'CreativeAssetSearchCriteria')
 
     method_name = 'getCreativeAssets'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
                   creative_asset_search_criteria, 'creativeAssetSearchCriteria',
-                  [], [], True))))
+                  self._wsdl_types_map, True, 'CreativeAssetSearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -363,10 +431,14 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetCreativeTypes(self):
-    """Return types of creative.
+    """Returns the types of creatives.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     method_name = 'getCreativeTypes'
     if self._config['soap_lib'] == SOAPPY:
@@ -378,23 +450,29 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetCreatives(self, creative_search_criteria):
-    """Return single page of creatives matching the given criteria.
+    """Returns a single page of creatives matching the given criteria.
 
     Args:
       creative_search_criteria: dict Search criteria to match creatives.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateCreativeSearchCriteria(creative_search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, creative_search_criteria,
+        'CreativeSearchCriteria')
 
     method_name = 'getCreatives'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_search_criteria,
-                                                  'creativeSearchCriteria',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  creative_search_criteria, 'creativeSearchCriteria',
+                  self._wsdl_types_map, True, 'CreativeSearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -402,24 +480,29 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetCreativeRenderings(self, creative_rendering_request):
-    """Return creative for a given id.
+    """Returns the creative for a given id.
 
     Args:
-      creative_id: str Id of the creative to return.
+      creative_rendering_request: str Request to see a creative rendering.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateCreativeRenderingRequest(
-        creative_rendering_request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, creative_rendering_request,
+        'CreativeRenderingRequest')
 
     method_name = 'getCreativeRenderings'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_rendering_request,
-                                                  'creativeRenderingRequest',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  creative_rendering_request, 'creativeRenderingRequest',
+                  self._wsdl_types_map, True, 'CreativeRenderingRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -427,22 +510,25 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetRichMediaPreviewURL(self, creative_id):
-    """Return generated default external preview URL for the saved rich media
-    creative.
+    """Returns generated default external preview URL for a rich media creative.
 
     Args:
       creative_id: str Id of the creative.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((creative_id, (str, unicode)),))
 
     method_name = 'getRichMediaPreviewURL'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(creative_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -450,7 +536,7 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def ReplaceRichMediaAsset(self, old_asset_file_name, replace_request):
-    """Replace a rich media asset for a rich media creative.
+    """Replaces a rich media asset for a rich media creative.
 
     Args:
       old_asset_file_name: str Name of asset to replace.
@@ -458,20 +544,26 @@ class CreativeRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((old_asset_file_name, (str, unicode)),))
-    self._sanity_check.ValidateRichMediaAssetUploadRequest(replace_request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, replace_request, 'RichMediaAssetUploadRequest')
 
     method_name = 'replaceRichMediaAsset'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(old_asset_file_name,
-                                                  'assetFileName')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(replace_request,
-                                                  'replaceRequest', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  old_asset_file_name, 'assetFileName')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                replace_request, 'replaceRequest',
+                                self._wsdl_types_map, True,
+                                'RichMediaAssetUploadRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -479,7 +571,7 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def ReplaceRichMediaCreativePackage(self, creative_id, file_data):
-    """Replace the given creative package for the specified creative.
+    """Replaces the given creative package for the specified creative.
 
     Args:
       creative_id: str Id of the creative.
@@ -487,17 +579,22 @@ class CreativeRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((creative_id, (str, unicode)),
                                (file_data, (str, unicode))))
 
     method_name = 'replaceRichMediaCreativePackage'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_id, 'creativeId')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(file_data, 'fileData'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(creative_id, 'creativeId')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                file_data, 'fileData'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -505,7 +602,7 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SaveCreative(self, creative_base, campaign_id):
-    """Save given creative.
+    """Saves the given creative.
 
     Args:
       creative_base: dict Creative to save.
@@ -513,18 +610,26 @@ class CreativeRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateCreativeBase(creative_base)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, creative_base, 'CreativeBase')
+    DfaUtils.AssignCreativeXsi(creative_base)
     SanityCheck.ValidateTypes(((campaign_id, (str, unicode)),))
 
     method_name = 'saveCreative'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_base, 'creative', [],
-                                                  [], True)),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(campaign_id, 'campaignId'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  creative_base, 'creativeBase', self._wsdl_types_map, True,
+                  'CreativeBase')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                campaign_id, 'campaignId'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -532,23 +637,28 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SaveCreativeAsset(self, creative_asset):
-    """Save the given creative asset.
+    """Saves the given creative asset.
 
     Args:
       creative_asset: dict Creative asset to save.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateCreativeAsset(creative_asset)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, creative_asset, 'CreativeAsset')
 
     method_name = 'saveCreativeAsset'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_asset,
-                                                  'creativeAsset', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  creative_asset, 'creativeAsset', self._wsdl_types_map, True,
+                  'CreativeAsset'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -556,23 +666,28 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def UploadCreativeFiles(self, creative_upload_request):
-    """Upload creative files in the given creative upload session.
+    """Uploads creative files in the given creative upload session.
 
     Args:
       creative_upload_request: dict Creative upload request.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateCreativeUploadRequest(creative_upload_request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, creative_upload_request, 'CreativeUploadRequest')
 
     method_name = 'uploadCreativeFiles'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(creative_upload_request,
-                                                  'creativeUploadRequest',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  creative_upload_request, 'creativeUploadRequest',
+                  self._wsdl_types_map, True, 'CreativeUploadRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -580,23 +695,28 @@ class CreativeRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def UploadRichMediaAsset(self, upload_request):
-    """Upload a new rich media asset for a rich media creative.
+    """Uploads a new rich media asset for a rich media creative.
 
     Args:
       upload_request: dict Rich media asset to upload
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateRichMediaAssetUploadRequest(upload_request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, upload_request, 'RichMediaAssetUploadRequest')
 
     method_name = 'uploadRichMediaAsset'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(upload_request,
-                                                  'richMediaAssetUploadRequest',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  upload_request, 'richMediaAssetUploadRequest',
+                  self._wsdl_types_map, True, 'RichMediaAssetUploadRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -605,7 +725,7 @@ class CreativeRemoteService(ApiService):
 
   def UploadRichMediaCreativePackage(self, advertiser_id, file_data,
                                      upload_as_flash_in_flash_creative):
-    """Upload the given rich media creative package.
+    """Uploads the given rich media creative package.
 
     Args:
       advertiser_id: str Id of the advertiser.
@@ -615,6 +735,10 @@ class CreativeRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes((
         (advertiser_id, (str, unicode)), (file_data, (str, unicode)),
@@ -622,16 +746,17 @@ class CreativeRemoteService(ApiService):
 
     method_name = 'uploadRichMediaCreativePackage'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(advertiser_id,
-                                                  'advertiserId')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(file_data, 'fileData')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
-                  upload_as_flash_in_flash_creative,
-                  'uploadAsFlashInFlashCreative', [], [], True)),))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(advertiser_id,
+                                                 'advertiserId')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                file_data, 'fileData')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                upload_as_flash_in_flash_creative,
+                                'uploadAsFlashInFlashCreative', [], True)),))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

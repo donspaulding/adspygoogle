@@ -30,15 +30,15 @@ def ValidateServer(server, version):
     version: str API version being used to access the server.
   """
   # Map of supported API servers and versions.
-  prod = {'v1.11': 'http://advertisersapi.doubleclick.net',
-          'v1.12': 'http://advertisersapi.doubleclick.net',
-          'v1.13': 'http://advertisersapi.doubleclick.net'}
-  beta = {'v1.11': 'http://betaadvertisersapi.doubleclick.net',
-          'v1.12': 'http://betaadvertisersapi.doubleclick.net',
-          'v1.13': 'http://betaadvertisersapi.doubleclick.net'}
-  test = {'v1.11': 'http://advertisersapitest.doubleclick.net',
-          'v1.12': 'http://advertisersapitest.doubleclick.net',
-          'v1.13': 'http://advertisersapitest.doubleclick.net'}
+  prod = {'v1.12': 'http://advertisersapi.doubleclick.net',
+          'v1.13': 'http://advertisersapi.doubleclick.net',
+          'v1.14': 'http://advertisersapi.doubleclick.net'}
+  beta = {'v1.12': 'http://betaadvertisersapi.doubleclick.net',
+          'v1.13': 'http://betaadvertisersapi.doubleclick.net',
+          'v1.14': 'http://betaadvertisersapi.doubleclick.net'}
+  test = {'v1.12': 'http://advertisersapitest.doubleclick.net',
+          'v1.13': 'http://advertisersapitest.doubleclick.net',
+          'v1.14': 'http://advertisersapitest.doubleclick.net'}
 
   if (server not in prod.values() and server not in beta.values() and
       server not in test.values()):

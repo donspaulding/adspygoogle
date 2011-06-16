@@ -25,14 +25,73 @@ sys.path.append(os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.common import Utils
+from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_11
 from tests.adspygoogle.dfa import SERVER_V1_12
 from tests.adspygoogle.dfa import SERVER_V1_13
-from tests.adspygoogle.dfa import VERSION_V1_11
+from tests.adspygoogle.dfa import SERVER_V1_14
+from tests.adspygoogle.dfa import TEST_VERSION_V1_12
+from tests.adspygoogle.dfa import TEST_VERSION_V1_13
+from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_12
 from tests.adspygoogle.dfa import VERSION_V1_13
-from tests.adspygoogle.dfa import client
+from tests.adspygoogle.dfa import VERSION_V1_14
+
+
+class StrategyServiceTestV1_14(unittest.TestCase):
+
+  """Unittest suite for StrategyService using v1_14."""
+
+  SERVER = SERVER_V1_14
+  VERSION = VERSION_V1_14
+  client.debug = False
+  service = None
+  strategy_id = '0'
+
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
+    if not self.__class__.service:
+      self.__class__.service = client.GetStrategyService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+
+  def testGetPlacementStrategy(self):
+    """Test whether we can fetch a placement strategy by id"""
+    if self.__class__.strategy_id == '0':
+      self.testSavePlacementStrategy()
+    strategy_id = self.__class__.strategy_id
+    self.assert_(isinstance(self.__class__.service.GetPlacementStrategy(
+        strategy_id), tuple))
+
+  def testSavePlacementStrategy(self):
+    """Test whether we can save a placement strategy"""
+    placement_strategy = {
+        'name': 'Placement Strategy #%s' % Utils.GetUniqueName(),
+        'id' : '-1'
+    }
+    placement_strategy = self.__class__.service.SavePlacementStrategy(
+        placement_strategy)
+    self.__class__.strategy_id = placement_strategy[0]['id']
+    self.assert_(isinstance(placement_strategy, tuple))
+
+  def testGetPlacementStrategiesByCriteria(self):
+    """Test whether we can fetch placement strategies by criteria."""
+    if self.__class__.strategy_id == '0':
+      self.testSavePlacementStrategy()
+    search_criteria = {
+        'ids': [self.__class__.strategy_id]
+    }
+    self.__class__.strategy_id = \
+        self.__class__.service.GetPlacementStrategiesByCriteria(
+            search_criteria)[0]['records'][0]['id']
+
+  def testDeletePlacementStrategy(self):
+    """Test whether we can delete a placement strategy"""
+    if self.__class__.strategy_id == '0':
+      self.testSavePlacementStrategy()
+    self.assertEqual(self.__class__.service.DeletePlacementStrategy(
+        self.__class__.strategy_id), None)
+    self.__class__.strategy_id = '0'
 
 
 class StrategyServiceTestV1_13(unittest.TestCase):
@@ -147,60 +206,16 @@ class StrategyServiceTestV1_12(unittest.TestCase):
     self.__class__.strategy_id = '0'
 
 
-class StrategyServiceTestV1_11(unittest.TestCase):
+def makeTestSuiteV1_14():
+  """Set up test suite using v1_14.
 
-  """Unittest suite for StrategyService using v1_11."""
+  Returns:
+    TestSuite test suite using v1_14.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(StrategyServiceTestV1_14))
+  return suite
 
-  SERVER = SERVER_V1_11
-  VERSION = VERSION_V1_11
-  client.debug = False
-  service = None
-  strategy_id = '0'
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetStrategyService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testGetPlacementStrategy(self):
-    """Test whether we can fetch a placement strategy by id"""
-    if self.__class__.strategy_id == '0':
-      self.testSavePlacementStrategy()
-    strategy_id = self.__class__.strategy_id
-    self.assert_(isinstance(self.__class__.service.GetPlacementStrategy(
-        strategy_id), tuple))
-
-  def testSavePlacementStrategy(self):
-    """Test whether we can save a placement strategy"""
-    placement_strategy = {
-        'name': 'Placement Strategy #%s' % Utils.GetUniqueName(),
-        'id' : '-1'
-    }
-    placement_strategy = self.__class__.service.SavePlacementStrategy(
-        placement_strategy)
-    self.__class__.strategy_id = placement_strategy[0]['id']
-    self.assert_(isinstance(placement_strategy, tuple))
-
-  def testGetPlacementStrategiesByCriteria(self):
-    """Test whether we can fetch placement strategies by criteria."""
-    if self.__class__.strategy_id == '0':
-      self.testSavePlacementStrategy()
-    search_criteria = {
-        'ids': [self.__class__.strategy_id]
-    }
-    self.__class__.strategy_id = \
-        self.__class__.service.GetPlacementStrategiesByCriteria(
-            search_criteria)[0]['records'][0]['id']
-
-  def testDeletePlacementStrategy(self):
-    """Test whether we can delete a placement strategy"""
-    if self.__class__.strategy_id == '0':
-      self.testSavePlacementStrategy()
-    self.assertEqual(self.__class__.service.DeletePlacementStrategy(
-        self.__class__.strategy_id), None)
-    self.__class__.strategy_id = '0'
 
 
 def makeTestSuiteV1_13():
@@ -214,7 +229,6 @@ def makeTestSuiteV1_13():
   return suite
 
 
-
 def makeTestSuiteV1_12():
   """Set up test suite using v1_12.
 
@@ -226,20 +240,14 @@ def makeTestSuiteV1_12():
   return suite
 
 
-def makeTestSuiteV1_11():
-  """Set up test suite using v1_11.
-
-  Returns:
-    TestSuite test suite using v1_11.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(StrategyServiceTestV1_11))
-  return suite
-
-
 if __name__ == '__main__':
-  suite_v1_13 = makeTestSuiteV1_13()
-  suite_v1_12 = makeTestSuiteV1_12()
-  suite_v1_11 = makeTestSuiteV1_11()
-  alltests = unittest.TestSuite([suite_v1_13, suite_v1_12, suite_v1_11])
-  unittest.main(defaultTest='alltests')
+  suites = []
+  if TEST_VERSION_V1_14:
+    suites.append(makeTestSuiteV1_14())
+  if TEST_VERSION_V1_13:
+    suites.append(makeTestSuiteV1_13())
+  if TEST_VERSION_V1_12:
+    suites.append(makeTestSuiteV1_12())
+  if suites:
+    alltests = unittest.TestSuite(suites)
+    unittest.main(defaultTest='alltests')

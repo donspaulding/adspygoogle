@@ -1,3 +1,19 @@
+2.0.0:
+- Added scripts to generate pickled dictionaries representing the WSDL.
+- Added the ability to validate types against the WSDL.
+- Added ZSI Transformation layer to automatically turn python objects into ZSI-
+  compatible form.
+- Reworked SanityCheck and SOAPpy MessageHandler to take advantage of the WSDL
+  definitions.
+
+1.1.7:
+- Added support for complex SOAP headers.
+
+1.1.6:
+- Update Utils.GetUniqueName() to support name length. Reverted how construction
+  of the unique name is done to make it more random for names with shorter
+  length.
+
 1.1.5:
 - Added Utils.GetDictFromCsvFile() method.
 - Patch to pack NoneTypes as 'xsi3:nil="true"' in SOAPpy

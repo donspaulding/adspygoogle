@@ -125,6 +125,7 @@ class Client(object):
         'raw_response': 'n',
         'strict': 'y',
         'auth_token_epoch': 0,
+        'auth_type': '',
         'pretty_xml': 'y',
         'compress': 'y',
         'data_injects': (),
@@ -178,7 +179,7 @@ class Client(object):
     Args:
       new_state: bool New state of the debug mode.
     """
-    self._config['debug'] = Utils.BoolTypeConvert(new_state)
+    self._config['debug'] = Utils.BoolTypeConvert(new_state, str)
 
   def __GetDebug(self):
     """Return current state of the debug mode.
@@ -194,7 +195,7 @@ class Client(object):
     Args:
       new_state: bool New state of the debug mode.
     """
-    self._config['debug'] = Utils.BoolTypeConvert(new_state)
+    self._config['debug'] = Utils.BoolTypeConvert(new_state, str)
 
   debug = property(__GetDebug, __SetDebug)
 
@@ -212,7 +213,7 @@ class Client(object):
     Args:
       new_state: bool New state of the raw debug mode.
     """
-    self._config['raw_debug'] = Utils.BoolTypeConvert(new_state)
+    self._config['raw_debug'] = Utils.BoolTypeConvert(new_state, str)
 
   raw_debug = property(__GetRawDebug, __SetRawDebug)
 
@@ -230,7 +231,7 @@ class Client(object):
     Args:
       new_state: bool New state of the strictness mode.
     """
-    self._config['strict'] = Utils.BoolTypeConvert(new_state)
+    self._config['strict'] = Utils.BoolTypeConvert(new_state, str)
 
   strict = property(__GetUseStrict, __SetUseStrict)
 

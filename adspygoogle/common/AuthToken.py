@@ -66,22 +66,41 @@ class AuthToken(object):
             ('source', self.__source)]
     try:
       fh = urllib.urlopen(url, urllib.urlencode(data))
+      data = self.__ParseResponse(fh)
       try:
-        tag, msg = fh.readline().split('=')
-        if tag in ('SID', 'LSID', 'Auth'):
-          self.__sid = msg.strip()
-          self.__lsid = fh.readline().split('=')[1].strip()
-          self.__auth = fh.readline().split('=')[1].strip()
-        elif tag in ('Error',):
-          raise AuthTokenError(msg.strip())
-        elif tag in ('CaptchaToken',):
-          raise AuthTokenError('Captcha token is %s' % msg.strip())
+        if 'SID' in data or 'LSID' in data or 'Auth' in data:
+          self.__sid = data.get('SID', '')
+          self.__lsid = data.get('LSID', '')
+          self.__auth = data.get('Auth', '')
+        elif 'Error' in data:
+          msg = data['Error'].strip()
+          if 'Info' in data:
+            msg = msg + ' Additional Info: ' + data['Info'].strip()
+          raise AuthTokenError(msg)
+        elif 'CaptchaToken' in data:
+          raise AuthTokenError('Captcha token is %s'
+                               % data['CaptchaToken'].strip())
         else:
-          raise AuthTokenError(msg.strip())
+          raise AuthTokenError('Unexpected response: ' + str(data))
       finally:
         fh.close()
     except IOError, e:
       raise AuthTokenError(e)
+
+  def __ParseResponse(self, fh):
+    """Processes the ClientLogin response into a dict.
+
+    Args:
+      fh: file The file object representing the ClientLogin response.
+
+    Returns:
+      dict Dictionary containing the response in key-value format.
+    """
+    ret = {}
+    for line in fh:
+      key, value = line.split('=')
+      ret[key] = value
+    return ret
 
   def GetSidToken(self):
     """Return SID cookie.

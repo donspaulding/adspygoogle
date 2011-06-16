@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2010 Google Inc. All Rights Reserved.
+# Copyright 2011 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,6 +41,10 @@ class ApiService(object):
       import_chain: str Import chain of the wrapper for web service.
       lock: thread.lock Thread lock
       logger: Logger Instance of Logger
+
+    Raises:
+      ValidationError: The API version in op_config is not supported by the
+                       ZSI-generated code for this product.
     """
     ToolkitSanityCheck = None
     API_VERSIONS = []
@@ -48,13 +52,28 @@ class ApiService(object):
     self._op_config = op_config
     if config['soap_lib'] == SOAPPY:
       from adspygoogle.common.soappy import MessageHandler
-      exec ('from %s.soappy import SanityCheck as ToolkitSanityCheck'
-            % import_chain)
-      self._web_services = None
       self._message_handler = MessageHandler
+      self._web_services = None
+      # Attempt to import SOAPpy SanityCheck. Required for backwards
+      # compatibility. Eventually, no library should have toolkit specific
+      # sanity checks.
+      try:
+        exec ('from %s.soappy import SanityCheck as ToolkitSanityCheck'
+              % import_chain)
+      except ImportError, e:
+        pass
     elif config['soap_lib'] == ZSI:
+      from adspygoogle.common.zsi import Transformation
+      self._transformation = Transformation
+      # Attempt to import ZSI SanityCheck. Required for backwards
+      # compatibility. Eventually, no library should have toolkit specific
+      # sanity checks.
+      try:
+        exec ('from %s.zsi import SanityCheck as ToolkitSanityCheck'
+              % import_chain)
+      except ImportError, e:
+        pass
       exec 'from %s import API_VERSIONS' % import_chain
-      exec 'from %s.zsi import SanityCheck as ToolkitSanityCheck' % import_chain
       if op_config['version'] in API_VERSIONS:
         module = '%s_services' % self.__class__.__name__
         try:

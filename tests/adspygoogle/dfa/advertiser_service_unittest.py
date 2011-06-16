@@ -25,14 +25,73 @@ sys.path.append(os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.common import Utils
+from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_11
 from tests.adspygoogle.dfa import SERVER_V1_12
 from tests.adspygoogle.dfa import SERVER_V1_13
-from tests.adspygoogle.dfa import VERSION_V1_11
+from tests.adspygoogle.dfa import SERVER_V1_14
+from tests.adspygoogle.dfa import TEST_VERSION_V1_12
+from tests.adspygoogle.dfa import TEST_VERSION_V1_13
+from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_12
 from tests.adspygoogle.dfa import VERSION_V1_13
-from tests.adspygoogle.dfa import client
+from tests.adspygoogle.dfa import VERSION_V1_14
+
+
+class AdvertiserServiceTestV1_14(unittest.TestCase):
+
+  """Unittest suite for AdvertiserService using v1_14."""
+
+  SERVER = SERVER_V1_14
+  VERSION = VERSION_V1_14
+  client.debug = False
+  service = None
+  advertiser1 = None
+  advertiser2 = None
+
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
+    if not self.__class__.service:
+      self.__class__.service = client.GetAdvertiserService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+
+  def testDeleteAdvertiser(self):
+    """Test whether we can delete an advertiser."""
+    if self.__class__.advertiser2 is None:
+      self.testSaveAdvertiser()
+    self.assertEqual(self.__class__.service.DeleteAdvertiser(
+        self.__class__.advertiser2['id']), None)
+
+  def testGetAdvertisers(self):
+    """Test whether we can fetch advertisers."""
+    if self.__class__.advertiser1 is None:
+      self.testSaveAdvertiser()
+    search_criteria = {
+        'ids': [self.__class__.advertiser1['id']]
+    }
+    self.__class__.advertiser_id = self.__class__.service.GetAdvertisers(
+        search_criteria)[0]['records'][0]['id']
+
+  def testSaveAdvertiser(self):
+    """Test whether we can create an advertiser."""
+    advertiser = {
+        'name': 'Advertiser #%s' % Utils.GetUniqueName(),
+        'approved': 'true',
+        'hidden': 'false'
+    }
+    advertiser = self.__class__.service.SaveAdvertiser(advertiser)
+    self.__class__.advertiser1 = advertiser[0]
+    self.assert_(isinstance(advertiser, tuple))
+
+    advertiser = {
+        'name': '广告客户 #%s' % Utils.GetUniqueName(),
+        'approved': 'true',
+        'hidden': 'false'
+    }
+    advertiser = self.__class__.service.SaveAdvertiser(advertiser)
+    self.__class__.advertiser2 = advertiser[0]
+    self.assert_(isinstance(advertiser, tuple))
 
 
 class AdvertiserServiceTestV1_13(unittest.TestCase):
@@ -147,60 +206,15 @@ class AdvertiserServiceTestV1_12(unittest.TestCase):
     self.assert_(isinstance(advertiser, tuple))
 
 
-class AdvertiserServiceTestV1_11(unittest.TestCase):
+def makeTestSuiteV1_14():
+  """Set up test suite using v1_14.
 
-  """Unittest suite for AdvertiserService using v1_11."""
-
-  SERVER = SERVER_V1_11
-  VERSION = VERSION_V1_11
-  client.debug = False
-  service = None
-  advertiser1 = None
-  advertiser2 = None
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetAdvertiserService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testDeleteAdvertiser(self):
-    """Test whether we can delete an advertiser."""
-    if self.__class__.advertiser2 is None:
-      self.testSaveAdvertiser()
-    self.assertEqual(self.__class__.service.DeleteAdvertiser(
-        self.__class__.advertiser2['id']), None)
-
-  def testGetAdvertisers(self):
-    """Test whether we can fetch advertisers."""
-    if self.__class__.advertiser1 is None:
-      self.testSaveAdvertiser()
-    search_criteria = {
-        'ids': [self.__class__.advertiser1['id']]
-    }
-    self.__class__.advertiser_id = self.__class__.service.GetAdvertisers(
-        search_criteria)[0]['records'][0]['id']
-
-  def testSaveAdvertiser(self):
-    """Test whether we can create an advertiser."""
-    advertiser = {
-        'name': 'Advertiser #%s' % Utils.GetUniqueName(),
-        'approved': 'true',
-        'hidden': 'false'
-    }
-    advertiser = self.__class__.service.SaveAdvertiser(advertiser)
-    self.__class__.advertiser1 = advertiser[0]
-    self.assert_(isinstance(advertiser, tuple))
-
-    advertiser = {
-        'name': 'Advertiser #%s' % Utils.GetUniqueName(),
-        'approved': 'true',
-        'hidden': 'false'
-    }
-    advertiser = self.__class__.service.SaveAdvertiser(advertiser)
-    self.__class__.advertiser2 = advertiser[0]
-    self.assert_(isinstance(advertiser, tuple))
+  Returns:
+    TestSuite test suite using v1_14.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(AdvertiserServiceTestV1_14))
+  return suite
 
 
 def makeTestSuiteV1_13():
@@ -225,20 +239,14 @@ def makeTestSuiteV1_12():
   return suite
 
 
-def makeTestSuiteV1_11():
-  """Set up test suite using v1_11.
-
-  Returns:
-    TestSuite test suite using v1_11.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(AdvertiserServiceTestV1_11))
-  return suite
-
-
 if __name__ == '__main__':
-  suite_v1_13 = makeTestSuiteV1_13()
-  suite_v1_12 = makeTestSuiteV1_12()
-  suite_v1_11 = makeTestSuiteV1_11()
-  alltests = unittest.TestSuite([suite_v1_13, suite_v1_12, suite_v1_11])
-  unittest.main(defaultTest='alltests')
+  suites = []
+  if TEST_VERSION_V1_14:
+    suites.append(makeTestSuiteV1_14())
+  if TEST_VERSION_V1_13:
+    suites.append(makeTestSuiteV1_13())
+  if TEST_VERSION_V1_12:
+    suites.append(makeTestSuiteV1_12())
+  if suites:
+    alltests = unittest.TestSuite(suites)
+    unittest.main(defaultTest='alltests')

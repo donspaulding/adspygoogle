@@ -19,6 +19,7 @@
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import glob
+import inspect
 import os
 import sys
 sys.path.append(os.path.join('..', '..', '..'))
@@ -26,6 +27,9 @@ import unittest
 
 from adspygoogle.dfa import LIB_SIG
 from adspygoogle.common.Logger import Logger
+from tests.adspygoogle.dfa import TEST_VERSION_V1_12
+from tests.adspygoogle.dfa import TEST_VERSION_V1_13
+from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 
 
 LOG_NAME = 'dfa_api_lib'
@@ -36,7 +40,12 @@ suite = unittest.TestSuite()
 tests = [test[:-3] for test in glob.glob('*_unittest.py')]
 for test in tests:
   module = __import__(test)
-  suite.addTest(unittest.TestLoader().loadTestsFromModule(module))
+  for name, obj in inspect.getmembers(module):
+    if inspect.isclass(obj):
+      if ((name.endswith('1_12') and TEST_VERSION_V1_12) or
+          (name.endswith('1_13') and TEST_VERSION_V1_13) or
+          (name.endswith('1_14') and TEST_VERSION_V1_14)):
+        suite.addTest(unittest.makeSuite(obj))
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2010 Google Inc. All Rights Reserved.
+# Copyright 2011 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import urllib
 from urlparse import urlparse
 from urlparse import urlunparse
 
-from adspygoogle.common import SanityCheck
 from adspygoogle.common.AuthToken import AuthToken
 from adspygoogle.common.Buffer import Buffer
 from adspygoogle.common.Errors import Error
@@ -80,8 +79,10 @@ def GetDataFromCsvFile(loc):
 
 
 def GetDictFromCsvFile(loc):
-  """Get data from CSV file as a dictionary, given its location. For each row,
-  the first value will be used as a key mapped to the second value in the row.
+  """Get data from CSV file as a dictionary, given its location.
+
+  For each row, the first value will be used as a key mapped to the second value
+  in the row.
 
   Args:
     loc: str Location of the CSV data file.
@@ -252,6 +253,9 @@ def __ParseUrl(url):
 
   Args:
     url: str URL to parse.
+
+  Returns:
+    tuple The components of the given URL.
   """
   return urlparse(url)
 
@@ -261,6 +265,9 @@ def GetSchemeFromUrl(url):
 
   Args:
     url: str URL to parse.
+
+  Returns:
+    str The scheme portion of the URL.
   """
   return __ParseUrl(url)[0]
 
@@ -294,6 +301,9 @@ def GetServerFromUrl(url):
 
   Args:
     url: str URL to parse.
+
+  Returns:
+    str Scheme and netloc portion of given URL.
   """
   return urlunparse((GetSchemeFromUrl(url), GetNetLocFromUrl(url), '', '', '',
                      ''))
@@ -336,6 +346,8 @@ def UnLoadDictKeys(dct, keys_lst):
   Returns:
     dict New dictionary with out given keys.
   """
+  from adspygoogle.common import SanityCheck
+
   if not keys_lst: return dct
   SanityCheck.ValidateTypes(((dct, dict), (keys_lst, list)))
 
@@ -346,6 +358,7 @@ def UnLoadDictKeys(dct, keys_lst):
     new_dct[key] = dct[key]
   return new_dct
 
+
 def CleanUpDict(dct):
   """Return newly built dictionary with out the keys that point to no values.
 
@@ -355,6 +368,8 @@ def CleanUpDict(dct):
   Returns:
     dict New dictionary with out empty keys.
   """
+  from adspygoogle.common import SanityCheck
+
   SanityCheck.ValidateTypes(((dct, dict),))
 
   new_dct = {}
@@ -364,26 +379,37 @@ def CleanUpDict(dct):
   return new_dct
 
 
-def BoolTypeConvert(bool_type):
+def BoolTypeConvert(bool_type, target=bool):
   """Convert bool to local bool and vice versa.
 
   Args:
     bool_type: bool or str a type to convert (i.e. True<=>'y', False<=>'n',
                'true'=>True, 'false'=>False).
+    target: type (i.e. str or bool) for the return value, defaults to bool
 
   Returns:
-    bool or str converted type.
+    target boolean converted type.
+
+  Raises:
+    LookupError: Thrown when string value doesn't match one of: 1 y yes t true 0
+                 n no f false
   """
-  if isinstance(bool_type, bool):
+  if isinstance(bool_type, target):
+    return bool_type
+  elif isinstance(bool_type, bool) and target == str:
     if bool_type:
       return 'y'
     else:
       return 'n'
   elif isinstance(bool_type, str):
-    if bool_type == 'y' or bool_type.lower() == 'true':
-      return True
-    elif bool_type == 'n' or bool_type.lower() == 'false':
-      return False
+    if bool_type.lower() in '1 y yes t true'.split():
+      return target(True)
+    elif bool_type.lower() in '0 n no f false'.split():
+      return target(False)
+    else:
+      raise LookupError('unrecognized string boolean')
+  else:
+    return target(bool_type)
 
 
 def LastStackTrace():
@@ -419,12 +445,13 @@ def HtmlUnescape(text):
   Returns:
     str/unicode Plain text, as a Unicode string, if necessary.
   """
-  def fixup(m):
+  def FixUp(m):
+    """Helper function for HTML Unescaping."""
     text = m.group(0)
-    if text[:2] == "&#":
+    if text[:2] == '&#':
         # character reference
       try:
-        if text[:3] == "&#x":
+        if text[:3] == '&#x':
           return unichr(int(text[3:-1], 16))
         else:
           return unichr(int(text[2:-1]))
@@ -436,8 +463,8 @@ def HtmlUnescape(text):
         text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
       except KeyError:
         pass
-    return text # leave as is
-  return re.sub("&#?\w+;", fixup, text)
+    return text  # leave as is
+  return re.sub('&#?\w+;', FixUp, text)
 
 
 def HtmlEscape(text):
@@ -452,11 +479,11 @@ def HtmlEscape(text):
     str HTML escaped string.
   """
   html_escape_table = {
-    '&': '&amp;',
-    '"': '&quot;',
-    '\'': '&apos;',
-    '>': '&gt;',
-    '<': '&lt;'
+      '&': '&amp;',
+      '"': '&quot;',
+      '\'': '&apos;',
+      '>': '&gt;',
+      '<': '&lt;'
   }
   return ''.join(html_escape_table.get(char, char) for char in text)
 
@@ -483,27 +510,33 @@ def CsvEscape(text):
   """
   if not text: return ''
   if text.find('"') > -1: text = text.replace('"', '""')
-  if (text == '' or text.find(',') > -1 or text.find('"') > -1 or
+  if (not text or text.find(',') > -1 or text.find('"') > -1 or
       text.find('\n') > -1 or text.find('\r') > -1 or text[0] == ' ' or
       text[-1] == ' '):
     text = '"%s"' % text
   return text
 
 
-def GetUniqueName():
+def GetUniqueName(max_len=None):
   """Returns a unique value consisting of parts from datetime.datetime.now().
+
+  Args:
+    max_len: int Maximum length for the unique name.
 
   Returns:
     str Unique name.
   """
   dt = datetime.datetime.now()
-  return '%s%s%s%s%s%s%s' % (dt.year, dt.month, dt.day, dt.hour, dt.minute,
-                             dt.second, dt.microsecond)
+  name = '%s%s%s%s%s%s%s' % (dt.microsecond, dt.second, dt.minute, dt.hour,
+                             dt.day, dt.month, dt.year)
+  if max_len > len(name): max_len = len(name)
+  return name[:max_len]
 
 
 def GetDictFromMap(entries):
-  """Gets a dictionary from an array of map entries. A map entry is any object
-  that has a key and value fields.
+  """Gets a dictionary from an array of map entries.
+
+  A map entry is any object that has a key and value fields.
 
   Args:
     entries: list List of map entries.
@@ -515,3 +548,68 @@ def GetDictFromMap(entries):
   for entry in entries:
     dct[entry['key']] = entry['value']
   return dct
+
+
+def GenParamOrder(wsdl_types, xsi_type):
+  """Generates the order of parameters for a WSDL-defined type.
+
+  This function will place the parameters of a WSDL-defined type's base type
+  first, followed by the supertype's parameters.
+
+  Args:
+    wsdl_types: dict A map of all of the WSDL defined types in one service.
+    xsi_type: str Which WSDL-defined type to generate the order for.
+
+  Returns:
+    list Order of parameters for the given type.
+  """
+  order = []
+  if xsi_type in wsdl_types:
+    if wsdl_types[xsi_type]['base_type']:
+      order.extend(GenParamOrder(wsdl_types, wsdl_types[xsi_type]['base_type']))
+    order.extend(wsdl_types[xsi_type]['parameters'])
+  return order
+
+
+def IsXsdOrSoapenc(xsi_type):
+  """Checks to see if a type is in the xsd or soapenc namespaces.
+
+  This function is based on the fact that the WSDL-parsing scripts remove all
+  namespaces except xsd and soapenc.
+
+  Args:
+    xsi_type: str The xsi type of an object from a WSDL.
+
+  Returns:
+    bool Whether or not the given type is in the xsd or soapenc namespaces.
+  """
+  return xsi_type.find(':') > -1
+
+
+def GetExplicitType(wsdl_types, obj, xsi_type):
+  """Returns the explicit type specified within a complex type, if one exists.
+
+  Args:
+    wsdl_types: dict WSDL-defined types in the same service as the given type.
+    obj: dict Object that represents an instance of the given type.
+    xsi_type: str The complex type name defined in the WSDL.
+
+  Returns:
+    obj_contained_type: str The xsi type explicitly specified in the given
+                        object. Will be the empty string if no type was
+                        specified.
+    contained_type_key: str The dictionary key in the given object which houses
+                        its specified xsi type. Will be the empty string if no
+                        type was specified.
+  """
+  obj_contained_type = contained_type_key = ''
+  for key in obj:
+    if ((key == 'xsi_type' or key == 'type' or key.find('.Type') > -1 or
+         key.find('_Type') > -1) and not
+        (key == 'type' and ('xsi_type' in obj or
+                            (xsi_type in wsdl_types and
+                             wsdl_types[xsi_type]['has_native_type'])))):
+      obj_contained_type = obj[key]
+      contained_type_key = key
+      break
+  return obj_contained_type, contained_type_key

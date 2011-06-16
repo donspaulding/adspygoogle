@@ -16,14 +16,15 @@
 
 """Methods to access StrategyRemoteService service."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
 
@@ -50,26 +51,32 @@ class StrategyRemoteService(ApiService):
            'api/dfa-api/strategy']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(StrategyRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def DeletePlacementStrategy(self, placement_strategy_id):
-    """Delete placement strategy for given id.
+    """Deletes the placement strategy for given id.
 
     Args:
       placement_strategy_id: str Id of the placement strategy to delete.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((placement_strategy_id, (str, unicode)),))
 
     method_name = 'deletePlacementStrategy'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(placement_strategy_id,
-                                                  'id'))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(placement_strategy_id,
+                                                 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -78,7 +85,7 @@ class StrategyRemoteService(ApiService):
 
   def GetPlacementStrategiesByCriteria(self,
                                        placement_strategy_search_criteria):
-    """Return placement strategy matching given criteria.
+    """Returns the placement strategy matching given criteria.
 
     Args:
       placement_strategy_search_criteria: dict Search criteria to match
@@ -86,17 +93,23 @@ class StrategyRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidatePlacementStrategySearchCriteria(
-        placement_strategy_search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, placement_strategy_search_criteria,
+        'PlacementStrategySearchCriteria')
 
     method_name = 'getPlacementStrategiesByCriteria'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
                   placement_strategy_search_criteria,
-                  'placementStrategySearchCriteria', [], [], True))))
+                  'placementStrategySearchCriteria', self._wsdl_types_map, True,
+                  'PlacementStrategySearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -104,22 +117,25 @@ class StrategyRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetPlacementStrategy(self, placement_strategy_id):
-    """Return placement strategy for given id.
+    """Returns the placement strategy for given id.
 
     Args:
       placement_strategy_id: str Id of the placement strategy to return.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((placement_strategy_id, (str, unicode)),))
 
     method_name = 'getPlacementStrategy'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(placement_strategy_id,
-                                                  'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(placement_strategy_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -127,23 +143,28 @@ class StrategyRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SavePlacementStrategy(self, placement_strategy):
-    """Save given placement strategy.
+    """Saves the given placement strategy.
 
     Args:
       placement_strategy: dict Placement strategy to save.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidatePlacementStrategy(placement_strategy)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, placement_strategy, 'PlacementStrategy')
 
     method_name = 'savePlacementStrategy'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(placement_strategy,
-                                                  'placementStrategy', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  placement_strategy, 'placementStrategy', self._wsdl_types_map,
+                  True, 'PlacementStrategy'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

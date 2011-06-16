@@ -25,14 +25,61 @@ sys.path.append(os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.common import Utils
+from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_11
 from tests.adspygoogle.dfa import SERVER_V1_12
 from tests.adspygoogle.dfa import SERVER_V1_13
-from tests.adspygoogle.dfa import VERSION_V1_11
+from tests.adspygoogle.dfa import SERVER_V1_14
+from tests.adspygoogle.dfa import TEST_VERSION_V1_12
+from tests.adspygoogle.dfa import TEST_VERSION_V1_13
+from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_12
 from tests.adspygoogle.dfa import VERSION_V1_13
-from tests.adspygoogle.dfa import client
+from tests.adspygoogle.dfa import VERSION_V1_14
+
+
+class DfaLoggerTestV1_14(unittest.TestCase):
+
+  """Unittest suite for Logger using v1_14."""
+
+  SERVER = SERVER_V1_14
+  VERSION = VERSION_V1_14
+  TMP_LOG = os.path.join('..', '..', '..', 'logs', 'logger_unittest.log')
+  DEBUG_MSG1 = 'Message before call to an API method.'
+  DEBUG_MSG2 = 'Message after call to an API method.'
+  client.debug = False
+
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
+
+  def testUpperStackLogging(self):
+    """Tests whether we can define logger at client level and log before and
+    after the API request is made.
+    """
+    logger = logging.getLogger(self.__class__.__name__)
+    logger.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(self.__class__.TMP_LOG)
+    fh.setLevel(logging.DEBUG)
+    logger.addHandler(fh)
+
+    # Clean up temporary log file.
+    Utils.PurgeLog(self.__class__.TMP_LOG)
+
+    logger.debug(self.__class__.DEBUG_MSG1)
+    advertiser_service = client.GetAdvertiserService(
+        self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+    advertiser_service.GetAdvertisers({})
+    logger.debug(self.__class__.DEBUG_MSG2)
+
+    data = Utils.ReadFile(self.__class__.TMP_LOG)
+    self.assertEqual(data.find(self.__class__.DEBUG_MSG1), 0)
+    self.assertEqual(data.find(self.__class__.DEBUG_MSG2),
+                     len(self.__class__.DEBUG_MSG1) + 1)
+
+    # Clean up and remove temporary log file.
+    Utils.PurgeLog(self.__class__.TMP_LOG)
+    os.remove(self.__class__.TMP_LOG)
 
 
 class DfaLoggerTestV1_13(unittest.TestCase):
@@ -123,48 +170,15 @@ class DfaLoggerTestV1_12(unittest.TestCase):
     os.remove(self.__class__.TMP_LOG)
 
 
-class DfaLoggerTestV1_11(unittest.TestCase):
+def makeTestSuiteV1_14():
+  """Set up test suite using v1_14.
 
-  """Unittest suite for Logger using v1_11."""
-
-  SERVER = SERVER_V1_11
-  VERSION = VERSION_V1_11
-  TMP_LOG = os.path.join('..', '..', '..', 'logs', 'logger_unittest.log')
-  DEBUG_MSG1 = 'Message before call to an API method.'
-  DEBUG_MSG2 = 'Message after call to an API method.'
-  client.debug = False
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-
-  def testUpperStackLogging(self):
-    """Tests whether we can define logger at client level and log before and
-    after the API request is made.
-    """
-    logger = logging.getLogger(self.__class__.__name__)
-    logger.setLevel(logging.DEBUG)
-    fh = logging.FileHandler(self.__class__.TMP_LOG)
-    fh.setLevel(logging.DEBUG)
-    logger.addHandler(fh)
-
-    # Clean up temporary log file.
-    Utils.PurgeLog(self.__class__.TMP_LOG)
-
-    logger.debug(self.__class__.DEBUG_MSG1)
-    advertiser_service = client.GetAdvertiserService(
-        self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-    advertiser_service.GetAdvertisers({})
-    logger.debug(self.__class__.DEBUG_MSG2)
-
-    data = Utils.ReadFile(self.__class__.TMP_LOG)
-    self.assertEqual(data.find(self.__class__.DEBUG_MSG1), 0)
-    self.assertEqual(data.find(self.__class__.DEBUG_MSG2),
-                     len(self.__class__.DEBUG_MSG1) + 1)
-
-    # Clean up and remove temporary log file.
-    Utils.PurgeLog(self.__class__.TMP_LOG)
-    os.remove(self.__class__.TMP_LOG)
+  Returns:
+    TestSuite test suite using v1_14.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(DfaLoggerTestV1_14))
+  return suite
 
 
 def makeTestSuiteV1_13():
@@ -189,20 +203,14 @@ def makeTestSuiteV1_12():
   return suite
 
 
-def makeTestSuiteV1_11():
-  """Set up test suite using v1_11.
-
-  Returns:
-    TestSuite test suite using v1_11.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(DfaLoggerTestV1_11))
-  return suite
-
-
 if __name__ == '__main__':
-  suite_v1_13 = makeTestSuiteV1_13()
-  suite_v1_12 = makeTestSuiteV1_12()
-  suite_v1_11 = makeTestSuiteV1_11()
-  alltests = unittest.TestSuite([suite_v1_13, suite_v1_12, suite_v1_11])
-  unittest.main(defaultTest='alltests')
+  suites = []
+  if TEST_VERSION_V1_14:
+    suites.append(makeTestSuiteV1_14())
+  if TEST_VERSION_V1_13:
+    suites.append(makeTestSuiteV1_13())
+  if TEST_VERSION_V1_12:
+    suites.append(makeTestSuiteV1_12())
+  if suites:
+    alltests = unittest.TestSuite(suites)
+    unittest.main(defaultTest='alltests')

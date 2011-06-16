@@ -16,14 +16,15 @@
 
 """Methods to access LoginRemoteService service."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
 
@@ -53,11 +54,13 @@ class LoginRemoteService(ApiService):
     url = [op_config['server'], op_config['version'], 'api/dfa-api/login']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(LoginRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def Authenticate(self, username, password):
-    """Return the profile for authenticated credentials.
+    """Returns the profile for authenticated credentials.
 
     Args:
       username: str Account's user name.
@@ -65,17 +68,22 @@ class LoginRemoteService(ApiService):
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((username, (str, unicode)),
                                (password, (str, unicode))))
 
     method_name = 'authenticate'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(username, 'username')),
-          self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(password, 'password'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(username, 'username')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                password, 'password'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -83,23 +91,28 @@ class LoginRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def ChangePassword(self, change_password_request):
-    """Change password for a given user.
+    """Changes the password for a given user.
 
     Args:
       change_password_request: dict Change password request.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateChangePasswordRequest(change_password_request)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, change_password_request, 'ChangePasswordRequest')
 
     method_name = 'changePassword'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(change_password_request,
-                                                  'changePasswordRequest',
-                                                  [], [], True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  change_password_request, 'changePasswordRequest',
+                  self._wsdl_types_map, True, 'ChangePasswordRequest'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -107,15 +120,19 @@ class LoginRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def ImpersonateNetwork(self, username, token, network_id):
-    """Impersonate given network.
+    """Impersonates a given network.
 
     Args:
-      user_name: str Super user's login.
+      username: str Super user's login.
       token: str Super user's authentication token.
       network_id: str Id of the network to impersonate.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((username, (str, unicode)),
                                (token, (str, unicode)),
@@ -123,13 +140,14 @@ class LoginRemoteService(ApiService):
 
     method_name = 'impersonateNetwork'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(username, 'username')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(token, 'token')),
-          self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(network_id, 'networkId'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(username, 'username')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(token, 'token')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                network_id, 'networkId'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -137,15 +155,19 @@ class LoginRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def ImpersonateUser(self, username, token, user_to_impersonate):
-    """Impersonate given network.
+    """Impersonates a given user.
 
     Args:
-      user_name: str Super user's login.
+      username: str Super user's login.
       token: str Super user's authentication token.
       user_to_impersonate: str User to impersonate.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((username, (str, unicode)),
                                (token, (str, unicode)),
@@ -153,14 +175,14 @@ class LoginRemoteService(ApiService):
 
     method_name = 'impersonateUser'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(username, 'username')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(token, 'token')),
-           self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(user_to_impersonate,
-                                                  'username'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(username, 'username')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(token, 'token')),
+                        self._sanity_check.SoappySanityCheck.UnType(
+                            self._message_handler.PackVarAsXml(
+                                user_to_impersonate, 'username'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

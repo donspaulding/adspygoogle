@@ -26,14 +26,167 @@ sys.path.append(os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.common import Utils
+from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_11
 from tests.adspygoogle.dfa import SERVER_V1_12
 from tests.adspygoogle.dfa import SERVER_V1_13
-from tests.adspygoogle.dfa import VERSION_V1_11
+from tests.adspygoogle.dfa import SERVER_V1_14
+from tests.adspygoogle.dfa import TEST_VERSION_V1_12
+from tests.adspygoogle.dfa import TEST_VERSION_V1_13
+from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_12
 from tests.adspygoogle.dfa import VERSION_V1_13
-from tests.adspygoogle.dfa import client
+from tests.adspygoogle.dfa import VERSION_V1_14
+
+
+class CampaignServiceTestV1_14(unittest.TestCase):
+
+  """Unittest suite for CampaignService using v1_14."""
+
+  SERVER = SERVER_V1_14
+  VERSION = VERSION_V1_14
+  client.debug = False
+  service = None
+  campaign1 = None
+  campaign2 = None
+  advertiser_id = '0'
+  landing_page_id = '0'
+
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
+    if not self.__class__.service:
+      self.__class__.service = client.GetCampaignService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+
+    if self.__class__.advertiser_id == '0':
+      advertiser_service = client.GetAdvertiserService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+      search_criteria = {}
+      self.__class__.advertiser_id = advertiser_service.GetAdvertisers(
+          search_criteria)[0]['records'][0]['id']
+
+  def testAddLandingPageToCampaign(self):
+    """Test whether we can add a landing page to campaign."""
+    if self.__class__.campaign1 is None:
+      self.testSaveCampaign()
+    landing_page = {
+        'id': '-1',
+        'url': 'http://www.example.com',
+        'name': 'Landing page #%s' % Utils.GetUniqueName()
+    }
+    self.assert_(isinstance(self.__class__.service.AddLandingPageToCampaign(
+        self.__class__.campaign1['id'], [landing_page]), tuple))
+
+  def testCopyCampaigns(self):
+    """Test whether we can copy campaigns."""
+    if self.__class__.campaign1 is None:
+      self.testSaveCampaign()
+    requests = [{
+        'campaignId': self.__class__.campaign1['id']
+    }]
+    self.assert_(isinstance(self.__class__.service.CopyCampaigns(requests),
+                            tuple))
+
+  def testDeleteCampaign(self):
+    """Test whether we can delete a campaign."""
+    if self.__class__.campaign2 is None:
+      self.testSaveCampaign()
+    self.assertEqual(self.__class__.service.DeleteCampaign(
+        self.__class__.campaign2['id']), None)
+
+  def testGetCampaign(self):
+    """Test whether we can fetch a campaign."""
+    if self.__class__.campaign1 is None:
+      self.testSaveCampaign()
+    self.assert_(isinstance(self.__class__.service.GetCampaign(
+        self.__class__.campaign1['id']), tuple))
+
+  def testGetCampaignsByCriteria(self):
+    """Test whether we can fetch campaigns by criteria."""
+    criteria = {
+        'archiveFilter': {
+            'inactiveOnly': 'true'
+        }
+    }
+    self.assert_(isinstance(self.__class__.service.GetCampaignsByCriteria(
+        criteria), tuple))
+
+  def testGetLandingPagesForCampaign(self):
+    """Test whether we can fetch landing pages for a campaign."""
+    if self.__class__.campaign1 is None:
+      self.testSaveCampaign()
+    self.assert_(isinstance(self.__class__.service.GetLandingPagesForCampaign(
+        self.__class__.campaign1['id']), tuple))
+
+  def testSaveCampaign(self):
+    """Test whether we can create a campaign."""
+    self.testSaveLandingPage()
+    dt = datetime.datetime.now()
+    campaign = {
+        'advertiserId': self.__class__.advertiser_id,
+        'archived': 'false',
+        'name': 'Campaign #%s' % Utils.GetUniqueName(),
+        'defaultLandingPageId': self.__class__.landing_page_id,
+        'endDate': '%s-01-31T12:00:00' % (dt.year + 1),
+        'startDate': '%s-01-01T12:00:00' % (dt.year + 1),
+        'creativeOptimizationConfiguration': {
+            'minimumCreativeWeight': '5',
+            'optimizationModelId': '1',
+            'relativeStrength': '2'
+        },
+        'landingPageIds': [self.__class__.landing_page_id],
+        'lookbackWindow': {
+            'postClickEventLookbackWindow': '-1',
+            'postImpressionEventLookbackWindow': '-1',
+            'richMediaEventLookbackWindow': '-1'
+        },
+        'reachReportConfiguration': {
+            'pageLevelFrequency': 'false',
+            'siteLevelFrequency': 'false'
+        }
+    }
+    campaign = self.__class__.service.SaveCampaign(campaign)
+    self.__class__.campaign1 = campaign[0]
+    self.assert_(isinstance(campaign, tuple))
+
+    self.testSaveLandingPage()
+    campaign = {
+        'advertiserId': self.__class__.advertiser_id,
+        'archived': 'false',
+        'name': 'Campaign #%s' % Utils.GetUniqueName(),
+        'defaultLandingPageId': self.__class__.landing_page_id,
+        'endDate': '%s-01-31T12:00:00' % (dt.year + 1),
+        'startDate': '%s-01-01T12:00:00' % (dt.year + 1),
+        'creativeOptimizationConfiguration': {
+            'minimumCreativeWeight': '5',
+            'optimizationModelId': '1',
+            'relativeStrength': '2'
+        },
+        'landingPageIds': [self.__class__.landing_page_id],
+        'lookbackWindow': {
+            'postClickEventLookbackWindow': '-1',
+            'postImpressionEventLookbackWindow': '-1',
+            'richMediaEventLookbackWindow': '-1'
+        },
+        'reachReportConfiguration': {
+            'pageLevelFrequency': 'false',
+            'siteLevelFrequency': 'false'
+        }
+    }
+    campaign = self.__class__.service.SaveCampaign(campaign)
+    self.__class__.campaign2 = campaign[0]
+    self.assert_(isinstance(campaign, tuple))
+
+  def testSaveLandingPage(self):
+    """Test whether we can create a landing page."""
+    landing_page = {
+        'url': 'http://www.example.com',
+        'name': 'Landing page #%s' % Utils.GetUniqueName()
+    }
+    landing_page = self.__class__.service.SaveLandingPage(landing_page)
+    self.__class__.landing_page_id = landing_page[0]['id']
+    self.assert_(isinstance(landing_page, tuple))
 
 
 class CampaignServiceTestV1_13(unittest.TestCase):
@@ -336,153 +489,15 @@ class CampaignServiceTestV1_12(unittest.TestCase):
     self.assert_(isinstance(landing_page, tuple))
 
 
-class CampaignServiceTestV1_11(unittest.TestCase):
+def makeTestSuiteV1_14():
+  """Set up test suite using v1_14.
 
-  """Unittest suite for CampaignService using v1_11."""
-
-  SERVER = SERVER_V1_11
-  VERSION = VERSION_V1_11
-  client.debug = False
-  service = None
-  campaign1 = None
-  campaign2 = None
-  advertiser_id = '0'
-  landing_page_id = '0'
-
-  def setUp(self):
-    """Prepare unittest."""
-    if not self.__class__.service:
-      self.__class__.service = client.GetCampaignService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-    if self.__class__.advertiser_id == '0':
-      advertiser_service = client.GetAdvertiserService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-      search_criteria = {}
-      self.__class__.advertiser_id = advertiser_service.GetAdvertisers(
-          search_criteria)[0]['records'][0]['id']
-
-  def testAddLandingPageToCampaign(self):
-    """Test whether we can add a landing page to campaign."""
-    if self.__class__.campaign1 is None:
-      self.testSaveCampaign()
-    landing_page = {
-        'id': '-1',
-        'url': 'http://www.example.com',
-        'name': 'Landing page #%s' % Utils.GetUniqueName()
-    }
-    self.assert_(isinstance(self.__class__.service.AddLandingPageToCampaign(
-        self.__class__.campaign1['id'], [landing_page]), tuple))
-
-  def testCopyCampaigns(self):
-    """Test whether we can copy campaigns."""
-    if self.__class__.campaign1 is None:
-      self.testSaveCampaign()
-    requests = [{
-        'campaignId': self.__class__.campaign1['id']
-    }]
-    self.assert_(isinstance(self.__class__.service.CopyCampaigns(requests),
-                            tuple))
-
-  def testDeleteCampaign(self):
-    """Test whether we can delete a campaign."""
-    if self.__class__.campaign2 is None:
-      self.testSaveCampaign()
-    self.assertEqual(self.__class__.service.DeleteCampaign(
-        self.__class__.campaign2['id']), None)
-
-  def testGetCampaign(self):
-    """Test whether we can fetch a campaign."""
-    if self.__class__.campaign1 is None:
-      self.testSaveCampaign()
-    self.assert_(isinstance(self.__class__.service.GetCampaign(
-        self.__class__.campaign1['id']), tuple))
-
-  def testGetCampaignsByCriteria(self):
-    """Test whether we can fetch campaigns by criteria."""
-    criteria = {
-        'archiveFilter': {
-            'inactiveOnly': 'true'
-        }
-    }
-    self.assert_(isinstance(self.__class__.service.GetCampaignsByCriteria(
-        criteria), tuple))
-
-  def testGetLandingPagesForCampaign(self):
-    """Test whether we can fetch landing pages for a campaign."""
-    if self.__class__.campaign1 is None:
-      self.testSaveCampaign()
-    self.assert_(isinstance(self.__class__.service.GetLandingPagesForCampaign(
-        self.__class__.campaign1['id']), tuple))
-
-  def testSaveCampaign(self):
-    """Test whether we can create a campaign."""
-    self.testSaveLandingPage()
-    dt = datetime.datetime.now()
-    campaign = {
-        'advertiserId': self.__class__.advertiser_id,
-        'archived': 'false',
-        'name': 'Campaign #%s' % Utils.GetUniqueName(),
-        'defaultLandingPageId': self.__class__.landing_page_id,
-        'endDate': '%s-01-31T12:00:00' % (dt.year + 1),
-        'startDate': '%s-01-01T12:00:00' % (dt.year + 1),
-        'creativeOptimizationConfiguration': {
-            'minimumCreativeWeight': '5',
-            'optimizationModelId': '1',
-            'relativeStrength': '2'
-        },
-        'landingPageIds': [self.__class__.landing_page_id],
-        'lookbackWindow': {
-            'postClickEventLookbackWindow': '-1',
-            'postImpressionEventLookbackWindow': '-1',
-            'richMediaEventLookbackWindow': '-1'
-        },
-        'reachReportConfiguration': {
-            'pageLevelFrequency': 'false',
-            'siteLevelFrequency': 'false'
-        }
-    }
-    campaign = self.__class__.service.SaveCampaign(campaign)
-    self.__class__.campaign1 = campaign[0]
-    self.assert_(isinstance(campaign, tuple))
-
-    self.testSaveLandingPage()
-    campaign = {
-        'advertiserId': self.__class__.advertiser_id,
-        'archived': 'false',
-        'name': 'Campaign #%s' % Utils.GetUniqueName(),
-        'defaultLandingPageId': self.__class__.landing_page_id,
-        'endDate': '%s-01-31T12:00:00' % (dt.year + 1),
-        'startDate': '%s-01-01T12:00:00' % (dt.year + 1),
-        'creativeOptimizationConfiguration': {
-            'minimumCreativeWeight': '5',
-            'optimizationModelId': '1',
-            'relativeStrength': '2'
-        },
-        'landingPageIds': [self.__class__.landing_page_id],
-        'lookbackWindow': {
-            'postClickEventLookbackWindow': '-1',
-            'postImpressionEventLookbackWindow': '-1',
-            'richMediaEventLookbackWindow': '-1'
-        },
-        'reachReportConfiguration': {
-            'pageLevelFrequency': 'false',
-            'siteLevelFrequency': 'false'
-        }
-    }
-    campaign = self.__class__.service.SaveCampaign(campaign)
-    self.__class__.campaign2 = campaign[0]
-    self.assert_(isinstance(campaign, tuple))
-
-  def testSaveLandingPage(self):
-    """Test whether we can create a landing page."""
-    landing_page = {
-        'url': 'http://www.example.com',
-        'name': 'Landing page #%s' % Utils.GetUniqueName()
-    }
-    landing_page = self.__class__.service.SaveLandingPage(landing_page)
-    self.__class__.landing_page_id = landing_page[0]['id']
-    self.assert_(isinstance(landing_page, tuple))
+  Returns:
+    TestSuite test suite using v1_14.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(CampaignServiceTestV1_14))
+  return suite
 
 
 def makeTestSuiteV1_13():
@@ -507,20 +522,14 @@ def makeTestSuiteV1_12():
   return suite
 
 
-def makeTestSuiteV1_11():
-  """Set up test suite using v1_11.
-
-  Returns:
-    TestSuite test suite using v1_11.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(CampaignServiceTestV1_11))
-  return suite
-
-
 if __name__ == '__main__':
-  suite_v1_13 = makeTestSuiteV1_13()
-  suite_v1_12 = makeTestSuiteV1_12()
-  suite_v1_11 = makeTestSuiteV1_11()
-  alltests = unittest.TestSuite([suite_v1_13, suite_v1_12, suite_v1_11])
-  unittest.main(defaultTest='alltests')
+  suites = []
+  if TEST_VERSION_V1_14:
+    suites.append(makeTestSuiteV1_14())
+  if TEST_VERSION_V1_13:
+    suites.append(makeTestSuiteV1_13())
+  if TEST_VERSION_V1_12:
+    suites.append(makeTestSuiteV1_12())
+  if suites:
+    alltests = unittest.TestSuite(suites)
+    unittest.main(defaultTest='alltests')

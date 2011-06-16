@@ -16,14 +16,15 @@
 
 """Methods to access ContentCategoryRemoteService service."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
+from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
+from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
+from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
 
@@ -51,22 +52,28 @@ class ContentCategoryRemoteService(ApiService):
            'api/dfa-api/contentcategory']
     self.__service = DfaWebService(headers, config, op_config, '/'.join(url),
                                    lock, logger)
+    self._wsdl_types_map = WSDL_MAP[op_config['version']][
+        self.__service._GetServiceName()]
     super(ContentCategoryRemoteService, self).__init__(
         headers, config, op_config, url, 'adspygoogle.dfa', lock, logger)
 
   def DeleteContentCategory(self, content_category_id):
-    """Delete content category with the given id.
+    """Deletes the content category with the given id.
 
     Args:
       content_category_id: str Id of the content category.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((content_category_id, (str, unicode)),))
 
     method_name = 'deleteContentCategory'
     if self._config['soap_lib'] == SOAPPY:
-      self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(content_category_id, 'id'))))
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(content_category_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -74,23 +81,29 @@ class ContentCategoryRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetContentCategories(self, search_criteria):
-    """Return content categories matching the given criteria.
+    """Returns the content categories matching the given criteria.
 
     Args:
       search_criteria: dict Search criteria to match content categories.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateAdvertiserGroupSearchCriteria(search_criteria)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, search_criteria, 'ContentCategorySearchCriteria')
 
     method_name = 'getContentCategories'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(
-                  search_criteria, 'contentCategorySearchCriteria', [], [],
-                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  search_criteria, 'contentCategorySearchCriteria',
+                  self._wsdl_types_map, True,
+                  'ContentCategorySearchCriteria'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -98,21 +111,25 @@ class ContentCategoryRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def GetContentCategory(self, content_category_id):
-    """Return content category of given id.
+    """Returns the content category of given id.
 
     Args:
       content_category_id: str Id of the content category to return.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
     SanityCheck.ValidateTypes(((content_category_id, (str, unicode)),))
 
     method_name = 'getContentCategory'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(content_category_id, 'id'))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(content_category_id, 'id'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
@@ -120,23 +137,28 @@ class ContentCategoryRemoteService(ApiService):
       raise ApiVersionNotSupportedError(msg)
 
   def SaveContentCategory(self, content_category):
-    """Save content category.
+    """Saves the content category.
 
     Args:
       content_category: dict Content category to save.
 
     Returns:
       tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
     """
-    self._sanity_check.ValidateContentCategory(content_category)
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, content_category, 'ContentCategory')
 
     method_name = 'saveContentCategory'
     if self._config['soap_lib'] == SOAPPY:
-      return self.__service.CallMethod(method_name,
-          (self._sanity_check.SoappySanityCheck.UnType(
-              self._message_handler.PackDictAsXml(content_category,
-                                                  'contentCategory', [], [],
-                                                  True))))
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  content_category, 'contentCategory', self._wsdl_types_map,
+                  True, 'ContentCategory'))))
     elif self._config['soap_lib'] == ZSI:
       msg = ('The \'%s\' request via %s is currently not supported for '
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),

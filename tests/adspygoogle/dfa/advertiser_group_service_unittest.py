@@ -25,14 +25,93 @@ sys.path.append(os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.common import Utils
+from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_11
 from tests.adspygoogle.dfa import SERVER_V1_12
 from tests.adspygoogle.dfa import SERVER_V1_13
-from tests.adspygoogle.dfa import VERSION_V1_11
+from tests.adspygoogle.dfa import SERVER_V1_14
+from tests.adspygoogle.dfa import TEST_VERSION_V1_12
+from tests.adspygoogle.dfa import TEST_VERSION_V1_13
+from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_12
 from tests.adspygoogle.dfa import VERSION_V1_13
-from tests.adspygoogle.dfa import client
+from tests.adspygoogle.dfa import VERSION_V1_14
+
+
+class AdvertiserGroupServiceTestV1_14(unittest.TestCase):
+
+  """Unittest suite for AdvertiserGroupService using v1_14."""
+
+  SERVER = SERVER_V1_14
+  VERSION = VERSION_V1_14
+  client.debug = False
+  service = None
+  advertiser_group1 = None
+  advertiser_group2 = None
+  advertiser_id = '0'
+
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
+    if not self.__class__.service:
+      self.__class__.service = client.GetAdvertiserGroupService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+
+    if self.__class__.advertiser_id == '0':
+      advertiser_service = client.GetAdvertiserService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+      search_criteria = {}
+      self.__class__.advertiser_id = advertiser_service.GetAdvertisers(
+          search_criteria)[0]['records'][0]['id']
+
+  def testDeleteAdvertiserGroup(self):
+    """Test whether we can delete advertiser group."""
+    if self.__class__.advertiser_group2 is None:
+      self.testSaveAdvertiserGroup()
+    self.assertEqual(self.__class__.service.DeleteAdvertiserGroup(
+        self.__class__.advertiser_group2['id']), None)
+
+  def testGetAdvertiserGroup(self):
+    """Test whether we can fetch advertiser group."""
+    self.assert_(isinstance(self.__class__.service.GetAdvertiserGroup(
+        '1'), tuple))
+
+  def testGetAdvertiserGroups(self):
+    """Test whether we can fetch advertiser groups."""
+    search_criteria = {
+        'sortOrder': {
+            'fieldName': 'id',
+            'descending': 'false'
+        }
+    }
+    self.assert_(isinstance(self.__class__.service.GetAdvertiserGroups(
+        search_criteria), tuple))
+
+  def testSaveAdvertiserGroup(self):
+    """Test whether we can create an advertiser group."""
+    advertiser_group = {
+        'name': 'AdvertiserGroup #%s' % Utils.GetUniqueName()
+    }
+    advertiser_group = self.__class__.service.SaveAdvertiserGroup(
+        advertiser_group)
+    self.__class__.advertiser_group1 = advertiser_group[0]
+    self.assert_(isinstance(advertiser_group, tuple))
+
+    advertiser_group = {
+        'name': 'AdvertiserGroup #%s' % Utils.GetUniqueName()
+    }
+    advertiser_group = self.__class__.service.SaveAdvertiserGroup(
+        advertiser_group)
+    self.__class__.advertiser_group2 = advertiser_group[0]
+    self.assert_(isinstance(advertiser_group, tuple))
+
+  def testAssignAdvertisersToAdvertiserGroup(self):
+    """Test whether we can assign advertisers to an advertiser group."""
+    if self.__class__.advertiser_group1 is None:
+      self.testSaveAdvertiserGroup()
+    self.assertEqual(self.__class__.service.AssignAdvertisersToAdvertiserGroup(
+        self.__class__.advertiser_group1['id'], [self.__class__.advertiser_id]),
+        None)
 
 
 class AdvertiserGroupServiceTestV1_13(unittest.TestCase):
@@ -187,80 +266,15 @@ class AdvertiserGroupServiceTestV1_12(unittest.TestCase):
         None)
 
 
-class AdvertiserGroupServiceTestV1_11(unittest.TestCase):
+def makeTestSuiteV1_14():
+  """Set up test suite using v1_14.
 
-  """Unittest suite for AdvertiserGroupService using v1_11."""
-
-  SERVER = SERVER_V1_11
-  VERSION = VERSION_V1_11
-  client.debug = False
-  service = None
-  advertiser_group1 = None
-  advertiser_group2 = None
-  advertiser_id = '0'
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetAdvertiserGroupService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-    if self.__class__.advertiser_id == '0':
-      advertiser_service = client.GetAdvertiserService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-      search_criteria = {}
-      self.__class__.advertiser_id = advertiser_service.GetAdvertisers(
-          search_criteria)[0]['records'][0]['id']
-
-  def testDeleteAdvertiserGroup(self):
-    """Test whether we can delete advertiser group."""
-    if self.__class__.advertiser_group2 is None:
-      self.testSaveAdvertiserGroup()
-    self.assertEqual(self.__class__.service.DeleteAdvertiserGroup(
-        self.__class__.advertiser_group2['id']), None)
-
-  def testGetAdvertiserGroup(self):
-    """Test whether we can fetch advertiser group."""
-    self.assert_(isinstance(self.__class__.service.GetAdvertiserGroup(
-        '1'), tuple))
-
-  def testGetAdvertiserGroups(self):
-    """Test whether we can fetch advertiser groups."""
-    search_criteria = {
-        'sortOrder': {
-            'fieldName': 'id',
-            'descending': 'false'
-        }
-    }
-    self.assert_(isinstance(self.__class__.service.GetAdvertiserGroups(
-        search_criteria), tuple))
-
-  def testSaveAdvertiserGroup(self):
-    """Test whether we can create an advertiser group."""
-    advertiser_group = {
-        'name': 'AdvertiserGroup #%s' % Utils.GetUniqueName()
-    }
-    advertiser_group = self.__class__.service.SaveAdvertiserGroup(
-        advertiser_group)
-    self.__class__.advertiser_group1 = advertiser_group[0]
-    self.assert_(isinstance(advertiser_group, tuple))
-
-    advertiser_group = {
-        'name': 'AdvertiserGroup #%s' % Utils.GetUniqueName()
-    }
-    advertiser_group = self.__class__.service.SaveAdvertiserGroup(
-        advertiser_group)
-    self.__class__.advertiser_group2 = advertiser_group[0]
-    self.assert_(isinstance(advertiser_group, tuple))
-
-  def testAssignAdvertisersToAdvertiserGroup(self):
-    """Test whether we can assign advertisers to an advertiser group."""
-    if self.__class__.advertiser_group1 is None:
-      self.testSaveAdvertiserGroup()
-    self.assertEqual(self.__class__.service.AssignAdvertisersToAdvertiserGroup(
-        self.__class__.advertiser_group1['id'], [self.__class__.advertiser_id]),
-        None)
+  Returns:
+    TestSuite test suite using v1_14.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(AdvertiserGroupServiceTestV1_14))
+  return suite
 
 
 def makeTestSuiteV1_13():
@@ -285,20 +299,14 @@ def makeTestSuiteV1_12():
   return suite
 
 
-def makeTestSuiteV1_11():
-  """Set up test suite using v1_11.
-
-  Returns:
-    TestSuite test suite using v1_11.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(AdvertiserGroupServiceTestV1_11))
-  return suite
-
-
 if __name__ == '__main__':
-  suite_v1_13 = makeTestSuiteV1_13()
-  suite_v1_12 = makeTestSuiteV1_12()
-  suite_v1_11 = makeTestSuiteV1_11()
-  alltests = unittest.TestSuite([suite_v1_13, suite_v1_12, suite_v1_11])
-  unittest.main(defaultTest='alltests')
+  suites = []
+  if TEST_VERSION_V1_14:
+    suites.append(makeTestSuiteV1_14())
+  if TEST_VERSION_V1_13:
+    suites.append(makeTestSuiteV1_13())
+  if TEST_VERSION_V1_12:
+    suites.append(makeTestSuiteV1_12())
+  if suites:
+    alltests = unittest.TestSuite(suites)
+    unittest.main(defaultTest='alltests')

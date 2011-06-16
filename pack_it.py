@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2010 Google Inc. All Rights Reserved.
+# Copyright 2011 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,103 +20,174 @@ Usage:
   $ python pack_it.py adwords
 """
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
 import os
 import platform
+import re
 import shutil
 import sys
 sys.path.append(os.path.join('..', '..', '..'))
 
 
 LIBS = ['adwords', 'adxbuyer', 'dfa', 'dfp']
+TARGET_DIR_BASE = '/tmp/google-py'
+ADWORDS_ONLY_REGEX = 'Api:.*AdWordsOnly'
+
+
+def FileMatches(filename, regex=ADWORDS_ONLY_REGEX):
+  """Runs the regex against the provided file.
+
+  Args:
+    filename: str Name of the file to regex.
+    regex: str Regex to run against this file. Defaults to ADWORDS_ONLY_REGEX.
+
+  Returns:
+    bool True if the regex matches the file.
+  """
+  f = open(filename, 'r')
+  try:
+    text = f.read()
+    matches = re.search(regex, text)
+    return matches
+  finally:
+    f.close()
 
 
 def Main(argv):
+  """Builds a gzipped tarball containing the api library you specified.
+
+  Args:
+    argv: list Commandline args with script name removed.
+  """
   if not argv or len(argv) > 1 or argv[0] not in LIBS:
     print ('Nothing was done. Make sure to pass in the right argument: %s'
            % LIBS)
     return
 
-  LIB_NAME = LIB_URL = LIB_VERSION = ''
-  exec 'from adspygoogle.%s import LIB_NAME' % argv[0]
-  exec 'from adspygoogle.%s import LIB_URL' % argv[0]
-  exec 'from adspygoogle.%s import LIB_VERSION' % argv[0]
+  effective_target = actual_target = argv[0]
+  if actual_target == 'adxbuyer': effective_target = 'adwords'
 
-  LIB_TAG = '%s_api_python_%s' % (argv[0], LIB_VERSION)
-  SOURCE_DIR = os.path.abspath('.')
-  TARGET_DIR = '/usr/local/lib/py/%s' % LIB_TAG
-  TARGET_PKG_DIR = os.path.join(TARGET_DIR, 'adspygoogle')
-  TARGET_LIB_DIR = os.path.join(TARGET_PKG_DIR, argv[0])
-  TARGET_DOCS_DIR = os.path.join(TARGET_DIR, 'docs')
-  TARGET_EXMPLS_DIR = os.path.join(TARGET_DIR, 'examples', 'adspygoogle',
-                                   argv[0])
-  TARGET_LOGS_DIR = os.path.join(TARGET_DIR, 'logs')
-  TARGET_SCRIPTS_DIR = os.path.join(TARGET_DIR, 'scripts', 'adspygoogle',
-                                    argv[0])
-  TARGET_TESTS_DIR = os.path.join(TARGET_DIR, 'tests')
+  LIB_NAME = LIB_URL = LIB_VERSION = ''
+  exec 'from adspygoogle.%s import LIB_NAME' % effective_target
+  exec 'from adspygoogle.%s import LIB_URL' % effective_target
+  exec 'from adspygoogle.%s import LIB_VERSION' % effective_target
+
+  lib_tag = '%s_api_python_%s' % (actual_target, LIB_VERSION)
+  source_dir = os.path.abspath('.')
+  target_dir = '%s/%s' % (TARGET_DIR_BASE, lib_tag)
+  # If temp base dir exists, remove it so we start fresh
+  if os.path.exists(target_dir):
+    os.system('rm -rf %s*' % target_dir)
+  # Create the target directory
+  os.makedirs(target_dir)
+  target_pkg_dir = os.path.join(target_dir, 'adspygoogle')
+  target_lib_dir = os.path.join(target_pkg_dir, effective_target)
+  target_docs_dir = os.path.join(target_dir, 'docs')
+  target_examples_dir = os.path.join(target_dir, 'examples', 'adspygoogle',
+                                     effective_target)
+  target_logs_dir = os.path.join(target_dir, 'logs')
+  target_scripts_dir = os.path.join(target_dir, 'scripts', 'adspygoogle',
+                                    effective_target)
+  target_common_scripts_dir = os.path.join(target_dir, 'scripts', 'adspygoogle',
+                                           'common')
+  target_tests_dir = os.path.join(target_dir, 'tests')
 
   # If there is an existing copy of the target directory, remove it.
-  if os.path.exists(os.path.abspath(TARGET_DIR)):
-    shutil.rmtree(os.path.abspath(TARGET_DIR))
-
-  # Create target directory.
-  os.mkdir(TARGET_DIR)
+  if os.path.exists(os.path.abspath(target_dir)):
+    shutil.rmtree(os.path.abspath(target_dir))
 
   # Recursively copy client library code into target package directory.
-  shutil.copytree(os.path.join(SOURCE_DIR, 'adspygoogle', argv[0]),
-                  TARGET_LIB_DIR)
-  shutil.copytree(os.path.join(SOURCE_DIR, 'adspygoogle', 'common'),
-                  os.path.join(TARGET_PKG_DIR, 'common'))
-  shutil.copyfile(os.path.join(SOURCE_DIR, 'adspygoogle', '__init__.py'),
-                  os.path.join(TARGET_PKG_DIR, '__init__.py'))
+  shutil.copytree(os.path.join(source_dir, 'adspygoogle', effective_target),
+                  target_lib_dir)
+  shutil.copytree(os.path.join(source_dir, 'adspygoogle', 'common'),
+                  os.path.join(target_pkg_dir, 'common'))
+  shutil.copyfile(os.path.join(source_dir, 'adspygoogle', '__init__.py'),
+                  os.path.join(target_pkg_dir, '__init__.py'))
+
+  # Copy examples.  Need to handle AdX as a special case.
+  if actual_target == 'adxbuyer':
+    adx_source_dir = os.path.join(source_dir, 'examples', 'adspygoogle',
+                                  actual_target)
+    adwords_source_dir = os.path.join(source_dir, 'examples', 'adspygoogle',
+                                      effective_target)
+    # Copy over AdX examples, this creates the directory structure we need.
+    shutil.copytree(adx_source_dir, target_examples_dir)
+
+    # Need to copy examples from adwords for all versions that AdX has.
+    for directory in os.listdir(adx_source_dir):
+      # Skip non-directories (README)
+      if not os.path.isdir(os.path.join(adwords_source_dir, directory)):
+        continue
+      for filename in os.listdir(os.path.join(adwords_source_dir, directory)):
+        source_file = os.path.join(adwords_source_dir, directory, filename)
+        if not os.path.exists(source_file): continue
+        dest_file = os.path.join(target_examples_dir, directory, filename)
+        # Only copy over if it doesn't match our exclusion list.
+        if FileMatches(source_file,
+                       ADWORDS_ONLY_REGEX) or os.path.exists(dest_file):
+          pass
+        else:
+          shutil.copy(source_file, dest_file)
+  else:
+    shutil.copytree(os.path.join(source_dir, 'examples', 'adspygoogle',
+                                 effective_target), target_examples_dir)
 
   # Copy the rest of the data that comes with client library.
-  shutil.copytree(os.path.join(SOURCE_DIR, 'docs'), TARGET_DOCS_DIR)
-  shutil.copytree(os.path.join(SOURCE_DIR, 'examples', 'adspygoogle', argv[0]),
-                  TARGET_EXMPLS_DIR)
-  shutil.copytree(os.path.join(SOURCE_DIR, 'logs'), TARGET_LOGS_DIR)
-  shutil.copytree(os.path.join(SOURCE_DIR, 'scripts', 'adspygoogle', argv[0]),
-                  TARGET_SCRIPTS_DIR)
-  shutil.copyfile(os.path.join(SOURCE_DIR, 'scripts', 'README'),
-                  os.path.join(TARGET_DIR, 'scripts', 'README'))
-  shutil.move(os.path.join(TARGET_SCRIPTS_DIR, 'config.py'),
-              os.path.join(TARGET_DIR, 'config.py'))
-  shutil.move(os.path.join(TARGET_SCRIPTS_DIR, 'setup.py'),
-              os.path.join(TARGET_DIR, 'setup.py'))
-  shutil.copytree(os.path.join(SOURCE_DIR, 'tests', 'adspygoogle', argv[0]),
-                  os.path.join(TARGET_TESTS_DIR, 'adspygoogle', argv[0]))
-  shutil.copytree(os.path.join(SOURCE_DIR, 'tests', 'adspygoogle', 'common'),
-                  os.path.join(TARGET_TESTS_DIR, 'adspygoogle', 'common'))
-  shutil.copyfile(os.path.join(SOURCE_DIR, 'tests', '__init__.py'),
-                  os.path.join(TARGET_TESTS_DIR, '__init__.py'))
-  shutil.copyfile(os.path.join(SOURCE_DIR, 'tests', 'adspygoogle',
+  shutil.copytree(os.path.join(source_dir, 'docs'), target_docs_dir)
+  shutil.copytree(os.path.join(source_dir, 'logs'), target_logs_dir)
+  shutil.copytree(os.path.join(source_dir, 'scripts', 'adspygoogle',
+                               effective_target), target_scripts_dir)
+  shutil.copytree(os.path.join(source_dir, 'scripts', 'adspygoogle', 'common'),
+                               target_common_scripts_dir)
+  shutil.copyfile(os.path.join(source_dir, 'scripts', 'README'),
+                  os.path.join(target_dir, 'scripts', 'README'))
+  shutil.copyfile(os.path.join(source_dir, 'scripts', '__init__.py'),
+                  os.path.join(target_dir, 'scripts', '__init__.py'))
+  shutil.copyfile(os.path.join(source_dir, 'scripts', 'adspygoogle',
                                '__init__.py'),
-                  os.path.join(TARGET_TESTS_DIR, 'adspygoogle', '__init__.py'))
-  shutil.copyfile(os.path.join(SOURCE_DIR, 'COPYING'),
-                  os.path.join(TARGET_DIR, 'COPYING'))
-  shutil.move(os.path.join(TARGET_LIB_DIR, 'README'),
-              os.path.join(TARGET_DIR, 'README'))
+                  os.path.join(target_dir, 'scripts', 'adspygoogle',
+                               '__init__.py'))
+  shutil.move(os.path.join(target_scripts_dir, 'config.py'),
+              os.path.join(target_dir, 'config.py'))
+  shutil.move(os.path.join(target_scripts_dir, 'setup.py'),
+              os.path.join(target_dir, 'setup.py'))
+  shutil.copytree(os.path.join(source_dir, 'tests', 'adspygoogle',
+                               effective_target),
+                  os.path.join(target_tests_dir, 'adspygoogle',
+                               effective_target))
+  shutil.copytree(os.path.join(source_dir, 'tests', 'adspygoogle', 'common'),
+                  os.path.join(target_tests_dir, 'adspygoogle', 'common'))
+  shutil.copyfile(os.path.join(source_dir, 'tests', '__init__.py'),
+                  os.path.join(target_tests_dir, '__init__.py'))
+  shutil.copyfile(os.path.join(source_dir, 'tests', 'adspygoogle',
+                               '__init__.py'),
+                  os.path.join(target_tests_dir, 'adspygoogle', '__init__.py'))
+  shutil.copyfile(os.path.join(source_dir, 'COPYING'),
+                  os.path.join(target_dir, 'COPYING'))
+  shutil.move(os.path.join(target_lib_dir, 'README'),
+              os.path.join(target_dir, 'README'))
 
-  # Perform clean up, generated docs, and adjust permissions.
-  os.chdir(TARGET_DIR)
+  # Perform clean up, generate docs, and adjust permissions.
+  os.chdir(target_dir)
   os.system('find docs \( -not -name \'docs\' -and -not -name \'README\' \) | '
             'xargs rm')
   os.system('epydoc -q --name "%s" --url "%s" --html adspygoogle '
             '--exclude=_services -o docs' % (LIB_NAME, LIB_URL))
   os.system('perl -pi -e \'s/Generated by Epydoc (\d+\.\d+\.\d+) .*/Generated '
             'by Epydoc $1/\' docs/*')
-  os.system('find . \( -name \'*.pkl\' -or -name \'*.log\' -or -name \'*.pyc\' '
-            '-or -name \'.project\' -or -name \'.pydevproject\' -or -name '
+  os.system('find . \( -name \'*.pkl\' -or -name \'*.log\' -or -name \'*.pyc*\''
+            ' -or -name \'.project\' -or -name \'.pydevproject\' -or -name '
             '\'.settings\' \) | xargs rm -fr')
   # Remove any ._* files.
   if platform.system() == 'Darwin' and platform.mac_ver()[0] >= '10.5':
     os.system('dot_clean --keep=native .')
 
   # Package target directory into .tar.gz and adjust permissions.
-  os.chdir(os.path.abspath(os.path.join(TARGET_DIR, '..')))
-  os.system('tar -cf %s.tar %s/' % (LIB_TAG, LIB_TAG))
-  os.system('gzip %s.tar' % LIB_TAG)
+  os.chdir(os.path.abspath(os.path.join(target_dir, '..')))
+  os.system('tar -cf %s.tar %s/' % (lib_tag, lib_tag))
+  os.system('gzip %s.tar' % lib_tag)
+  print 'Built %s at %s' % (actual_target, TARGET_DIR_BASE)
 
 
 if __name__ == '__main__':
