@@ -20,7 +20,7 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import os
 import sys
-sys.path.append(os.path.join('..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.common import SanityCheck
@@ -97,7 +97,7 @@ class SanityCheckTest(unittest.TestCase):
 
   def setUp(self):
     """Prepare unittest."""
-    print self.id()
+    pass
 
   def testSimpleTypeIsCorrectDataType(self):
     """Test if Sanity Check enforces correct data types on simple types."""

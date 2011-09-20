@@ -21,7 +21,7 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 import glob
 import os
 import sys
-sys.path.append(os.path.join('..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.adwords import LIB_SIG

@@ -28,7 +28,7 @@ from xml.sax import saxutils
 from xml.sax.handler import feature_namespaces
 
 
-def main(location, types_name, ops_name, api_targets, wsdl_url_function):
+def GenPickles(location, types_name, ops_name, api_targets, wsdl_url_function):
   """Loops through given WSDLs, saving a dictionary representation to a pickle.
 
   Args:
@@ -74,8 +74,41 @@ class WsdlHandler(saxutils.DefaultHandler):
 
   """Parses WSDLs, extracting type definitions and operation details."""
 
+  # The _TOP_LEVEL_DEFINITION_HANDLERS dictionary maps SOAP type-defining XML
+  # elements to functions that are designed to parse them. It is initialized
+  # the first time an object of type WsdlHandler is created.
+  _TOP_LEVEL_DEFINITION_HANDLERS = {}
+  # The _TYPE_TAG_HANDLERS dictionary maps XML sub-elements to handler
+  # functions based upon what SOAP type (complex, simple, or element) the
+  # top-level XML element they are inside represents. It is initialized the
+  # first time an object of type WsdlHandler is created.
+  _TYPE_TAG_HANDLERS = {}
+
   def __init__(self):
     """Inits a WsdlHandler object."""
+    if not WsdlHandler._TOP_LEVEL_DEFINITION_HANDLERS:
+      WsdlHandler._TOP_LEVEL_DEFINITION_HANDLERS = {
+          'complexType': WsdlHandler.HandleComplexStart,
+          'simpleType': WsdlHandler.HandleSimpleStart,
+          'element': WsdlHandler.HandleTopLevelElementStart
+      }
+    if not WsdlHandler._TYPE_TAG_HANDLERS:
+      WsdlHandler._TYPE_TAG_HANDLERS = {
+          'complex': {
+              'extension': WsdlHandler.HandleExtensionStart,
+              'element': WsdlHandler.HandleElementStart,
+              'attribute': WsdlHandler.HandleAttributeStart,
+              'restriction': WsdlHandler.HandleRestrictionStart
+          },
+          'simple': {
+              'enumeration': WsdlHandler.HandleEnumerationStart,
+              'restriction': WsdlHandler.HandleRestrictionStart
+          },
+          'element': {
+              'element': WsdlHandler.HandleNestedElementStart
+          }
+      }
+
     self._current_types_dict = None
     self._current_ops_dict = None
     self._xpath = []
@@ -106,7 +139,7 @@ class WsdlHandler(saxutils.DefaultHandler):
     self._current_ops_dict = ops_dict
 
   def HandleComplexStart(self, attrs):
-    """Takes appropriate action upon finding an opening complex type XML tag.
+    """Sets the handler to begin parsing a complex type definition.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -116,7 +149,7 @@ class WsdlHandler(saxutils.DefaultHandler):
       self._type_name = attrs.get('name')
 
   def HandleComplexEnd(self):
-    """Takes appropriate action upon finding an ending complex type XML tag."""
+    """Adds a completed complex type definition to the types dictionary."""
     if self._is_array:
       self._current_types_dict[self._type_name] = {
           'base_type': self._base_type,
@@ -131,7 +164,7 @@ class WsdlHandler(saxutils.DefaultHandler):
       }
 
   def HandleSimpleStart(self, attrs):
-    """Takes appropriate action upon finding an opening simple type XML tag.
+    """Sets the handler to begin parsing a simple type definition.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -141,7 +174,7 @@ class WsdlHandler(saxutils.DefaultHandler):
       self._type_name = attrs.get('name')
 
   def HandleSimpleEnd(self):
-    """Takes appropriate action upon finding an ending simple type XML tag."""
+    """Adds a completed simple type definition to the types dictionary."""
     self._current_types_dict[self._type_name] = {
         'soap_type': 'simple',
         'base_type': self._base_type,
@@ -149,7 +182,11 @@ class WsdlHandler(saxutils.DefaultHandler):
     }
 
   def HandleRestrictionStart(self, attrs):
-    """Takes appropriate action upon finding an opening restriction XML tag.
+    """Updates an in-progress definition with information from restriction tags.
+
+    For simple type definitions, this function extracts the primitive data type
+    that the simple type uses. For complex types, a restriction tag indicates
+    that the complex type is an array definition.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -160,7 +197,9 @@ class WsdlHandler(saxutils.DefaultHandler):
       self._is_array = True
 
   def HandleEnumerationStart(self, attrs):
-    """Takes appropriate action upon finding an opening enumeration XML tag.
+    """Updates an in-progress definition with information from enumeration tags.
+
+    This function grabs allowed values for simple types.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -168,19 +207,21 @@ class WsdlHandler(saxutils.DefaultHandler):
     self._params.append(attrs.get('value'))
 
   def HandleAttributeStart(self, attrs):
-    """Takes appropriate action upon finding an opening attribute XML tag.
+    """Updates an in-progress definition with information from attribute tags.
+
+    This function extracts the data type that an array contains. It will slice
+    the trailing two characters off of the type name to remove the "[]" ending.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
     """
     if attrs.has_key('wsdl:arrayType'):
-      # Trim the trailing "[]" from the type by slicing off 2 characters.
       self._base_type = self.TrimNonstandardNamespace(attrs.get(
           'wsdl:arrayType')[:-2])
       self._is_array = True
 
   def HandleExtensionStart(self, attrs):
-    """Takes appropriate action upon finding an opening extension XML tag.
+    """Updates an in-progress complex type definition with the type it extends.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -188,14 +229,15 @@ class WsdlHandler(saxutils.DefaultHandler):
     self._base_type = self.TrimNonstandardNamespace(attrs.get('base'))
 
   def HandleElementStart(self, attrs):
-    """Takes appropriate action upon finding an opening element XML tag.
+    """Adds a new field to an in-progress complex type definition.
+
+    If this element can occur more than one time, it will be treated as if it
+    were an array. A new array entry will be generated for it and the field's
+    data type will be set to this new array type definition.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
     """
-    # If this element can occur more than one time, we're going to treat it
-    # as an array. Generate an array entry for it and change the element's
-    # type to this new array type.
     if attrs.get('name') == 'type': self._has_native_type = True
     trim_type = self.TrimNonstandardNamespace(attrs.get('type'))
     if (attrs.has_key('maxOccurs') and
@@ -208,7 +250,7 @@ class WsdlHandler(saxutils.DefaultHandler):
       self._params.append([attrs.get('name'), trim_type])
 
   def HandleOperationStart(self, attrs):
-    """Takes appropriate action upon finding an opening operation XML tag.
+    """Sets the handler to begin parsing an operation definition.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -217,7 +259,7 @@ class WsdlHandler(saxutils.DefaultHandler):
       self._type_name = attrs.get('name')
 
   def HandleOutputStart(self, attrs):
-    """Takes appropriate action upon finding an opening output XML tag.
+    """Adds an output type to the current operation's dictionary entry.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -225,7 +267,7 @@ class WsdlHandler(saxutils.DefaultHandler):
     self._operations[self._type_name] = attrs.get('name')
 
   def HandleMessageStart(self, attrs):
-    """Takes appropriate action upon finding an opening message XML tag.
+    """Sets the handler to begin parsing a message definition.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -234,12 +276,12 @@ class WsdlHandler(saxutils.DefaultHandler):
     self._type_name = attrs.get('name')
 
   def HandleMessageEnd(self):
-    """Takes appropriate action upon finding an ending message XML tag."""
+    """Adds a completed message to the message parts dictionary."""
     if not self._type_name in self._message_parts:
       self._message_parts[self._type_name] = self._params
 
   def HandleMessagePartStart(self, attrs):
-    """Takes appropriate action upon finding an opening message part XML tag.
+    """Updates an in-progress message definition with a new message part.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -250,7 +292,7 @@ class WsdlHandler(saxutils.DefaultHandler):
       self._params.append(self.TrimNonstandardNamespace(attrs.get('element')),)
 
   def HandleTopLevelElementStart(self, attrs):
-    """Takes appropriate action upon finding an opening top-level element tag.
+    """Sets the handler to begin parsing a top-level element definition.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -259,11 +301,15 @@ class WsdlHandler(saxutils.DefaultHandler):
     self._type_name = attrs.get('name')
 
   def HandleTopLevelElementEnd(self):
-    """Takes appropriate action upon finding an ending top-level element tag."""
+    """Adds a completed top-level element definition to the message parts."""
     self._message_parts[self._type_name] = self._params
 
   def HandleNestedElementStart(self, attrs):
-    """Takes appropriate action upon finding an opening nested element XML tag.
+    """Adds a new field to an in-progress top-level element definition.
+
+    If this element can occur more than one time, it will be treated as if it
+    were an array. A new array entry will be generated for it and the field's
+    data type will be set to this new array type definition.
 
     Args:
       attrs: Attributes The attributes set within this XML tag.
@@ -298,44 +344,19 @@ class WsdlHandler(saxutils.DefaultHandler):
     """
     self._xpath.append(self.TrimNonstandardNamespace(name))
 
-    # Check to see if this is a top-level type definition.
     if (len(self._xpath) > 1 and self._xpath[-2] == 'types' or
         (len(self._xpath) > 2 and self._xpath[-3] == 'types' and
          self._xpath[-2] == 'schema')):
-      if name == 'complexType':
-        self.HandleComplexStart(attrs)
-      elif name == 'simpleType':
-        self.HandleSimpleStart(attrs)
-      elif name == 'element':
-        self.HandleTopLevelElementStart(attrs)
-    # Check to see if this is within a top-level complexType definition.
-    elif self._type == 'complex':
-      if name == 'extension':
-        self.HandleExtensionStart(attrs)
-      elif name == 'element':
-        self.HandleElementStart(attrs)
-      elif name == 'attribute':
-        self.HandleAttributeStart(attrs)
-      elif name == 'restriction':
-        self.HandleRestrictionStart(attrs)
-    # Check to see if this is within a top-level simpleType definition.
-    elif self._type == 'simple':
-      if name == 'restriction':
-        self.HandleRestrictionStart(attrs)
-      elif name == 'enumeration':
-        self.HandleEnumerationStart(attrs)
-    # Check to see if this is within a top-level element definition.
-    elif self._type == 'element':
-      if name == 'element':
-        self.HandleNestedElementStart(attrs)
-    # Check to see if within the binding portion of the WSDL document.
+      if name in WsdlHandler._TOP_LEVEL_DEFINITION_HANDLERS:
+        WsdlHandler._TOP_LEVEL_DEFINITION_HANDLERS[name](self, attrs)
+    elif self._type in WsdlHandler._TYPE_TAG_HANDLERS:
+      if name in WsdlHandler._TYPE_TAG_HANDLERS[self._type]:
+        WsdlHandler._TYPE_TAG_HANDLERS[self._type][name](self, attrs)
     elif 'binding' in self._xpath:
       if name.endswith('output'):
         self.HandleOutputStart(attrs)
       elif name.endswith('operation'):
         self.HandleOperationStart(attrs)
-    # Check for other tags that need to be parsed and do not match any of the
-    # above criteria.
     elif name.endswith('message'):
       self.HandleMessageStart(attrs)
     elif self._type == 'message' and name.endswith('part'):
@@ -349,18 +370,20 @@ class WsdlHandler(saxutils.DefaultHandler):
     """
     self._xpath.pop()
 
-    if name == 'complexType' and self._type == 'complex':
-      self.HandleComplexEnd()
-    elif name == 'simpleType' and self._type == 'simple':
-      self.HandleSimpleEnd()
+    finalizer_handlers = {
+        ('complexType', 'complex'): self.HandleComplexEnd,
+        ('simpleType', 'simple'): self.HandleSimpleEnd,
+    }
+
+    if (name, self._type) in finalizer_handlers:
+      finalizer_handlers[name, self._type]()
     elif (name == 'element' and self._type == 'element' and not
           'element' in self._xpath):
       self.HandleTopLevelElementEnd()
     elif name.endswith('message') and not self._type is None:
       self.HandleMessageEnd()
 
-    if ((name in ('complexType', 'simpleType') and
-         self._type in ('complex', 'simple')) or
+    if ((name, self._type) in finalizer_handlers or
         (name == 'element' and self._type == 'element' and
          not 'element' in self._xpath)):
       self._type = None
@@ -397,9 +420,6 @@ class WsdlHandler(saxutils.DefaultHandler):
       for output in self._message_parts[self._operations[operation]]:
         if (output not in self._current_types_dict and not
             (output.startswith('xsd') or output.startswith('soapenc'))):
-          # This type is not defined as a complex or simple type under the
-          # wsdl:types definitions. This means it was defined as an element
-          # under wsdl:types.
           outputs.append(self._message_parts[output])
         else:
           outputs.append(output)

@@ -21,7 +21,7 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 import os
 import pickle
 import sys
-sys.path.append(os.path.join('..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
 from scripts.adspygoogle.common import wsdl_auto_obj
@@ -135,7 +135,7 @@ class WsdlAutoObjTest(unittest.TestCase):
 
   def setUp(self):
     """Prepare unittest."""
-    print self.id()
+    pass
 
   def testWsdlAutoObj(self):
     """Test whether the wsdl_auto_obj script properly parses the test WSDL."""
@@ -145,10 +145,10 @@ class WsdlAutoObjTest(unittest.TestCase):
       return 'file:%s' % os.path.join(self.__class__.DATA_LOCATION,
                                       self.__class__.WSDL_NAME)
     try:
-      wsdl_auto_obj.main(self.__class__.DATA_LOCATION,
-                         self.__class__.TYPES_FILENAME,
-                         self.__class__.OPS_FILENAME,
-                         self.__class__.API_TARGETS, MockWsdlInfoToUrl)
+      wsdl_auto_obj.GenPickles(self.__class__.DATA_LOCATION,
+                               self.__class__.TYPES_FILENAME,
+                               self.__class__.OPS_FILENAME,
+                               self.__class__.API_TARGETS, MockWsdlInfoToUrl)
 
       types_map = pickle.load(open(os.path.join(
           self.__class__.DATA_LOCATION, self.__class__.TYPES_FILENAME), 'r'))
@@ -181,3 +181,4 @@ if __name__ == '__main__':
   suite = makeTestSuite()
   alltests = unittest.TestSuite([suite])
   unittest.main(defaultTest='alltests')
+

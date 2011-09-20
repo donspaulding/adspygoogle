@@ -27,6 +27,7 @@ class Error(Exception):
   """
 
   def __init__(self, msg):
+    super(Error, self).__init__(msg)
     self.msg = msg
 
   def __str__(self):
@@ -58,27 +59,10 @@ class ApiAsStrError(Error):
   """
 
   def __init__(self, msg):
-    (self.code, self.message, fault) = (-1, msg, {})
-    lines = msg.split('\n')
-    for line in lines:
-      if not line or line.lower() == 'error:': continue
-      try:
-        (key, value) = line.split(': ', 1)
-        fault[key] = value
-      except:
-        continue
-    try:
-      self.code = fault['code']
-      self.message = fault['message']
-    except:
-      # Unknown error code, likely a stackTrace was returned (see SOAP XML log).
-      self.message = fault['faultstring']
-
-  def __str__(self):
-    return 'Code %s: %s' % (self.code, self.message)
+    super(ApiAsStrError, self).__init__(msg)
 
   def __call__(self):
-    return (self.code, self.message)
+    return (self.code, super(ApiAsStrError, self).__str__())
 
 
 class InvalidInputError(Error):

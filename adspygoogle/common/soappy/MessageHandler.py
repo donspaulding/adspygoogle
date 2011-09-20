@@ -41,12 +41,11 @@ def GetServiceConnection(headers, config, url, http_proxy, is_jaxb_api):
   """Get SOAP service connection.
 
   Args:
-    headers: dict Dictionary object with populated authentication
-             credentials.
-    config: dict Dictionary object with populated configuration values.
-    url: str URL of the web service to call.
-    http_proxy: str HTTP proxy to use.
-    is_jaxb_api: bool Whether API uses JAXB.
+    headers: A dictionary object with populated authentication credentials.
+    config: A dictionary object with populated configuration values.
+    url: A string specifying the URL of the web service to call.
+    http_proxy: A string specifying the HTTP proxy to use.
+    is_jaxb_api: A boolean specifying whether the API uses JAXB.
 
   Returns:
     instance SOAPpy.SOAPProxy with set headers.
@@ -59,13 +58,13 @@ def GetServiceConnection(headers, config, url, http_proxy, is_jaxb_api):
   if is_jaxb_api or Utils.BoolTypeConvert(config['wsse']):
     headers = SOAPpy.Types.headerType({config['ns_target'][1]: full_headers})
     headers._setAttr('xmlns', config['ns_target'][0])
-    HTTPTransportHandler.data_injects = config['data_injects']
     service = SOAPpy.SOAPProxy(url, http_proxy=http_proxy, header=headers,
                                transport=HTTPTransportHandler)
+    service.transport.data_injects = config['data_injects']
   elif Utils.BoolTypeConvert(config['force_data_inject']):
-    HTTPTransportHandler.data_injects = config['data_injects']
     service = SOAPpy.SOAPProxy(url, http_proxy=http_proxy, header=headers,
                                transport=HTTPTransportHandler)
+    service.transport.data_injects = config['data_injects']
   else:
     headers = SOAPpy.Types.headerType(full_headers)
     service = SOAPpy.SOAPProxy(url, http_proxy=http_proxy, header=headers)
@@ -82,11 +81,18 @@ def GetServiceConnection(headers, config, url, http_proxy, is_jaxb_api):
 
   # Explicitly set the style of the namespace, otherwise will default to 1999.
   service.config.namespaceStyle = '2001'
+
+  # Set up OAuth, if applicable.
+  if 'oauth_enabled' in config and config['oauth_enabled']:
+    service.transport.oauth_enabled = True
+    service.transport.oauth_handler = config['oauth_handler']
+    service.transport.oauth_credentials = config['oauth_credentials']
+
   return service
 
 
 # TODO(api.jdilallo): Remove this function once all products use PackVarAsXml.
-def PackDictAsXml(obj, key='', key_map=[], order=[], wrap_list=False):
+def PackDictAsXml(obj, key='', key_map=None, order=None, wrap_list=False):
   """Pack a Python dictionary object into an XML string.
 
   DEPRECATED. As of version 2.0.0, use PackVarAsXml instead.
@@ -96,18 +102,22 @@ def PackDictAsXml(obj, key='', key_map=[], order=[], wrap_list=False):
   "<dct><ids>12345</ids><ids>67890</ids></dct>".
 
   Args:
-    obj: dict Python dictionary to pack.
+    obj: A Python dict to pack.
     [optional]
-    key: str Key that maps to this Python dictionary.
-    key_map: dict Object key order map.
-    order: list Order of sub keys for this Python dictionary.
-    wrap_list: bool If True, wraps list into an extra layer (e.g.,
-               "'ids': ['12345']"  becomes "<ids><ids>12345</ids></ids>"). If
-               False, "'ids': ['12345']" becomes "<ids>12345</ids>".
+    key: A string key that maps to this Python dict.
+    key_map: A dict containing parameter orderings, possibly containing the
+             given key.
+    order: A list specifying the order of sub keys for this Python dictionary.
+    wrap_list: A bool specifying if lists should be wrapped in an extra layer.
+               e.g., If True, "'ids': ['12345']"  becomes
+               "<ids><ids>12345</ids></ids>". If False, "'ids': ['12345']"
+               becomes "<ids>12345</ids>".
 
   Returns:
     str XML snippet.
   """
+  if key_map is None: key_map = {}
+  if order is None: order = []
   buf = xsi_type = ''
   has_native_type = False
   tmp_xsi_type, local_order, tmp_key_type_obj = ('', [], {})
@@ -233,23 +243,28 @@ def PackDictAsXml(obj, key='', key_map=[], order=[], wrap_list=False):
 def _PackDictionaryAsXml(obj, xml_tag_name, wsdl_type_map, wrap_list, xsi_type):
   """Pack a Python dictionary object into an XML string.
 
+  If the xsi_type for the given object has a parameter ordering in the WSDL
+  types dict, parameters will be packed in that order. Parameters in the given
+  object which do not appear in the parameter ordering will be placed
+  at the end of the XML message in no particular order.
+
   Args:
-    obj: dict Python dictionary to pack.
-    xml_tag_name: str The name of the XML tag that will house this dict.
-    wsdl_type_map: dict Information on all WSDL-defined types.
-    wrap_list: bool If true, wraps lists in an extra layer (e.g.,
-               "'ids': ['12345']"  becomes "<ids><ids>12345</ids></ids>"). If
-               False, "'ids': ['12345']" becomes "<ids>12345</ids>".
-    xsi_type: str The WSDL-defined type of this object, if applicable.
+    obj: A Python dict to pack.
+    xml_tag_name: A string stating the name of the XML tag that will house this
+                  dict.
+    wsdl_type_map: A dict of information on all WSDL-defined types.
+    wrap_list: A bool specifying if lists should be wrapped in an extra layer.
+               e.g., If True, "'ids': ['12345']"  becomes
+               "<ids><ids>12345</ids></ids>". If False, "'ids': ['12345']"
+               becomes "<ids>12345</ids>".
+    xsi_type: A string representing the WSDL-defined type of this object, if
+              applicable.
 
   Returns:
     str An XML element representing the given dictionary.
   """
   buf = ''
   obj_copy = obj.copy()
-  # See if this object specifies its xsi_type and, if so, override the xsi_type
-  # given. This has to occur before the main packing loop to ensure that
-  # elements which exist only in a specified subtype can be handled correctly.
   obj_contained_type, xsi_override_key = Utils.GetExplicitType(wsdl_type_map,
                                                                obj, xsi_type)
   if obj_contained_type:
@@ -260,9 +275,6 @@ def _PackDictionaryAsXml(obj, xml_tag_name, wsdl_type_map, wrap_list, xsi_type):
   if xsi_type in wsdl_type_map:
     param_order = Utils.GenParamOrder(wsdl_type_map, xsi_type)
 
-  # Recursively pack this dictionary's elements. If there is a specified param
-  # order, pack things in this order. After going through the parameters with
-  # an ordering, pack anything that remains in no particular order.
   for parameter, param_type in param_order:
     if parameter in obj_copy:
       buf += PackVarAsXml(obj[parameter], parameter, wsdl_type_map, wrap_list,
@@ -288,20 +300,30 @@ def _PackListAsXml(obj, xml_tag_name, wsdl_type_map, wrap_list, xsi_type):
   For compatibility reasons, this does not pack an empty list into XML at all.
 
   Args:
-    obj: list Python list to pack.
-    xml_tag_name: str The name of the XML tag that will house this list.
-    wsdl_type_map: dict Information on all WSDL-defined types.
-    wrap_list: bool If true, wraps lists in an extra layer (e.g.,
-               "'ids': ['12345']"  becomes "<ids><ids>12345</ids></ids>"). If
-               False, "'ids': ['12345']" becomes "<ids>12345</ids>".
-    xsi_type: str The WSDL-defined type of this object, if applicable.
+    obj: A Python list to pack.
+    xml_tag_name: A string stating the name of the XML tag that will house this
+                  list.
+    wsdl_type_map: A dict of information on all WSDL-defined types.
+    wrap_list: A bool specifying if lists should be wrapped in an extra layer.
+               e.g., If True, "'ids': ['12345']"  becomes
+               "<ids><ids>12345</ids></ids>". If False, "'ids': ['12345']"
+               becomes "<ids>12345</ids>".
+    xsi_type: A string representing the WSDL-defined type of this object, if
+              applicable.
 
   Returns:
     str An XML element representing the given list.
   """
   buf = ''
   base_xsi_type = xsi_type
-  if not obj or all(value is None for value in obj):
+  if not obj:
+    return buf
+  all_none = True
+  for value in obj:
+    if value != None:
+      all_none = False
+      break
+  if all_none:
     return buf
   if (xsi_type in wsdl_type_map and
       wsdl_type_map[xsi_type]['soap_type'] == 'array'):
@@ -324,8 +346,9 @@ def _PackStringAsXml(obj, xml_tag_name):
   """Pack a Python string into an XML string.
 
   Args:
-    obj: str Python string to pack.
-    xml_tag_name: str The name of the XML tag that will house this string.
+    obj: A Python string to pack.
+    xml_tag_name: A string stating the name of the XML tag that will house this
+                  string.
 
   Returns:
     str An XML element representing the given string.
@@ -340,7 +363,7 @@ def _PackStringAsXml(obj, xml_tag_name):
       return obj
 
 
-def PackVarAsXml(obj, xml_tag_name='', wsdl_type_map={}, wrap_list=False,
+def PackVarAsXml(obj, xml_tag_name='', wsdl_type_map=None, wrap_list=False,
                  xsi_type=''):
   """Pack a Python object into an XML string.
 
@@ -351,16 +374,20 @@ def PackVarAsXml(obj, xml_tag_name='', wsdl_type_map={}, wrap_list=False,
   Args:
     obj: object Python object to pack.
     [optional]
-    xml_tag_name: str Key that maps to this Python dictionary.
-    wsdl_type_map: dict Object key order map.
-    wrap_list: bool If True, wraps lists into an extra layer (e.g.,
-               "'ids': ['12345']"  becomes "<ids><ids>12345</ids></ids>"). If
-               False, "'ids': ['12345']" becomes "<ids>12345</ids>".
-    xsi_type: str The WSDL-defined type of this object, if applicable.
+    xml_tag_name: A string stating the name of the XML tag that will house this
+                  object.
+    wsdl_type_map: A dict of information on all WSDL-defined types.
+    wrap_list: A bool specifying if lists should be wrapped in an extra layer.
+               e.g., If True, "'ids': ['12345']"  becomes
+               "<ids><ids>12345</ids></ids>". If False, "'ids': ['12345']"
+               becomes "<ids>12345</ids>".
+    xsi_type: A string representing the WSDL-defined type of this object, if
+              applicable.
 
   Returns:
     str An XML element representing the given object.
   """
+  if wsdl_type_map is None: wsdl_type_map = {}
   if isinstance(obj, dict):
     return _PackDictionaryAsXml(obj, xml_tag_name, wsdl_type_map, wrap_list,
                                 xsi_type)
@@ -374,9 +401,9 @@ def SetRequestParams(config, method_name, params):
   """Set SOAP request parameters.
 
   Args:
-    config: dict Dictionary object with populated configuration values.
-    method_name: str API method name.
-    params: list List of parameters to send to the API method.
+    config: A dict object with populated configuration values.
+    method_name: A string of the API method name.
+    params: A list of parameters to send to the API method.
 
   Returns:
     instance SOAPpy.Types.bodyType with set parameters.
@@ -430,16 +457,16 @@ def UnpackResponseAsDict(response):
     return response
 
 
-def RestoreListType(response, key_triggers=()):
+def RestoreListType(response, key_triggers=None):
   """Restores a response object's list types which were overwritten by SOAPpy.
 
   Lists with only one element are converted by SOAPpy into a dictionary. This
   handler function restores the proper type.
 
   Args:
-    response: dict Response data object.
-    key_triggers: tuple Names of the parameters which should contain list types
-                  in the response object.
+    response: A dict containing response data.
+    key_triggers: A tuple of names of the parameters which should contain list
+                  types in the response object.
 
   Returns:
     dict Restored data object.
@@ -469,9 +496,11 @@ def RestoreListTypeWithWsdl(response, service_type_map, operation_return_types):
   """Restores list types within given response which were overwritten by SOAPpy.
 
   Args:
-    response: tuple Response data object.
-    service_type_map: dict Information on WSDL-defined types in one service.
-    operation_return_types: list Data types this operation returns, in order.
+    response: A tuple of response data.
+    service_type_map: A dict containing information on WSDL-defined types in one
+                      web service.
+    operation_return_types: A list of data types this operation returns, in
+                            order.
 
   Returns:
     tuple Responses, each with list types restored.
@@ -493,10 +522,11 @@ def _RestoreListTypesForResponse(response, xsi_type, service_type_map):
   """Restores list types for an individual response object.
 
   Args:
-    response: obj An individual object returned by the webservice. May be a
+    response: An individual object returned by the webservice. May be a
               dictionary, list, or string depending on what it represents.
-    xsi_type: str The WSDL-defined type of this response.
-    service_type_map: dict Information on WSDL-defined types in one service.
+    xsi_type: A string specifying the WSDL-defined type of this response.
+    service_type_map: A dict of information on WSDL-defined types in one
+                      web service.
 
   Returns:
     obj The response in its proper format. May be a dictionary, list, or string

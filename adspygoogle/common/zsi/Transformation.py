@@ -72,7 +72,7 @@ def ZsiTransfomComplexType(wsdl_types, obj, xsi_type, web_service):
 
   parameters = Utils.GenParamOrder(wsdl_types, xsi_type)
   for key in obj:
-    if not obj[key] or key == contained_type_key:
+    if key == contained_type_key:
       continue
     for parameter, param_type in parameters:
       if parameter == key:

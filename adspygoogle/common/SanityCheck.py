@@ -26,28 +26,41 @@ from adspygoogle.common import ZSI
 from adspygoogle.common.Errors import ValidationError
 
 
+# The BASE_TYPE_KEY and _SOAP_TYPE_KEY represent two keys that are required for
+# all dictionary definitions of WSDL types. These dictionaries are referenced in
+# the functions in this module.
+BASE_TYPE_KEY = 'base_type'
+_SOAP_TYPE_KEY = 'soap_type'
+# The _SOAP_TYPE_VALIDATION_FUNCTIONS dictionary maps SOAP types from WSDL type
+# definition dictionaries to the correct validation function. It is initialized
+# later, after the functions have all been declared. Once a value has been set
+# for it, it is treated as a constant.
+_SOAP_TYPE_VALIDATION_FUNCTIONS = {}
+
 def ValidateRequiredHeaders(headers, required_headers):
   """Sanity check for required authentication elements.
 
-  All required authentication headers have to be set in order to make
-  successful API request.
+  The required headers may contain several possible header combinations, only
+  one of which must be satisfied to make successful API request. In order for
+  any single combination to be satisfied, all of the headers it specifies must
+  exist as keys within the headers dict and each entry must contain data.
 
   Args:
-    headers: dict Authentication headers.
-    required_headers: tuple Valid combinations of headers.
+    headers: A dict containing authentication headers.
+    required_headers: A tuple containing valid combinations of headers. Each
+                      combination of headers is represented as a tuple of
+                      strings. e.g. (('Name', 'Password'), ('Name', 'Token'))
 
   Raises:
     ValidationError: The given authentication headers are not sufficient to make
-                     requests agaisnt this API.
+                     requests against this API.
   """
-  is_valid = True
+  is_valid = False
   for headers_set in required_headers:
     is_valid_set = True
     for key in headers_set:
       if key not in headers or not headers[key]: is_valid_set = False
-    if not is_valid_set:
-      is_valid = False
-    else:
+    if is_valid_set:
       is_valid = True
       break
 
@@ -58,11 +71,14 @@ def ValidateRequiredHeaders(headers, required_headers):
 
 
 def IsConfigUserInputValid(user_input, valid_el):
-  """Sanity check for user input.
+  """Determines if user input within configuration scripts is valid.
+
+  Each time a choice is presented to the user, a set of allowed values specific
+  to that interaction is passed into this function.
 
   Args:
-    user_input: str User input.
-    valid_el: list List of valid elements.
+    user_input: The string of user input.
+    valid_el: A list of valid elements for the current interaction.
 
   Returns:
     bool True if user input is valid, False otherwise.
@@ -77,10 +93,10 @@ def IsConfigUserInputValid(user_input, valid_el):
 
 
 def ValidateConfigSoapLib(soap_lib):
-  """Sanity check for SOAP library.
+  """Checks that the SOAP library set in the configuration is a valid choice.
 
   Args:
-    soap_lib: str SOAP library to use.
+    soap_lib: A string specifying which SOAP library to use.
 
   Raises:
     ValidationError: The given SOAP toolkit is not supported by this library.
@@ -93,10 +109,10 @@ def ValidateConfigSoapLib(soap_lib):
 
 
 def ValidateConfigXmlParser(xml_parser):
-  """Sanity check for XML parser.
+  """Checks that the XML parser set in the configuration is a valid choice.
 
   Args:
-    xml_parser: str XML parser to use.
+    xml_parser: A string specifying which XML parser to use.
 
   Raises:
     ValidationError: The given XML parser is not supported by this library.
@@ -108,26 +124,11 @@ def ValidateConfigXmlParser(xml_parser):
     raise ValidationError(msg)
 
 
-def IsType(param, param_type):
-  """Check if parameter is of the right type.
-
-  Args:
-    param: obj Parameter to check.
-    param_type: type Type of the parameter to check against.
-
-  Returns:
-    bool True if the parameter is of right type, False otherwise.
-  """
-  if not isinstance(param, param_type):
-    return False
-  return True
-
-
 def ValidateTypes(vars_tpl):
-  """Check types for a set of variables.
+  """Checks that each variable in a set of variables is the correct type.
 
   Args:
-    vars_tpl: tuple Set of variables to check.
+    vars_tpl: A tuple containing a set of variables to check.
 
   Raises:
     ValidationError: The given object was not one of the given accepted types.
@@ -136,7 +137,7 @@ def ValidateTypes(vars_tpl):
     if not isinstance(var_types, tuple):
       var_types = (var_types,)
     for var_type in var_types:
-      if IsType(var, var_type):
+      if isinstance(var, var_type):
         return
     msg = ('The \'%s\' is of type %s, expecting one of %s.'
            % (var, type(var), var_types))
@@ -144,10 +145,10 @@ def ValidateTypes(vars_tpl):
 
 
 def ValidateOneLevelObject(obj):
-  """Validate object with one level of complexity.
+  """Validates that a dict representing an object contains only string entries.
 
   Args:
-    obj: dict Object to validate.
+    obj: A dictionary to validate.
   """
   ValidateTypes(((obj, dict),))
   for key in obj:
@@ -155,10 +156,10 @@ def ValidateOneLevelObject(obj):
 
 
 def ValidateOneLevelList(lst):
-  """Validate list with one level of complexity.
+  """Validates that a list contains only string entries.
 
   Args:
-    lst: list List to validate.
+    lst: A list to validate.
   """
   ValidateTypes(((lst, list),))
   for item in lst:
@@ -166,26 +167,26 @@ def ValidateOneLevelList(lst):
 
 
 def IsSuperType(wsdl_types, sub_type, super_type):
-  """Checks to see if one type is a supertype of another type.
+  """Determines if one type is a supertype of another type.
 
   Any case where the sub_type cannot be traced through to super_type is
   considered to be an invalid supertype. For example, if the WSDL definitions
   dictionary is empty or if one type's entry in the definitions does not include
-  the required field (base_type), these are not valid supertypes.
+  the required field (BASE_TYPE_KEY), these are not valid supertypes.
 
   Args:
-    wsdl_types: dict WSDL-defined types in the same service as the given type.
-    sub_type: str Type that may be extending super_type.
-    super_type: str Type that may be extended by sub_type.
+    wsdl_types: A dict of WSDL-defined types in a single web service.
+    sub_type: A string representing a type that may be extending super_type.
+    super_type: A string representing a type that may be extended by sub_type.
 
   Returns:
     bool Whether super_type is really a supertype of sub_type.
   """
   if not wsdl_types or sub_type not in wsdl_types:
     return False
-  while (sub_type != super_type and 'base_type' in wsdl_types[sub_type] and
-         wsdl_types[sub_type]['base_type']):
-    sub_type = wsdl_types[sub_type]['base_type']
+  while (sub_type != super_type and BASE_TYPE_KEY in wsdl_types[sub_type] and
+         wsdl_types[sub_type][BASE_TYPE_KEY]):
+    sub_type = wsdl_types[sub_type][BASE_TYPE_KEY]
   return sub_type == super_type
 
 
@@ -193,9 +194,10 @@ def _SanityCheckComplexType(wsdl_types, obj, xsi_type):
   """Validates a dict representing a complex type against its WSDL definition.
 
   Args:
-    wsdl_types: dict WSDL-defined types in the same service as the given type.
-    obj: dict Object that should represent an instance of the given type.
-    xsi_type: str The complex type name defined in the WSDL.
+    wsdl_types: A dict of WSDL-defined types in a single web service.
+    obj: A dict that should represent an instance of the given type.
+    xsi_type: A string specifying the name of a complex type defined in the
+              WSDL.
 
   Raises:
     ValidationError: The given object is not an acceptable representation of the
@@ -220,7 +222,12 @@ def _SanityCheckComplexType(wsdl_types, obj, xsi_type):
       if parameter == key:
         found = True
         if Utils.IsXsdOrSoapenc(param_type):
-          ValidateTypes(((obj[key], (str, unicode)),))
+          try:
+            ValidateTypes(((obj[key], (str, unicode)),))
+          except ValidationError:
+            raise ValidationError('Field \'%s\' should be a string but value '
+                                  '\'%s\' is a \'%s\' instead.' %
+                                  (key, obj[key], type(obj[key])))
         else:
           NewSanityCheck(wsdl_types, obj[key], param_type)
         break
@@ -233,15 +240,20 @@ def _SanityCheckSimpleType(wsdl_types, obj, xsi_type):
   """Validates a string representing a simple type against its WSDL definition.
 
   Args:
-    wsdl_types: dict WSDL-defined types in the same service as the given type.
-    obj: str String representing the given simple type.
-    xsi_type: str The simple type name defined in the WSDL.
+    wsdl_types: A dict of WSDL-defined types in a single web service.
+    obj: String representing the given simple type.
+    xsi_type: A string specifying the simple type name defined in the WSDL.
 
   Raises:
     ValidationError: The given object is not an acceptable representation of the
                      given WSDL-defined simple type.
   """
-  ValidateTypes(((obj, (str, unicode)),))
+  try:
+    ValidateTypes(((obj, (str, unicode)),))
+  except ValidationError:
+    raise ValidationError('Simple type \'%s\' should be a string but value '
+                          '\'%s\' is a \'%s\' instead.' %
+                          (xsi_type, obj, type(obj)))
   if obj not in wsdl_types[xsi_type]['allowed_values']:
     raise ValidationError('Value \'%s\' is not listed as an acceptable value '
                           'for type \'%s\'. Allowed values are: %s.' %
@@ -253,19 +265,29 @@ def _SanityCheckArray(wsdl_types, obj, xsi_type):
   """Validates a list representing an array type against its WSDL definition.
 
   Args:
-    wsdl_types: dict WSDL-defined types in the same service as the given type.
-    obj: list List representing the given array type.
-    xsi_type: str The array type name defined in the WSDL.
+    wsdl_types: A dict of WSDL-defined types in a single web service.
+    obj: List representing the given array type.
+    xsi_type: A string specifying the array type name defined in the WSDL.
   """
-  ValidateTypes(((obj, list),))
-  if Utils.IsXsdOrSoapenc(wsdl_types[xsi_type]['base_type']):
+  try:
+    ValidateTypes(((obj, list),))
+  except ValidationError:
+    raise ValidationError('Type \'%s\' should be a list but value '
+                          '\'%s\' is a \'%s\' instead.' %
+                          (xsi_type, obj, type(obj)))
+  if Utils.IsXsdOrSoapenc(wsdl_types[xsi_type][BASE_TYPE_KEY]):
     for item in obj:
       if item is None: continue
-      ValidateTypes(((item, (str, unicode)),))
+      try:
+        ValidateTypes(((item, (str, unicode)),))
+      except ValidationError:
+        raise ValidationError('The items in array \'%s\' must all be strings. '
+                              'Value \'%s\' is of type \'%s\'.'
+                              % (xsi_type, item, type(item)))
   else:
     for item in obj:
       if item is None: continue
-      NewSanityCheck(wsdl_types, item, wsdl_types[xsi_type]['base_type'])
+      NewSanityCheck(wsdl_types, item, wsdl_types[xsi_type][BASE_TYPE_KEY])
 
 
 def NewSanityCheck(wsdl_types, obj, xsi_type):
@@ -275,11 +297,11 @@ def NewSanityCheck(wsdl_types, obj, xsi_type):
   of any type.
 
   Args:
-    wsdl_types: dict WSDL-defined types in the same service as the given type.
-    obj: object Object to be validated. Depending on the WSDL-defined type this
-         is representing, the data type will vary. It should always be either a
+    wsdl_types: A dict of WSDL-defined types in a single web service.
+    obj: Object to be validated. Depending on the WSDL-defined type this object
+         represents, the data type will vary. It should always be either a
          dictionary, list, or string no matter what WSDL-defined type it is.
-    xsi_type: str The type name defined in the WSDL.
+    xsi_type: A string specifying the type name defined in the WSDL.
 
   Raises:
     ValidationError: The given WSDL-defined type has no definition in the WSDL
@@ -287,16 +309,18 @@ def NewSanityCheck(wsdl_types, obj, xsi_type):
   """
   if obj in (None, ''):
     return
-  if not xsi_type in wsdl_types:
-    raise ValidationError('This type is not defined in the WSDL: %s.'
+  if not xsi_type in wsdl_types or _SOAP_TYPE_KEY not in wsdl_types[xsi_type]:
+    raise ValidationError('This type is not properly defined in the WSDL: %s.'
                           % xsi_type)
-  if wsdl_types[xsi_type]['soap_type'] == 'simple':
-    _SanityCheckSimpleType(wsdl_types, obj, xsi_type)
-  elif wsdl_types[xsi_type]['soap_type'] == 'complex':
-    _SanityCheckComplexType(wsdl_types, obj, xsi_type)
-  elif wsdl_types[xsi_type]['soap_type'] == 'array':
-    _SanityCheckArray(wsdl_types, obj, xsi_type)
+
+  if not _SOAP_TYPE_VALIDATION_FUNCTIONS:
+    _SOAP_TYPE_VALIDATION_FUNCTIONS['simple'] = _SanityCheckSimpleType
+    _SOAP_TYPE_VALIDATION_FUNCTIONS['complex'] = _SanityCheckComplexType
+    _SOAP_TYPE_VALIDATION_FUNCTIONS['array'] = _SanityCheckArray
+
+  soap_type = wsdl_types[xsi_type][_SOAP_TYPE_KEY]
+  if soap_type in _SOAP_TYPE_VALIDATION_FUNCTIONS:
+    _SOAP_TYPE_VALIDATION_FUNCTIONS[soap_type](wsdl_types, obj, xsi_type)
   else:
     raise ValidationError('Error in autogenerated WSDL definitions - Unknown '
-                          'parameter type: %s'
-                          % wsdl_types[xsi_type]['soap_type'])
+                          'parameter type: %s' % soap_type)

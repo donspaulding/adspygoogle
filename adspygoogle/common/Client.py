@@ -286,3 +286,87 @@ class Client(object):
       tuple Response from the API method.
     """
     pass
+
+  def RequestOAuthToken(self, server, callbackurl=None, applicationname=None):
+    """Obtains an OAuth Request Token from Google.
+
+    Args:
+      server: str The API server that requests will be made to.
+      callbackurl: str Optional callback url.
+      applicationname: str Optional name of the application to display on the
+                       authorization redirect page.
+    """
+    scope = self._GetOAuthScope(server)
+    self.SetOAuthCredentials(self.GetOAuthHandler().GetRequestToken(
+        self.GetOAuthCredentials(), scope, applicationname=applicationname,
+        callbackurl=callbackurl))
+
+  def GetOAuthAuthorizationUrl(self):
+    """Gets the OAuth authorization URL for the OAuth token.
+
+    Returns:
+      str The URL that will allow the user to authorize the token.
+    """
+    return self.GetOAuthHandler().GetAuthorizationUrl(
+        self.GetOAuthCredentials())
+
+  def _GetOAuthScope(self, server):
+    """Gets the OAuth scope for this user.
+
+    Must be overridden by implementors.
+
+    Args:
+      server: str The API server that requests will be made to.
+    Returns:
+      str The scope to use when requesting an OAuth token.
+    """
+    raise NotImplementedError
+
+  def UpgradeOAuthToken(self, verifier):
+    """Upgrades the authorized OAuth token.
+
+    Args:
+      verifier: str The verifier string returning from authorizing the token.
+    """
+    self.SetOAuthCredentials(self.GetOAuthHandler().GetAccessToken(
+        self.GetOAuthCredentials(), verifier))
+
+  def SetOAuthCredentials(self, credentials):
+    """Sets the OAuth credentials into the config.
+
+    Args:
+      credentials: dict OAuth credentials.
+    """
+    self._config['oauth_credentials'] = credentials
+
+  def GetOAuthCredentials(self):
+    """Retrieves the OAuth credentials from the config.
+
+    Returns:
+      dict The OAuth credentials.
+    """
+    return self._config['oauth_credentials']
+
+  def SetOAuthHandler(self, oauth_handler):
+    """Sets the config to use the specified OAuth Handler.
+
+    Args:
+      oauth_handler: OAuthHandler The OAuthHandler to use for OAuth.
+    """
+    self._config['oauth_handler'] = oauth_handler
+
+  def GetOAuthHandler(self):
+    """Returns the currently set OAuthHandler.
+
+    Returns:
+      OAuthHandler The OAuthHandler to use for OAuth.
+    """
+    return self._config['oauth_handler']
+
+  def EnableOAuth(self):
+    """Enables OAuth."""
+    self._config['oauth_enabled'] = True
+
+  def DisableOAuth(self):
+    """Disables OAuth."""
+    self._config['oauth_enabled'] = False

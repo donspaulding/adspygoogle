@@ -105,6 +105,7 @@ class HttpsConnectionHandler(httplib.HTTPSConnection):
       skip_accept_encoding: bool If True does not add automatically an
                             'Accept-Encoding:' header.
     """
+    self.url = url
     if HttpsConnectionHandler.compress: skip_accept_encoding = True
     httplib.HTTPConnection.putrequest(self, method=method, url=url,
                                       skip_host=skip_host,

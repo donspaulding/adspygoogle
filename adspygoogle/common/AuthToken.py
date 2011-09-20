@@ -98,7 +98,8 @@ class AuthToken(object):
     """
     ret = {}
     for line in fh:
-      key, value = line.split('=')
+      index = line.index('=')
+      key, value = line[:index], line[index + 1:].strip()
       ret[key] = value
     return ret
 

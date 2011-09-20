@@ -92,6 +92,17 @@ def GetServiceConnection(headers, config, op_config, url, service_name, loc):
   if Utils.BoolTypeConvert(config['compress']): postfix = ', gzip'
   user_agent = 'ZSI %s%s'  % ('.'.join(map(str, ZSI_VERSION)), postfix)
   port_type.binding.AddHeader('User-Agent', user_agent)
+
+  # Handle OAuth (if enabled)
+  if 'oauth_enabled' in config and config['oauth_enabled']:
+    signedrequestparams = config['oauth_handler'].GetSignedRequestParameters(
+        config['oauth_credentials'], url)
+    port_type.binding.AddHeader('Authorization',
+                                 'OAuth ' +
+                                 config['oauth_handler'
+                                        ].FormatParametersForHeader(
+                                            signedrequestparams))
+
   return port_type
 
 
@@ -144,7 +155,8 @@ def UnpackResponseAsTuple(response):
       if key == 'type': return dct
       value = response.__dict__.get(key)
       data = UnpackResponseAsTuple(value)
-      dct[key.strip('_')] = data
+      if data:
+        dct[key.strip('_')] = data
     return dct
   elif isinstance(response, list):
     lst = []
@@ -173,7 +185,7 @@ def UnpackResponseAsTuple(response):
   else:
     # Workaround for string with non-ASCII characters.
     try:
-      if response is None: return ''
+      if response is None: return None
       return str(response)
     except UnicodeEncodeError:
       return response

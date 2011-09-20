@@ -1,3 +1,10 @@
+2.1.0:
+- Altering the way ZSI handles elements that are not present in the response.
+  Moving forward, if an object is not present (i.e. ZSI stores None in the
+  generated class's field), we will no longer include it in the dictionary
+  returned from an API call.  Previously, it would include the field as a key
+  with '' (empty string) as the value.
+
 2.0.0:
 - Added scripts to generate pickled dictionaries representing the WSDL.
 - Added the ability to validate types against the WSDL.

@@ -18,7 +18,6 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
-from SOAPpy import __version__
 from SOAPpy import Client
 from SOAPpy import SOAPAddress
 from SOAPpy import Utilities
@@ -32,7 +31,11 @@ class HTTPTransportHandler(Client.HTTPTransport):
 
   """Implements HTTPTransportHandler."""
 
-  data_injects = ()
+  def __init__(self):
+    # Defaults for OAuth.
+    self.oauth_enabled = False
+    self.oauth_handler = None
+    self.oauth_credentials = None
 
   def call(self, addr, data, namespace, soapaction=None, encoding=None,
            http_proxy=None, config=Config):
@@ -57,42 +60,52 @@ class HTTPTransportHandler(Client.HTTPTransport):
       r = httplib.HTTP(real_addr)
 
     # Intercept outgoing XML message and inject data.
-    for old, new in HTTPTransportHandler.data_injects:
-      data = data.replace(old, new)
+    if self.data_injects:
+      for old, new in self.data_injects:
+        data = data.replace(old, new)
 
     r.putrequest('POST', real_path)
 
-    r.putheader('Host', addr.host)
-    r.putheader('User-agent', Client.SOAPUserAgent())
+    headers = []
+
+    headers.append(('Host', addr.host))
+    headers.append(('User-agent', Client.SOAPUserAgent()))
     t = 'text/xml';
     if encoding != None:
       t += '; charset="%s"' % encoding
-    r.putheader('Content-type', t)
-    r.putheader('Content-length', str(len(data)))
+    headers.append(('Content-type', t))
+    headers.append(('Content-length', str(len(data))))
 
     # If user is not a user:passwd format we'll receive a failure from the
     # server. . .I guess (??)
     if addr.user != None:
       val = base64.encodestring(addr.user)
-      r.putheader('Authorization', 'Basic ' + val.replace('\012',''))
+      headers.append(('Authorization', 'Basic ' + val.replace('\012','')))
+
+    # Handle OAuth (if enabled)
+    if self.oauth_enabled:
+      signedrequestparams = self.oauth_handler.GetSignedRequestParameters(
+          self.oauth_credentials, str(addr))
+      headers.append(('Authorization',
+                     'OAuth ' + self.oauth_handler.FormatParametersForHeader(
+                         signedrequestparams)))
 
     # This fixes sending either "" or "None".
     if soapaction is None or len(soapaction) == 0:
-      r.putheader('SOAPAction', '')
+      headers.append(('SOAPAction', ''))
     else:
-      r.putheader('SOAPAction', '"%s"' % soapaction)
+      headers.append(('SOAPAction', '"%s"' % soapaction))
 
     if config.dumpHeadersOut:
       s = 'Outgoing HTTP headers'
       Utilities.debugHeader(s)
       print 'POST %s %s' % (real_path, r._http_vsn_str)
-      print 'Host:', addr.host
-      print 'User-agent: SOAPpy %s (http://pywebsvcs.sf.net)' % __version__
-      print 'Content-type:', t
-      print 'Content-length:', len(data)
-      print 'SOAPAction: "%s"' % soapaction
+      for header in headers:
+        print '%s:%s' % header
       Utilities.debugFooter(s)
 
+    for header in headers:
+      r.putheader(header[0], header[1])
     r.endheaders()
 
     if config.dumpSOAPOut:
