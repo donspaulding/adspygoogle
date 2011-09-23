@@ -27,7 +27,7 @@ class Error(Exception):
   """
 
   def __init__(self, msg):
-    super(Error, self).__init__(msg)
+    Exception.__init__(self, msg)
     self.msg = msg
 
   def __str__(self):
@@ -59,10 +59,10 @@ class ApiAsStrError(Error):
   """
 
   def __init__(self, msg):
-    super(ApiAsStrError, self).__init__(msg)
+    Error.__init__(self, msg)
 
   def __call__(self):
-    return (self.code, super(ApiAsStrError, self).__str__())
+    return (self.code, Error.__str__(self))
 
 
 class InvalidInputError(Error):

@@ -601,8 +601,8 @@ class AdRemoteService(ApiService):
       ApiVersionNotSupportedError: Fails if the common framework is configured
                                    to use ZSI.
     """
-    SanityCheck.NewSanityCheck(self._wsdl_types_map, ad, 'AdBase')
     DfaUtils.AssignAdXsi(ad)
+    SanityCheck.NewSanityCheck(self._wsdl_types_map, ad, 'AdBase')
 
     method_name = 'saveAd'
     if self._config['soap_lib'] == SOAPPY:

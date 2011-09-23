@@ -24,7 +24,7 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import os
 import sys
-sys.path.append(os.path.join('..', '..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle.dfa.DfaClient import DfaClient

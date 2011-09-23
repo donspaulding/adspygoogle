@@ -615,9 +615,9 @@ class CreativeRemoteService(ApiService):
       ApiVersionNotSupportedError: Fails if the common framework is configured
                                    to use ZSI.
     """
+    DfaUtils.AssignCreativeXsi(creative_base)
     SanityCheck.NewSanityCheck(
         self._wsdl_types_map, creative_base, 'CreativeBase')
-    DfaUtils.AssignCreativeXsi(creative_base)
     SanityCheck.ValidateTypes(((campaign_id, (str, unicode)),))
 
     method_name = 'saveCreative'

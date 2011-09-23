@@ -32,18 +32,18 @@ LIB_SHORT_NAME = 'DfaApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python/'
 LIB_AUTHOR = 'Joseph DiLallo'
 LIB_AUTHOR_EMAIL = 'api.jdilallo@gmail.com'
-LIB_VERSION = '1.2.0'
-LIB_MIN_COMMON_VERSION = '2.0.0'
+LIB_VERSION = '1.3.0'
+LIB_MIN_COMMON_VERSION = '2.2.0'
 LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
 
-if VERSION > LIB_MIN_COMMON_VERSION:
+if VERSION < LIB_MIN_COMMON_VERSION:
   msg = ('Unsupported version of the core module is detected. Please download '
          'the latest version of client library at %s.' % LIB_URL)
   raise MissingPackageError(msg)
 
 # Tuple of tuples representing API versions, where each inner tuple is a
 # combination of the API vesrion and whether API used JAXB.
-API_VERSIONS_MAP = (('v1.12', False), ('v1.13', False), ('v1.14', False))
+API_VERSIONS_MAP = (('v1.13', False), ('v1.14', False), ('v1.15', False))
 API_VERSIONS = [version for version, is_jaxb_api in API_VERSIONS_MAP]
 MIN_API_VERSION = API_VERSIONS[2]
 

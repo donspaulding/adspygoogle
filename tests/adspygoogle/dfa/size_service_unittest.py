@@ -22,22 +22,22 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 import datetime
 import os
 import sys
-sys.path.append(os.path.join('..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.common import Utils
 from adspygoogle.dfa.DfaErrors import DfaRequestError
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_12
 from tests.adspygoogle.dfa import SERVER_V1_13
 from tests.adspygoogle.dfa import SERVER_V1_14
-from tests.adspygoogle.dfa import TEST_VERSION_V1_12
+from tests.adspygoogle.dfa import SERVER_V1_15
 from tests.adspygoogle.dfa import TEST_VERSION_V1_13
 from tests.adspygoogle.dfa import TEST_VERSION_V1_14
-from tests.adspygoogle.dfa import VERSION_V1_12
+from tests.adspygoogle.dfa import TEST_VERSION_V1_15
 from tests.adspygoogle.dfa import VERSION_V1_13
 from tests.adspygoogle.dfa import VERSION_V1_14
+from tests.adspygoogle.dfa import VERSION_V1_15
 
 
 class SizeServiceTestV1_14(unittest.TestCase):
@@ -172,12 +172,12 @@ class SizeServiceTestV1_13(unittest.TestCase):
         search_criteria), tuple))
 
 
-class SizeServiceTestV1_12(unittest.TestCase):
+class SizeServiceTestV1_15(unittest.TestCase):
 
-  """Unittest suite for SizeService using v1_12."""
+  """Unittest suite for SizeService using v1_15."""
 
-  SERVER = SERVER_V1_12
-  VERSION = VERSION_V1_12
+  SERVER = SERVER_V1_15
+  VERSION = VERSION_V1_15
   client.debug = False
   service = None
   SIZE_EXISTS_CODE = 101010
@@ -219,14 +219,6 @@ class SizeServiceTestV1_12(unittest.TestCase):
       self.__class__.size = self.__class__.service.GetSizeByWidthHeight(
           '1%s' % (dt.minute), '1%s' % (dt.second))[0]
 
-
-  def testGetSizeByWidthHeight(self):
-    """Test whether we can fetch sizes by width and height."""
-    if self.__class__.size is None:
-      self.testSaveSize()
-    self.assert_(isinstance(self.__class__.service.GetSizeByWidthHeight(
-        self.__class__.size['width'], self.__class__.size['height']), tuple))
-
   def testGetSizes(self):
     """Test whether we can fetch sizes by criteria."""
     if self.__class__.size is None:
@@ -262,14 +254,14 @@ def makeTestSuiteV1_13():
   return suite
 
 
-def makeTestSuiteV1_12():
-  """Set up test suite using v1_12.
+def makeTestSuiteV1_15():
+  """Set up test suite using v1_15.
 
   Returns:
-    TestSuite test suite using v1_12.
+    TestSuite test suite using v1_15.
   """
   suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(SizeServiceTestV1_12))
+  suite.addTests(unittest.makeSuite(SizeServiceTestV1_15))
   return suite
 
 
@@ -279,8 +271,8 @@ if __name__ == '__main__':
     suites.append(makeTestSuiteV1_14())
   if TEST_VERSION_V1_13:
     suites.append(makeTestSuiteV1_13())
-  if TEST_VERSION_V1_12:
-    suites.append(makeTestSuiteV1_12())
+  if TEST_VERSION_V1_15:
+    suites.append(makeTestSuiteV1_15())
   if suites:
     alltests = unittest.TestSuite(suites)
     unittest.main(defaultTest='alltests')

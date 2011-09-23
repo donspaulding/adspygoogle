@@ -309,3 +309,56 @@ class NetworkRemoteService(ApiService):
              'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
                                         self._op_config['version']))
       raise ApiVersionNotSupportedError(msg)
+
+  def GetAgreements(self, agreement_search_criteria):
+    """Returns a single page of agreements matching the given criteria.
+
+    Args:
+      agreement_search_criteria: dict Search criteria to match agreements.
+
+    Returns:
+      tuple Response from the API method.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
+    """
+    SanityCheck.NewSanityCheck(
+        self._wsdl_types_map, agreement_search_criteria,
+        'AgreementSearchCriteria')
+
+    method_name = 'getAgreements'
+    if self._config['soap_lib'] == SOAPPY:
+      return self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(
+                  agreement_search_criteria, 'agreementSearchCriteria',
+                  self._wsdl_types_map, True, 'AgreementSearchCriteria'))))
+    elif self._config['soap_lib'] == ZSI:
+      msg = ('The \'%s\' request via %s is currently not supported for '
+             'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
+                                        self._op_config['version']))
+      raise ApiVersionNotSupportedError(msg)
+
+  def ExecuteAgreement(self, agreement_id):
+    """Executes the agreement with the given ID.
+
+    Args:
+      agreement_id: str Id of the agreement.
+
+    Raises:
+      ApiVersionNotSupportedError: Fails if the common framework is configured
+                                   to use ZSI.
+    """
+    SanityCheck.ValidateTypes(((agreement_id, (str, unicode)),))
+
+    method_name = 'executeAgreement'
+    if self._config['soap_lib'] == SOAPPY:
+      self.__service.CallMethod(
+          method_name, (self._sanity_check.SoappySanityCheck.UnType(
+              self._message_handler.PackVarAsXml(agreement_id, 'agreement'))))
+    elif self._config['soap_lib'] == ZSI:
+      msg = ('The \'%s\' request via %s is currently not supported for '
+             'use with ZSI toolkit.' % (Utils.GetCurrentFuncName(),
+                                        self._op_config['version']))
+      raise ApiVersionNotSupportedError(msg)

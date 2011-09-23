@@ -320,7 +320,7 @@ def _PackListAsXml(obj, xml_tag_name, wsdl_type_map, wrap_list, xsi_type):
     return buf
   all_none = True
   for value in obj:
-    if value != None:
+    if value is not None:
       all_none = False
       break
   if all_none:
@@ -451,8 +451,11 @@ def UnpackResponseAsDict(response):
       if item is None: continue
       lst.append(UnpackResponseAsDict(item))
     return lst
+  elif isinstance(response, tuple) and len(response) == 6:
+    return '%04d-%02d-%02dT%02d:%02d:%02d' % response
   else:
-    if isinstance(response, int) or isinstance(response, long):
+    if (isinstance(response, int) or isinstance(response, long) or
+        isinstance(response, float)):
       return str(response)
     return response
 

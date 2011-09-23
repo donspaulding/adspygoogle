@@ -21,7 +21,7 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import os
 import sys
-sys.path.append(os.path.join('..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..'))
 
 from adspygoogle.common import SOAPPY
 from adspygoogle.common import ZSI
@@ -29,14 +29,14 @@ from adspygoogle.dfa.DfaClient import DfaClient
 
 
 HTTP_PROXY = None
-TEST_VERSION_V1_12 = False
-SERVER_V1_12 = 'http://advertisersapitest.doubleclick.net'
-VERSION_V1_12 = 'v1.12'
-TEST_VERSION_V1_13 = True
+TEST_VERSION_V1_13 = False
 SERVER_V1_13 = 'http://advertisersapitest.doubleclick.net'
 VERSION_V1_13 = 'v1.13'
 TEST_VERSION_V1_14 = True
 SERVER_V1_14 = 'http://advertisersapitest.doubleclick.net'
 VERSION_V1_14 = 'v1.14'
+TEST_VERSION_V1_15 = True
+SERVER_V1_15 = 'http://advertisersapitest.doubleclick.net'
+VERSION_V1_15 = 'v1.15'
 client = DfaClient(path=os.path.join('..', '..', '..'))
 client.soap_lib = SOAPPY

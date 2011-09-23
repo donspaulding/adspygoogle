@@ -24,7 +24,6 @@ from adspygoogle.common import Utils
 from adspygoogle.common import ZSI
 from adspygoogle.common.ApiService import ApiService
 from adspygoogle.common.Errors import ApiVersionNotSupportedError
-from adspygoogle.dfa import DfaUtils
 from adspygoogle.dfa import WSDL_MAP
 from adspygoogle.dfa.DfaWebService import DfaWebService
 
@@ -273,8 +272,6 @@ class CampaignRemoteService(ApiService):
       ApiVersionNotSupportedError: Fails if the common framework is configured
                                    to use ZSI.
     """
-    DfaUtils.TransformDates(campaign)
-
     SanityCheck.NewSanityCheck(self._wsdl_types_map, campaign, 'Campaign')
 
     method_name = 'saveCampaign'

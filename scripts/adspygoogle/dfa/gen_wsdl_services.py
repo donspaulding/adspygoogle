@@ -20,7 +20,7 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import os
 import sys
-sys.path.append(os.path.join('..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..'))
 
 from scripts.adspygoogle.common import wsdl_auto_obj
 from scripts.adspygoogle.dfa import API_TARGETS
@@ -37,7 +37,7 @@ pickle_location = os.path.join('..', '..', '..', 'adspygoogle', 'dfa', 'data')
 types_filename = 'wsdl_type_defs.pkl'
 operation_filename = 'wsdl_ops_defs.pkl'
 
-wsdl_auto_obj.main(pickle_location, types_filename, operation_filename,
-                   API_TARGETS, DfaWsdlToUrl)
+wsdl_auto_obj.GenPickles(pickle_location, types_filename, operation_filename,
+                         API_TARGETS, DfaWsdlToUrl)
 
 print '... done.'

@@ -20,27 +20,26 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import os
 import sys
-sys.path.append(os.path.join('..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..'))
 import thread
 import threading
 import unittest
 
 from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import Utils
 from adspygoogle.dfa.DfaErrors import DfaApiError
 from adspygoogle.dfa.DfaWebService import DfaWebService
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_12
 from tests.adspygoogle.dfa import SERVER_V1_13
 from tests.adspygoogle.dfa import SERVER_V1_14
-from tests.adspygoogle.dfa import TEST_VERSION_V1_12
+from tests.adspygoogle.dfa import SERVER_V1_15
 from tests.adspygoogle.dfa import TEST_VERSION_V1_13
 from tests.adspygoogle.dfa import TEST_VERSION_V1_14
-from tests.adspygoogle.dfa import VERSION_V1_12
+from tests.adspygoogle.dfa import TEST_VERSION_V1_15
 from tests.adspygoogle.dfa import VERSION_V1_13
 from tests.adspygoogle.dfa import VERSION_V1_14
+from tests.adspygoogle.dfa import VERSION_V1_15
 
 
 class DfaWebServiceTestV1_14(unittest.TestCase):
@@ -60,9 +59,10 @@ class DfaWebServiceTestV1_14(unittest.TestCase):
   def testCallMethod(self):
     """Test whether we can call an API method indirectly."""
     search_criteria = {'pageSize': '10'}
-    self.assert_(isinstance(client.GetAdvertiserService(self.__class__.SERVER,
-        self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(
-            search_criteria), tuple))
+    self.assert_(isinstance(client.GetAdvertiserService(
+        self.__class__.SERVER,
+        self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(search_criteria),
+                            tuple))
 
   def testCallMethodDirect(self):
     """Test whether we can call an API method directly."""
@@ -87,7 +87,7 @@ class DfaWebServiceTestV1_14(unittest.TestCase):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
         os.path.join('data', 'request_getadvertisers.xml'))
-    url = '/v1.12/api/dfa-api/advertiser'
+    url = '/v1.14/api/dfa-api/advertiser'
     http_proxy = None
 
     self.failUnlessRaises(DfaApiError, client.CallRawMethod, soap_message, url,
@@ -139,9 +139,10 @@ class DfaWebServiceTestV1_13(unittest.TestCase):
   def testCallMethod(self):
     """Test whether we can call an API method indirectly."""
     search_criteria = {'pageSize': '10'}
-    self.assert_(isinstance(client.GetAdvertiserService(self.__class__.SERVER,
-        self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(
-            search_criteria), tuple))
+    self.assert_(isinstance(client.GetAdvertiserService(
+        self.__class__.SERVER,
+        self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(search_criteria),
+                            tuple))
 
   def testCallMethodDirect(self):
     """Test whether we can call an API method directly."""
@@ -201,12 +202,12 @@ class TestThreadV1_13(threading.Thread):
         HTTP_PROXY).GetAdvertisers(search_criteria))
 
 
-class DfaWebServiceTestV1_12(unittest.TestCase):
+class DfaWebServiceTestV1_15(unittest.TestCase):
 
-  """Unittest suite for DfaWebService using v1_12."""
+  """Unittest suite for DfaWebService using v1_15."""
 
-  SERVER = SERVER_V1_12
-  VERSION = VERSION_V1_12
+  SERVER = SERVER_V1_15
+  VERSION = VERSION_V1_15
   client.debug = False
   res = []
   MAX_THREADS = 3
@@ -218,16 +219,17 @@ class DfaWebServiceTestV1_12(unittest.TestCase):
   def testCallMethod(self):
     """Test whether we can call an API method indirectly."""
     search_criteria = {'pageSize': '10'}
-    self.assert_(isinstance(client.GetAdvertiserService(self.__class__.SERVER,
-        self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(
-            search_criteria), tuple))
+    self.assert_(isinstance(client.GetAdvertiserService(
+        self.__class__.SERVER,
+        self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(search_criteria),
+                            tuple))
 
   def testCallMethodDirect(self):
     """Test whether we can call an API method directly."""
     headers = client.GetAuthCredentials()
     config = client.GetConfigValues()
-    url = '/'.join([DfaWebServiceTestV1_12.SERVER,
-                   'v1.12/api/dfa-api', 'placement'])
+    url = '/'.join([DfaWebServiceTestV1_15.SERVER,
+                    'v1.15/api/dfa-api', 'placement'])
     op_config = {
         'server': self.__class__.SERVER,
         'version': self.__class__.VERSION,
@@ -245,7 +247,7 @@ class DfaWebServiceTestV1_12(unittest.TestCase):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
         os.path.join('data', 'request_getadvertisers.xml'))
-    url = '/v1.12/api/dfa-api/advertiser'
+    url = '/v1.15/api/dfa-api/advertiser'
     http_proxy = None
 
     self.failUnlessRaises(DfaApiError, client.CallRawMethod, soap_message, url,
@@ -255,7 +257,7 @@ class DfaWebServiceTestV1_12(unittest.TestCase):
     """Test whether we can safely execute multiple threads."""
     all_threads = []
     for i in xrange(self.__class__.MAX_THREADS):
-      t = TestThreadV1_12()
+      t = TestThreadV1_15()
       all_threads.append(t)
       t.start()
 
@@ -265,9 +267,9 @@ class DfaWebServiceTestV1_12(unittest.TestCase):
     self.assertEqual(len(self.res), self.__class__.MAX_THREADS)
 
 
-class TestThreadV1_12(threading.Thread):
+class TestThreadV1_15(threading.Thread):
 
-  """Creates TestThread using v1_12.
+  """Creates TestThread using v1_15.
 
   Responsible for defining an action for a single thread.
   """
@@ -275,8 +277,8 @@ class TestThreadV1_12(threading.Thread):
   def run(self):
     """Represent thread's activity."""
     search_criteria = {'pageSize': '10'}
-    DfaWebServiceTestV1_12.res.append(client.GetAdvertiserService(
-        DfaWebServiceTestV1_12.SERVER, DfaWebServiceTestV1_12.VERSION,
+    DfaWebServiceTestV1_15.res.append(client.GetAdvertiserService(
+        DfaWebServiceTestV1_15.SERVER, DfaWebServiceTestV1_15.VERSION,
         HTTP_PROXY).GetAdvertisers(search_criteria))
 
 
@@ -302,14 +304,14 @@ def makeTestSuiteV1_13():
   return suite
 
 
-def makeTestSuiteV1_12():
-  """Set up test suite using v1_12.
+def makeTestSuiteV1_15():
+  """Set up test suite using v1_15.
 
   Returns:
-    TestSuite test suite using v1_12.
+    TestSuite test suite using v1_15.
   """
   suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(DfaWebServiceTestV1_12))
+  suite.addTests(unittest.makeSuite(DfaWebServiceTestV1_15))
   return suite
 
 
@@ -319,8 +321,8 @@ if __name__ == '__main__':
     suites.append(makeTestSuiteV1_14())
   if TEST_VERSION_V1_13:
     suites.append(makeTestSuiteV1_13())
-  if TEST_VERSION_V1_12:
-    suites.append(makeTestSuiteV1_12())
+  if TEST_VERSION_V1_15:
+    suites.append(makeTestSuiteV1_15())
   if suites:
     alltests = unittest.TestSuite(suites)
     unittest.main(defaultTest='alltests')

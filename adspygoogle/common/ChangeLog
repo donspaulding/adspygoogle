@@ -1,3 +1,11 @@
+2.2.1:
+- Addressing AdWords issue 164 (cannot use super with Exception in Python 2.4).
+
+2.2.0:
+- SOAPpy will now transform xsd:dateTime and xsd:float values into strings
+  before returning them from a SOAP response. Previously, they were returned as
+  6-item tuples and floats, respectively.
+
 2.1.0:
 - Altering the way ZSI handles elements that are not present in the response.
   Moving forward, if an object is not present (i.e. ZSI stores None in the

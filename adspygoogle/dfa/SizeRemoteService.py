@@ -59,6 +59,8 @@ class SizeRemoteService(ApiService):
   def GetSizeByWidthHeight(self, width, height):
     """Returns the size for given width and height.
 
+    This operation was removed from the API in v1.15.
+
     Args:
       width: str Size's width.
       height: str Size's height.
@@ -68,8 +70,14 @@ class SizeRemoteService(ApiService):
 
     Raises:
       ApiVersionNotSupportedError: Fails if the common framework is configured
-                                   to use ZSI.
+                                   to use ZSI. Also fails is using DFA API v1.15
+                                   or newer.
     """
+    if self._op_config['version'] >= '1.15':
+      raise ApiVersionNotSupportedError(
+          'The ability to call getSize with a width and height was removed in '
+          'API version v1.15.')
+
     SanityCheck.ValidateTypes(((width, (str, unicode)),
                                (height, (str, unicode))))
 

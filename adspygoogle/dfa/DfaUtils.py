@@ -58,6 +58,9 @@ def GetCreativeXsiTypes():
 def TransformDates(obj):
   """Transforms tuple-represented dates within the given object to strings.
 
+  This function is retained for legacy use. Dates should never be given in tuple
+  format.
+
   Args:
     obj: dict The object whose dates need to all be strings.
   """
@@ -65,9 +68,7 @@ def TransformDates(obj):
     if key in ('startDate', 'startTime', 'endDate', 'endTime'):
       if isinstance(obj[key], tuple):
         if len(obj[key]) == 6:
-          obj[key] = '%04s-%02d-%02dT%02d:%02d:%02d' % (
-              obj[key][0], obj[key][1], obj[key][2], obj[key][3],
-              obj[key][4], obj[key][5])
+          obj[key] = '%04s-%02d-%02dT%02d:%02d:%02d' % obj[key]
         else:
           raise ValidationError('The date in field %s is malformed.' % key)
 

@@ -21,21 +21,21 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import os
 import sys
-sys.path.append(os.path.join('..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.common import Utils
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_12
 from tests.adspygoogle.dfa import SERVER_V1_13
 from tests.adspygoogle.dfa import SERVER_V1_14
-from tests.adspygoogle.dfa import TEST_VERSION_V1_12
+from tests.adspygoogle.dfa import SERVER_V1_15
 from tests.adspygoogle.dfa import TEST_VERSION_V1_13
 from tests.adspygoogle.dfa import TEST_VERSION_V1_14
-from tests.adspygoogle.dfa import VERSION_V1_12
+from tests.adspygoogle.dfa import TEST_VERSION_V1_15
 from tests.adspygoogle.dfa import VERSION_V1_13
 from tests.adspygoogle.dfa import VERSION_V1_14
+from tests.adspygoogle.dfa import VERSION_V1_15
 
 
 class PlacementServiceTestV1_14(unittest.TestCase):
@@ -76,16 +76,8 @@ class PlacementServiceTestV1_14(unittest.TestCase):
     """Test whether we can save a placement."""
     campaign_id = self.__class__.campaign['id']
     site_id = self.__class__.dfa_site_id
-    start_date_dict = self.__class__.campaign['startDate']
-    end_date_dict = self.__class__.campaign['endDate']
-    start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': start_date_dict[0],
-        'month': start_date_dict[1],
-        'day': start_date_dict[2]}
-    end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': end_date_dict[0],
-        'month': end_date_dict[1],
-        'day': end_date_dict[2] - 1}
+    start_date = self.__class__.campaign['startDate']
+    end_date = self.__class__.campaign['endDate']
     placement = {
         'name': 'Placement #%s' % Utils.GetUniqueName(),
         'dfaSiteId': site_id,
@@ -176,16 +168,8 @@ class PlacementServiceTestV1_14(unittest.TestCase):
     """Test whether we can save a placement group."""
     campaign_id = self.__class__.campaign['id']
     site_id = self.__class__.dfa_site_id
-    start_date_dict = self.__class__.campaign['startDate']
-    end_date_dict = self.__class__.campaign['endDate']
-    start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': start_date_dict[0],
-        'month': start_date_dict[1],
-        'day': start_date_dict[2]}
-    end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': end_date_dict[0],
-        'month': end_date_dict[1],
-        'day': end_date_dict[2] - 1}
+    start_date = self.__class__.campaign['startDate']
+    end_date = self.__class__.campaign['endDate']
     placement_group = {
         'name': 'PlacementGroup #%s' % Utils.GetUniqueName(),
         'dfaSiteId': site_id,
@@ -236,16 +220,14 @@ class PlacementServiceTestV1_14(unittest.TestCase):
   def testUpdatePlacements(self):
     """Test whether we can update placements."""
     campaign_id = self.__class__.campaign['id']
-    start_date_dict = self.__class__.campaign['startDate']
-    end_date_dict = self.__class__.campaign['endDate']
-    start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': start_date_dict[0],
-        'month': start_date_dict[1],
-        'day': start_date_dict[2] + 2}
-    end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': end_date_dict[0],
-        'month': end_date_dict[1],
-        'day': end_date_dict[2] - 2}
+    start_date_before = self.__class__.campaign['startDate']
+    end_date_before = self.__class__.campaign['endDate']
+    start_date = '%s%02d%s' % (
+        start_date_before[:8], int(start_date_before[8:10]) + 2,
+        start_date_before[10:])
+    end_date = '%s%02d%s' % (
+        end_date_before[:8], int(end_date_before[8:10]) - 2,
+        end_date_before[10:])
     placement_update_request = {
         'campaignId' : campaign_id,
         'endDate': end_date,
@@ -306,16 +288,8 @@ class PlacementServiceTestV1_13(unittest.TestCase):
     """Test whether we can save a placement."""
     campaign_id = self.__class__.campaign['id']
     site_id = self.__class__.dfa_site_id
-    start_date_dict = self.__class__.campaign['startDate']
-    end_date_dict = self.__class__.campaign['endDate']
-    start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': start_date_dict[0],
-        'month': start_date_dict[1],
-        'day': start_date_dict[2]}
-    end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': end_date_dict[0],
-        'month': end_date_dict[1],
-        'day': end_date_dict[2] - 1}
+    start_date = self.__class__.campaign['startDate']
+    end_date = self.__class__.campaign['endDate']
     placement = {
         'name': 'Placement #%s' % Utils.GetUniqueName(),
         'dfaSiteId': site_id,
@@ -406,16 +380,8 @@ class PlacementServiceTestV1_13(unittest.TestCase):
     """Test whether we can save a placement group."""
     campaign_id = self.__class__.campaign['id']
     site_id = self.__class__.dfa_site_id
-    start_date_dict = self.__class__.campaign['startDate']
-    end_date_dict = self.__class__.campaign['endDate']
-    start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': start_date_dict[0],
-        'month': start_date_dict[1],
-        'day': start_date_dict[2]}
-    end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': end_date_dict[0],
-        'month': end_date_dict[1],
-        'day': end_date_dict[2] - 1}
+    start_date = self.__class__.campaign['startDate']
+    end_date = self.__class__.campaign['endDate']
     placement_group = {
         'name': 'PlacementGroup #%s' % Utils.GetUniqueName(),
         'dfaSiteId': site_id,
@@ -466,16 +432,14 @@ class PlacementServiceTestV1_13(unittest.TestCase):
   def testUpdatePlacements(self):
     """Test whether we can update placements."""
     campaign_id = self.__class__.campaign['id']
-    start_date_dict = self.__class__.campaign['startDate']
-    end_date_dict = self.__class__.campaign['endDate']
-    start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': start_date_dict[0],
-        'month': start_date_dict[1],
-        'day': start_date_dict[2] + 2}
-    end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': end_date_dict[0],
-        'month': end_date_dict[1],
-        'day': end_date_dict[2] - 2}
+    start_date_before = self.__class__.campaign['startDate']
+    end_date_before = self.__class__.campaign['endDate']
+    start_date = '%s%02d%s' % (
+        start_date_before[:8], int(start_date_before[8:10]) + 2,
+        start_date_before[10:])
+    end_date = '%s%02d%s' % (
+        end_date_before[:8], int(end_date_before[8:10]) - 2,
+        end_date_before[10:])
     placement_update_request = {
         'campaignId' : campaign_id,
         'endDate': end_date,
@@ -498,12 +462,12 @@ class PlacementServiceTestV1_13(unittest.TestCase):
         campaign_id, placement_tag_criteria), tuple))
 
 
-class PlacementServiceTestV1_12(unittest.TestCase):
+class PlacementServiceTestV1_15(unittest.TestCase):
 
-  """Unittest suite for PlacementService using v1_12."""
+  """Unittest suite for PlacementService using v1_15."""
 
-  SERVER = SERVER_V1_12
-  VERSION = VERSION_V1_12
+  SERVER = SERVER_V1_15
+  VERSION = VERSION_V1_15
   client.debug = False
   service = None
   campaign = None
@@ -536,16 +500,8 @@ class PlacementServiceTestV1_12(unittest.TestCase):
     """Test whether we can save a placement."""
     campaign_id = self.__class__.campaign['id']
     site_id = self.__class__.dfa_site_id
-    start_date_dict = self.__class__.campaign['startDate']
-    end_date_dict = self.__class__.campaign['endDate']
-    start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': start_date_dict[0],
-        'month': start_date_dict[1],
-        'day': start_date_dict[2]}
-    end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': end_date_dict[0],
-        'month': end_date_dict[1],
-        'day': end_date_dict[2] - 1}
+    start_date = self.__class__.campaign['startDate']
+    end_date = self.__class__.campaign['endDate']
     placement = {
         'name': 'Placement #%s' % Utils.GetUniqueName(),
         'dfaSiteId': site_id,
@@ -636,16 +592,8 @@ class PlacementServiceTestV1_12(unittest.TestCase):
     """Test whether we can save a placement group."""
     campaign_id = self.__class__.campaign['id']
     site_id = self.__class__.dfa_site_id
-    start_date_dict = self.__class__.campaign['startDate']
-    end_date_dict = self.__class__.campaign['endDate']
-    start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': start_date_dict[0],
-        'month': start_date_dict[1],
-        'day': start_date_dict[2]}
-    end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': end_date_dict[0],
-        'month': end_date_dict[1],
-        'day': end_date_dict[2] - 1}
+    start_date = self.__class__.campaign['startDate']
+    end_date = self.__class__.campaign['endDate']
     placement_group = {
         'name': 'PlacementGroup #%s' % Utils.GetUniqueName(),
         'dfaSiteId': site_id,
@@ -696,16 +644,14 @@ class PlacementServiceTestV1_12(unittest.TestCase):
   def testUpdatePlacements(self):
     """Test whether we can update placements."""
     campaign_id = self.__class__.campaign['id']
-    start_date_dict = self.__class__.campaign['startDate']
-    end_date_dict = self.__class__.campaign['endDate']
-    start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': start_date_dict[0],
-        'month': start_date_dict[1],
-        'day': start_date_dict[2] + 2}
-    end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
-        'year': end_date_dict[0],
-        'month': end_date_dict[1],
-        'day': end_date_dict[2] - 2}
+    start_date_before = self.__class__.campaign['startDate']
+    end_date_before = self.__class__.campaign['endDate']
+    start_date = '%s%02d%s' % (
+        start_date_before[:8], int(start_date_before[8:10]) + 2,
+        start_date_before[10:])
+    end_date = '%s%02d%s' % (
+        end_date_before[:8], int(end_date_before[8:10]) - 2,
+        end_date_before[10:])
     placement_update_request = {
         'campaignId' : campaign_id,
         'endDate': end_date,
@@ -750,14 +696,14 @@ def makeTestSuiteV1_13():
   return suite
 
 
-def makeTestSuiteV1_12():
-  """Set up test suite using v1_12.
+def makeTestSuiteV1_15():
+  """Set up test suite using v1_15.
 
   Returns:
-    TestSuite test suite using v1_12.
+    TestSuite test suite using v1_15.
   """
   suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(PlacementServiceTestV1_12))
+  suite.addTests(unittest.makeSuite(PlacementServiceTestV1_15))
   return suite
 
 
@@ -767,8 +713,8 @@ if __name__ == '__main__':
     suites.append(makeTestSuiteV1_14())
   if TEST_VERSION_V1_13:
     suites.append(makeTestSuiteV1_13())
-  if TEST_VERSION_V1_12:
-    suites.append(makeTestSuiteV1_12())
+  if TEST_VERSION_V1_15:
+    suites.append(makeTestSuiteV1_15())
   if suites:
     alltests = unittest.TestSuite(suites)
     unittest.main(defaultTest='alltests')

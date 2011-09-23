@@ -1,3 +1,11 @@
+1.3.0:
+- Added support for v1.15, removed support for v1.12.
+- Updated adspygoogle.common module to v2.2.0.
+- Fixed issues 2 and 3 on the issue tracker.
+- Dates and floats will no longer be returned as tuples and floats. Instead,
+  they will be returned as strings like all other data types. The DfaUtils
+  function TransformDates is no longer automatically called on any data type.
+
 1.2.0:
 - Added support for v1.14, removed support for v1.11.
 - Added flags to turn off unit tests for the selected versions. By default,
