@@ -22,6 +22,7 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
 # Locate the client library. If module was installed via "setup.py" script, then
 # the following two lines are not needed.
+from datetime import date
 import os
 import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
@@ -56,7 +57,7 @@ line_item = {
     'startDateTimeType': 'IMMEDIATELY',
     'endDateTime': {
         'date': {
-            'year': '2010',
+            'year': str(date.today().year + 1),
             'month': '9',
             'day': '30'
         },

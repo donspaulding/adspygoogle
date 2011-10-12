@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This code example gets a sorted set of sizes across all ad units. """
+"""This code example gets a sorted set of sizes across all ad units."""
 
 __author__ = 'api.shamjeff@gmail.com (Jeff Sham)'
 

@@ -121,7 +121,7 @@ def GetAllEntitiesByStatementWithService(service, query='', page_size=500):
   while True:
     filter_statement = {'query': '%s LIMIT %s OFFSET %s' % (query, page_size,
                                                             offset)}
-    entities = eval('service.%s(filter_statement)[0][\'results\']'
+    entities = eval('service.%s(filter_statement)[0].get(\'results\')'
                     % method_name)
 
     if not entities: break

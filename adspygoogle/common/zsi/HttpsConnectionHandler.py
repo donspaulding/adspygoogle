@@ -80,6 +80,11 @@ class HttpsConnectionHandler(httplib.HTTPSConnection):
         else:
           raise self.NotConnected()
 
+      # DFP - hack to add namespacing for objects that have lazy param arg set
+      # to true
+      data = data.replace('adUnitSizes','ns1:adUnitSizes')
+      data = data.replace('creativePlaceholders','ns1:creativePlaceholders')
+
       stream = StringIO.StringIO()
       zdata = gzip.GzipFile(mode='wb', fileobj=stream, compresslevel=1)
       zdata.write(data)

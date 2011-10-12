@@ -24,14 +24,14 @@ from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
 from adspygoogle.common.Errors import Error
 from adspygoogle.common.WebService import WebService
-from adspygoogle.dfp import DfpSanityCheck
 from adspygoogle.dfp import AUTH_TOKEN_EXPIRE
 from adspygoogle.dfp import AUTH_TOKEN_SERVICE
+from adspygoogle.dfp import DfpSanityCheck
 from adspygoogle.dfp import LIB_SIG
 from adspygoogle.dfp import LIB_URL
-from adspygoogle.dfp.DfpErrors import ERRORS
 from adspygoogle.dfp.DfpErrors import DfpApiError
 from adspygoogle.dfp.DfpErrors import DfpError
+from adspygoogle.dfp.DfpErrors import ERRORS
 from adspygoogle.dfp.DfpSoapBuffer import DfpSoapBuffer
 
 
@@ -168,24 +168,23 @@ class DfpWebService(WebService):
 
       # Load new authentication headers, starting with version v201103.
       data_injects = []
-      if self.__op_config['version'] > 'v201101':
-        new_headers = {}
-        for key in headers:
-          if key == 'authToken' and headers[key]:
-            if config['soap_lib'] == SOAPPY:
-              data_injects.append(
-                  ('<authentication>',
-                   '<authentication xsi3:type="ClientLogin">'))
-              config['data_injects'] = tuple(data_injects)
-            else:
-              config['auth_type'] = 'ClientLogin'
-            new_headers['authentication'] = {'token': headers['authToken']}
-          elif key == 'oAuthToken' and headers[key]:
-            # TODO(api.sgrinberg): Add support for OAuth.
-            pass
+      new_headers = {}
+      for key in headers:
+        if key == 'authToken' and headers[key]:
+          if config['soap_lib'] == SOAPPY:
+            data_injects.append(
+                ('<authentication>',
+                 '<authentication xsi3:type="ClientLogin">'))
+            config['data_injects'] = tuple(data_injects)
           else:
-            new_headers[key] = headers[key]
-        headers = new_headers
+            config['auth_type'] = 'ClientLogin'
+          new_headers['authentication'] = {'token': headers['authToken']}
+        elif key == 'oAuthToken' and headers[key]:
+          # TODO (api.sgrinberg): Add support for OAuth.
+          pass
+        else:
+          new_headers[key] = headers[key]
+      headers = new_headers
 
       buf = DfpSoapBuffer(
           xml_parser=self._config['xml_parser'],

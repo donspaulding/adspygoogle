@@ -22,38 +22,6 @@ import os
 
 API_TARGETS = [
     {
-        'version': 'v201004',
-        'location': os.path.join('..', '..', '..', 'adspygoogle', 'dfp', 'zsi',
-                                 'v201004'),
-        'server': 'https://www.google.com',
-        'services': ('CompanyService', 'CreativeService', 'ForecastService',
-                     'InventoryService', 'LineItemCreativeAssociationService',
-                     'LineItemService', 'NetworkService', 'OrderService',
-                     'PlacementService', 'ReportService', 'UserService')
-    },
-    {
-        'version': 'v201010',
-        'location': os.path.join('..', '..', '..', 'adspygoogle', 'dfp', 'zsi',
-                                 'v201010'),
-        'server': 'https://www.google.com',
-        'services': ('CompanyService', 'CreativeService', 'ForecastService',
-                     'InventoryService', 'LineItemCreativeAssociationService',
-                     'LineItemService', 'NetworkService', 'OrderService',
-                     'PlacementService', 'ReportService', 'UserService')
-    },
-    {
-        'version': 'v201101',
-        'location': os.path.join('..', '..', '..', 'adspygoogle', 'dfp', 'zsi',
-                                 'v201101'),
-        'server': 'https://www.google.com',
-        'services': ('CompanyService', 'CreativeService',
-                     'CustomTargetingService', 'ForecastService',
-                     'InventoryService', 'LineItemCreativeAssociationService',
-                     'LineItemService', 'NetworkService', 'OrderService',
-                     'PlacementService', 'PublisherQueryLanguageService',
-                     'ReportService', 'UserService')
-    },
-    {
         'version': 'v201103',
         'location': os.path.join('..', '..', '..', 'adspygoogle', 'dfp', 'zsi',
                                  'v201103'),
@@ -89,5 +57,18 @@ API_TARGETS = [
                      'NetworkService', 'OrderService', 'PlacementService',
                      'PublisherQueryLanguageService', 'ReportService',
                      'UserService')
+    },
+    {
+        'version': 'v201108',
+        'location': os.path.join('..', '..', '..', 'adspygoogle', 'dfp', 'zsi',
+                                 'v201108'),
+        'server': 'https://www.google.com',
+        'services': ('CompanyService', 'CreativeService',
+                     'CustomTargetingService', 'ForecastService',
+                     'InventoryService', 'LabelService',
+                     'LineItemCreativeAssociationService', 'LineItemService',
+                     'NetworkService', 'OrderService', 'PlacementService',
+                     'PublisherQueryLanguageService', 'ReportService',
+                     'ThirdPartySlotService', 'UserService')
     }
 ]

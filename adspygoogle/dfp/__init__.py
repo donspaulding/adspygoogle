@@ -32,21 +32,21 @@ LIB_SHORT_NAME = 'DfpApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-dfp-python'
 LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '6.0.0'
-LIB_MIN_COMMON_VERSION = '2.1.0'
+LIB_VERSION = '7.0.0'
+LIB_MIN_COMMON_VERSION = '2.2.1'
 LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
 
-if VERSION > LIB_MIN_COMMON_VERSION:
+if VERSION < LIB_MIN_COMMON_VERSION:
   msg = ('Unsupported version of the core module is detected. Please download '
          'the latest version of client library at %s.' % LIB_URL)
   raise MissingPackageError(msg)
 
 # Tuple of tuples representing API versions, where each inner tuple is a
 # combination of the API vesrion and whether API used JAXB.
-API_VERSIONS_MAP = (('v201004', True), ('v201010', True), ('v201101', True),
-                    ('v201103', True), ('v201104', True), ('v201107', True))
+API_VERSIONS_MAP = (('v201103', True), ('v201104', True), ('v201107', True),
+                    ('v201108', True))
 API_VERSIONS = [version for version, is_jaxb_api in API_VERSIONS_MAP]
-MIN_API_VERSION = API_VERSIONS[5]
+MIN_API_VERSION = API_VERSIONS[3]
 
 # Accepted combinations of headers which user has to provide. Either one of
 # these is required in order to make a succesful API request.

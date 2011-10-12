@@ -24,65 +24,16 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
+from tests.adspygoogle.dfp import client
 from tests.adspygoogle.dfp import HTTP_PROXY
-from tests.adspygoogle.dfp import SERVER_V201101
 from tests.adspygoogle.dfp import SERVER_V201103
 from tests.adspygoogle.dfp import SERVER_V201104
 from tests.adspygoogle.dfp import SERVER_V201107
-from tests.adspygoogle.dfp import VERSION_V201101
+from tests.adspygoogle.dfp import SERVER_V201108
 from tests.adspygoogle.dfp import VERSION_V201103
 from tests.adspygoogle.dfp import VERSION_V201104
 from tests.adspygoogle.dfp import VERSION_V201107
-from tests.adspygoogle.dfp import client
-
-
-class PublisherQueryLanguageServiceTestV201101(unittest.TestCase):
-
-  """Unittest suite for PublisherQueryLanguageService using v201101."""
-
-  SERVER = SERVER_V201101
-  VERSION = VERSION_V201101
-  client.debug = False
-  service = None
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetPublisherQueryLanguageService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testGetCitiesByStatement(self):
-    """Test whether we can fetch a list of existing cities that match given
-    statement."""
-    select_statement = {'query': 'SELECT * FROM City WHERE '
-                        'targetable = true limit 10'}
-    self.assert_(isinstance(
-        self.__class__.service.Select(select_statement), tuple))
-
-  def testGetCountriesByStatement(self):
-    """Test whether we can fetch a list of existing countries that match given
-    statement."""
-    select_statement = {'query': 'SELECT * FROM Country WHERE '
-                        'targetable = true limit 10'}
-    self.assert_(isinstance(
-        self.__class__.service.Select(select_statement), tuple))
-
-  def testGetMetrosByStatement(self):
-    """Test whether we can fetch a list of existing metros   that match given
-    statement."""
-    select_statement = {'query': 'SELECT * FROM Metro WHERE '
-                        'targetable = true limit 10'}
-    self.assert_(isinstance(
-        self.__class__.service.Select(select_statement), tuple))
-
-  def testGetRegionsByStatement(self):
-    """Test whether we can fetch a list of existing regions that match given
-    statement."""
-    select_statement = {'query': 'SELECT * FROM Region WHERE '
-                        'targetable = true limit 10'}
-    self.assert_(isinstance(
-        self.__class__.service.Select(select_statement), tuple))
+from tests.adspygoogle.dfp import VERSION_V201108
 
 
 class PublisherQueryLanguageServiceTestV201103(unittest.TestCase):
@@ -232,15 +183,53 @@ class PublisherQueryLanguageServiceTestV201107(unittest.TestCase):
         self.__class__.service.Select(select_statement), tuple))
 
 
-def makeTestSuiteV201101():
-  """Set up test suite using v201101.
+class PublisherQueryLanguageServiceTestV201108(unittest.TestCase):
 
-  Returns:
-    TestSuite test suite using v201101.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(PublisherQueryLanguageServiceTestV201101))
-  return suite
+  """Unittest suite for PublisherQueryLanguageService using v201108."""
+
+  SERVER = SERVER_V201108
+  VERSION = VERSION_V201108
+  client.debug = False
+  service = None
+
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
+    if not self.__class__.service:
+      self.__class__.service = client.GetPublisherQueryLanguageService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+
+  def testGetCitiesByStatement(self):
+    """Test whether we can fetch a list of existing cities that match given
+    statement."""
+    select_statement = {'query': 'SELECT * FROM City WHERE '
+                        'targetable = true limit 10'}
+    self.assert_(isinstance(
+        self.__class__.service.Select(select_statement), tuple))
+
+  def testGetCountriesByStatement(self):
+    """Test whether we can fetch a list of existing countries that match given
+    statement."""
+    select_statement = {'query': 'SELECT * FROM Country WHERE '
+                        'targetable = true limit 10'}
+    self.assert_(isinstance(
+        self.__class__.service.Select(select_statement), tuple))
+
+  def testGetMetrosByStatement(self):
+    """Test whether we can fetch a list of existing metros   that match given
+    statement."""
+    select_statement = {'query': 'SELECT * FROM Metro WHERE '
+                        'targetable = true limit 10'}
+    self.assert_(isinstance(
+        self.__class__.service.Select(select_statement), tuple))
+
+  def testGetRegionsByStatement(self):
+    """Test whether we can fetch a list of existing regions that match given
+    statement."""
+    select_statement = {'query': 'SELECT * FROM Region WHERE '
+                        'targetable = true limit 10'}
+    self.assert_(isinstance(
+        self.__class__.service.Select(select_statement), tuple))
 
 
 def makeTestSuiteV201103():
@@ -276,11 +265,21 @@ def makeTestSuiteV201107():
   return suite
 
 
+def makeTestSuiteV201108():
+  """Set up test suite using v201108.
+
+  Returns:
+    TestSuite test suite using v201108.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(PublisherQueryLanguageServiceTestV201108))
+  return suite
+
+
 if __name__ == '__main__':
-  suite_v201101 = makeTestSuiteV201101()
   suite_v201103 = makeTestSuiteV201103()
   suite_v201104 = makeTestSuiteV201104()
   suite_v201107 = makeTestSuiteV201107()
-  alltests = unittest.TestSuite([suite_v201101, suite_v201103, suite_v201104,
-                                 suite_v201107])
+  alltests = unittest.TestSuite([suite_v201103, suite_v201104, suite_v201107,
+                                 suite_v201108])
   unittest.main(defaultTest='alltests')

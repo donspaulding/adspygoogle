@@ -26,179 +26,16 @@ import unittest
 
 from adspygoogle.common import Utils
 from adspygoogle.dfp.DfpErrors import DfpApiError
+from tests.adspygoogle.dfp import client
 from tests.adspygoogle.dfp import HTTP_PROXY
-from tests.adspygoogle.dfp import SERVER_V201101
 from tests.adspygoogle.dfp import SERVER_V201103
 from tests.adspygoogle.dfp import SERVER_V201104
 from tests.adspygoogle.dfp import SERVER_V201107
-from tests.adspygoogle.dfp import VERSION_V201101
+from tests.adspygoogle.dfp import SERVER_V201108
 from tests.adspygoogle.dfp import VERSION_V201103
 from tests.adspygoogle.dfp import VERSION_V201104
 from tests.adspygoogle.dfp import VERSION_V201107
-from tests.adspygoogle.dfp import client
-
-
-class CustomTargetingServiceTestV201101(unittest.TestCase):
-
-  """Unittest suite for CustomTargetingService using v201101."""
-
-  SERVER = SERVER_V201101
-  VERSION = VERSION_V201101
-  client.debug = False
-  service = None
-  key1 = None
-  key2 = None
-  value1 = None
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetCustomTargetingService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testCreateCustomTargetingKeys(self):
-    """Test whether we can create custom targeting keys."""
-    keys = [
-        {
-            'displayName': 'gender',
-            'name': Utils.GetUniqueName(10),
-            'type': 'PREDEFINED'
-        },
-        {
-            'displayName': 'car model',
-            'name': Utils.GetUniqueName(10),
-            'type': 'FREEFORM'
-        }
-    ]
-    try:
-      keys = self.__class__.service.CreateCustomTargetingKeys(keys)
-      self.__class__.key1 = keys[0]
-      self.__class__.key2 = keys[1]
-      self.assert_(isinstance(keys, tuple))
-    except DfpApiError, e:
-      if str(e).find('CustomTargetingError.KEY_COUNT_TOO_LARGE') > -1:
-        self.testDeleteCustomTargetingKeys()
-      else:
-        raise e
-
-  def testCreateCustomTargetingValues(self):
-    """Test whether we can create custom targeting values."""
-    if not self.__class__.key1 or not self.__class__.key2:
-      self.testCreateCustomTargetingKeys()
-
-    values = [
-        {
-          'customTargetingKeyId': self.__class__.key1['id'],
-          'displayName': 'male',
-          'name': Utils.GetUniqueName(40),
-          'matchType': 'EXACT'
-        },
-        {
-          'customTargetingKeyId': self.__class__.key1['id'],
-          'displayName': 'female',
-          'name': Utils.GetUniqueName(40),
-          'matchType': 'EXACT'
-        }
-    ]
-    try:
-      values = self.__class__.service.CreateCustomTargetingValues(values)
-      self.__class__.value1 = values[0]
-      self.assert_(isinstance(values, tuple))
-    except DfpApiError, e:
-      if str(e).find('CustomTargetingError.VALUE_NAME_DUPLICATE') > -1:
-        self.testDeleteCustomTargetingValues()
-      else:
-        raise e
-
-  def testGetAllCustomTargetingKeys(self):
-    """Test whether we can retrieve all custom targeting keys."""
-    values = [{
-        'key': 'type',
-        'value': {
-            'xsi_type': 'TextValue',
-            'value': 'PREDEFINED'
-        }
-    }]
-    filter_statement = {'query': 'WHERE type = :type LIMIT 500',
-                        'values': values}
-    self.assert_(isinstance(
-        self.__class__.service.GetCustomTargetingKeysByStatement(
-            filter_statement), tuple))
-
-  def testGetAllCustomTargetingValues(self):
-    """Test whether we can retrieve all custom targeting values."""
-    if not self.__class__.key1 or not self.__class__.key2:
-      self.testCreateCustomTargetingKeys()
-
-    values = [{
-        'key': 'keyId',
-        'value': {
-            'xsi_type': 'NumberValue',
-            'value': self.__class__.key1['id']
-        }
-    }]
-    filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
-                                 'LIMIT 500',
-                        'values': values}
-    self.assert_(isinstance(
-        self.__class__.service.GetCustomTargetingValuesByStatement(
-            filter_statement), tuple))
-
-  def testUpdateCustomTargetingKeys(self):
-    """Test whether we can update existing custom targeting keys."""
-    if not self.__class__.key1 or not self.__class__.key2:
-      self.testCreateCustomTargetingKeys()
-
-    keys = [self.__class__.key1, self.__class__.key2]
-    for key in keys:
-      key['displayName'] += ' (Deprecated)'
-    self.assert_(isinstance(
-        self.__class__.service.UpdateCustomTargetingKeys(keys), tuple))
-
-  def testUpdateCustomTargetingValues(self):
-    """Test whether we can update existing custom targeting values."""
-    if not self.__class__.value1:
-      self.testCreateCustomTargetingValues()
-
-    values = [self.__class__.value1]
-    for value in values:
-      value['displayName'] += ' (Deprecated)'
-    self.assert_(isinstance(
-        self.__class__.service.UpdateCustomTargetingValues(values), tuple))
-
-  def testDeleteCustomTargetingKeys(self):
-    """Test whether we can delete existing custom targeting keys."""
-    action = {'type': 'DeleteCustomTargetingKeyAction'}
-    filter_statement = {'query': 'LIMIT 500'}
-    self.assert_(isinstance(
-        self.__class__.service.PerformCustomTargetingKeyAction(
-            action, filter_statement), tuple))
-    self.__class__.key1 = None
-    self.__class__.key2 = None
-
-  def testDeleteCustomTargetingValues(self):
-    """Test whether we can delete existing custom targeting values."""
-    if not self.__class__.key1 or not self.__class__.key2:
-      self.testCreateCustomTargetingKeys()
-    if not self.__class__.value1:
-      self.testCreateCustomTargetingValues()
-
-    action = {'type': 'DeleteCustomTargetingValueAction'}
-    values = [{
-        'key': 'keyId',
-        'value': {
-            'xsi_type': 'NumberValue',
-            'value': self.__class__.key1['id']
-        }
-    }]
-    filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
-                                 'AND id IN (%s)' % self.__class__.value1['id'],
-                        'values': values}
-    self.assert_(isinstance(
-        self.__class__.service.PerformCustomTargetingValueAction(
-            action, filter_statement), tuple))
-    self.__class__.value1 = None
+from tests.adspygoogle.dfp import VERSION_V201108
 
 
 class CustomTargetingServiceTestV201103(unittest.TestCase):
@@ -252,16 +89,16 @@ class CustomTargetingServiceTestV201103(unittest.TestCase):
 
     values = [
         {
-          'customTargetingKeyId': self.__class__.key1['id'],
-          'displayName': 'male',
-          'name': Utils.GetUniqueName(40),
-          'matchType': 'EXACT'
+            'customTargetingKeyId': self.__class__.key1['id'],
+            'displayName': 'male',
+            'name': Utils.GetUniqueName(40),
+            'matchType': 'EXACT'
         },
         {
-          'customTargetingKeyId': self.__class__.key1['id'],
-          'displayName': 'female',
-          'name': Utils.GetUniqueName(40),
-          'matchType': 'EXACT'
+            'customTargetingKeyId': self.__class__.key1['id'],
+            'displayName': 'female',
+            'name': Utils.GetUniqueName(40),
+            'matchType': 'EXACT'
         }
     ]
     try:
@@ -302,7 +139,7 @@ class CustomTargetingServiceTestV201103(unittest.TestCase):
         }
     }]
     filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
-                                 'LIMIT 500',
+                        'LIMIT 500',
                         'values': values}
     self.assert_(isinstance(
         self.__class__.service.GetCustomTargetingValuesByStatement(
@@ -356,7 +193,7 @@ class CustomTargetingServiceTestV201103(unittest.TestCase):
         }
     }]
     filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
-                                 'AND id IN (%s)' % self.__class__.value1['id'],
+                        'AND id IN (%s)' % self.__class__.value1['id'],
                         'values': values}
     self.assert_(isinstance(
         self.__class__.service.PerformCustomTargetingValueAction(
@@ -415,16 +252,16 @@ class CustomTargetingServiceTestV201104(unittest.TestCase):
 
     values = [
         {
-          'customTargetingKeyId': self.__class__.key1['id'],
-          'displayName': 'male',
-          'name': Utils.GetUniqueName(40),
-          'matchType': 'EXACT'
+            'customTargetingKeyId': self.__class__.key1['id'],
+            'displayName': 'male',
+            'name': Utils.GetUniqueName(40),
+            'matchType': 'EXACT'
         },
         {
-          'customTargetingKeyId': self.__class__.key1['id'],
-          'displayName': 'female',
-          'name': Utils.GetUniqueName(40),
-          'matchType': 'EXACT'
+            'customTargetingKeyId': self.__class__.key1['id'],
+            'displayName': 'female',
+            'name': Utils.GetUniqueName(40),
+            'matchType': 'EXACT'
         }
     ]
     try:
@@ -465,7 +302,7 @@ class CustomTargetingServiceTestV201104(unittest.TestCase):
         }
     }]
     filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
-                                 'LIMIT 500',
+                        'LIMIT 500',
                         'values': values}
     self.assert_(isinstance(
         self.__class__.service.GetCustomTargetingValuesByStatement(
@@ -519,7 +356,7 @@ class CustomTargetingServiceTestV201104(unittest.TestCase):
         }
     }]
     filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
-                                 'AND id IN (%s)' % self.__class__.value1['id'],
+                        'AND id IN (%s)' % self.__class__.value1['id'],
                         'values': values}
     self.assert_(isinstance(
         self.__class__.service.PerformCustomTargetingValueAction(
@@ -628,7 +465,7 @@ class CustomTargetingServiceTestV201107(unittest.TestCase):
         }
     }]
     filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
-                                 'LIMIT 500',
+                        'LIMIT 500',
                         'values': values}
     self.assert_(isinstance(
         self.__class__.service.GetCustomTargetingValuesByStatement(
@@ -682,7 +519,7 @@ class CustomTargetingServiceTestV201107(unittest.TestCase):
         }
     }]
     filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
-                                 'AND id IN (%s)' % self.__class__.value1['id'],
+                        'AND id IN (%s)' % self.__class__.value1['id'],
                         'values': values}
     self.assert_(isinstance(
         self.__class__.service.PerformCustomTargetingValueAction(
@@ -690,15 +527,167 @@ class CustomTargetingServiceTestV201107(unittest.TestCase):
     self.__class__.value1 = None
 
 
-def makeTestSuiteV201101():
-  """Set up test suite using v201101.
+class CustomTargetingServiceTestV201108(unittest.TestCase):
 
-  Returns:
-    TestSuite test suite using v201101.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(CustomTargetingServiceTestV201101))
-  return suite
+  """Unittest suite for CustomTargetingService using v201108."""
+
+  SERVER = SERVER_V201108
+  VERSION = VERSION_V201108
+  client.debug = False
+  service = None
+  key1 = None
+  key2 = None
+  value1 = None
+
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
+    if not self.__class__.service:
+      self.__class__.service = client.GetCustomTargetingService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+
+  def testCreateCustomTargetingKeys(self):
+    """Test whether we can create custom targeting keys."""
+    keys = [
+        {
+            'displayName': 'gender',
+            'name': Utils.GetUniqueName(10),
+            'type': 'PREDEFINED'
+        },
+        {
+            'displayName': 'car model',
+            'name': Utils.GetUniqueName(10),
+            'type': 'FREEFORM'
+        }
+    ]
+    try:
+      keys = self.__class__.service.CreateCustomTargetingKeys(keys)
+      self.__class__.key1 = keys[0]
+      self.__class__.key2 = keys[1]
+      self.assert_(isinstance(keys, tuple))
+    except DfpApiError, e:
+      if str(e).find('CustomTargetingError.KEY_COUNT_TOO_LARGE') > -1:
+        self.testDeleteCustomTargetingKeys()
+      else:
+        raise e
+
+  def testCreateCustomTargetingValues(self):
+    """Test whether we can create custom targeting values."""
+    if not self.__class__.key1 or not self.__class__.key2:
+      self.testCreateCustomTargetingKeys()
+
+    values = [
+        {
+            'customTargetingKeyId': self.__class__.key1['id'],
+            'displayName': 'male',
+            'name': Utils.GetUniqueName(40),
+            'matchType': 'EXACT'
+        },
+        {
+            'customTargetingKeyId': self.__class__.key1['id'],
+            'displayName': 'female',
+            'name': Utils.GetUniqueName(40),
+            'matchType': 'EXACT'
+        }
+    ]
+    try:
+      values = self.__class__.service.CreateCustomTargetingValues(values)
+      self.__class__.value1 = values[0]
+      self.assert_(isinstance(values, tuple))
+    except DfpApiError, e:
+      if str(e).find('CustomTargetingError.VALUE_NAME_DUPLICATE') > -1:
+        self.testDeleteCustomTargetingValues()
+      else:
+        raise e
+
+  def testGetAllCustomTargetingKeys(self):
+    """Test whether we can retrieve all custom targeting keys."""
+    values = [{
+        'key': 'type',
+        'value': {
+            'xsi_type': 'TextValue',
+            'value': 'PREDEFINED'
+        }
+    }]
+    filter_statement = {'query': 'WHERE type = :type LIMIT 500',
+                        'values': values}
+    self.assert_(isinstance(
+        self.__class__.service.GetCustomTargetingKeysByStatement(
+            filter_statement), tuple))
+
+  def testGetAllCustomTargetingValues(self):
+    """Test whether we can retrieve all custom targeting values."""
+    if not self.__class__.key1 or not self.__class__.key2:
+      self.testCreateCustomTargetingKeys()
+
+    values = [{
+        'key': 'keyId',
+        'value': {
+            'xsi_type': 'NumberValue',
+            'value': self.__class__.key1['id']
+        }
+    }]
+    filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
+                        'LIMIT 500',
+                        'values': values}
+    self.assert_(isinstance(
+        self.__class__.service.GetCustomTargetingValuesByStatement(
+            filter_statement), tuple))
+
+  def testUpdateCustomTargetingKeys(self):
+    """Test whether we can update existing custom targeting keys."""
+    if not self.__class__.key1 or not self.__class__.key2:
+      self.testCreateCustomTargetingKeys()
+
+    keys = [self.__class__.key1, self.__class__.key2]
+    for key in keys:
+      key['displayName'] += ' (Deprecated)'
+    self.assert_(isinstance(
+        self.__class__.service.UpdateCustomTargetingKeys(keys), tuple))
+
+  def testUpdateCustomTargetingValues(self):
+    """Test whether we can update existing custom targeting values."""
+    if not self.__class__.value1:
+      self.testCreateCustomTargetingValues()
+
+    values = [self.__class__.value1]
+    for value in values:
+      value['displayName'] += ' (Deprecated)'
+    self.assert_(isinstance(
+        self.__class__.service.UpdateCustomTargetingValues(values), tuple))
+
+  def testDeleteCustomTargetingKeys(self):
+    """Test whether we can delete existing custom targeting keys."""
+    action = {'type': 'DeleteCustomTargetingKeys'}
+    filter_statement = {'query': 'LIMIT 500'}
+    self.assert_(isinstance(
+        self.__class__.service.PerformCustomTargetingKeyAction(
+            action, filter_statement), tuple))
+    self.__class__.key1 = None
+    self.__class__.key2 = None
+
+  def testDeleteCustomTargetingValues(self):
+    """Test whether we can delete existing custom targeting values."""
+    if not self.__class__.key1 or not self.__class__.key2:
+      self.testCreateCustomTargetingKeys()
+    if not self.__class__.value1:
+      self.testCreateCustomTargetingValues()
+
+    action = {'type': 'DeleteCustomTargetingValues'}
+    values = [{
+        'key': 'keyId',
+        'value': {
+            'xsi_type': 'NumberValue',
+            'value': self.__class__.key1['id']
+        }
+    }]
+    filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId '
+                        'AND id IN (%s)' % self.__class__.value1['id'],
+                        'values': values}
+    self.assert_(isinstance(
+        self.__class__.service.PerformCustomTargetingValueAction(
+            action, filter_statement), tuple))
+    self.__class__.value1 = None
 
 
 def makeTestSuiteV201103():
@@ -734,11 +723,22 @@ def makeTestSuiteV201107():
   return suite
 
 
+def makeTestSuiteV201108():
+  """Set up test suite using v201108.
+
+  Returns:
+    TestSuite test suite using v201108.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(CustomTargetingServiceTestV201108))
+  return suite
+
+
 if __name__ == '__main__':
-  suite_v201101 = makeTestSuiteV201101()
   suite_v201103 = makeTestSuiteV201103()
   suite_v201104 = makeTestSuiteV201104()
   suite_v201107 = makeTestSuiteV201107()
-  alltests = unittest.TestSuite([suite_v201101, suite_v201103, suite_v201104,
-                                 suite_v201107])
+  suite_v201108 = makeTestSuiteV201108()
+  alltests = unittest.TestSuite([suite_v201103, suite_v201104, suite_v201107,
+                                 suite_v201108])
   unittest.main(defaultTest='alltests')

@@ -29,7 +29,7 @@ from adspygoogle.common.Logger import Logger
 from adspygoogle.dfp import LIB_SIG
 
 
-LOG_NAME = 'dfa_api_lib'
+LOG_NAME = 'dfp_api_lib'
 LOGGER = Logger(LIB_SIG, os.path.join('..', '..', '..', 'logs'))
 
 

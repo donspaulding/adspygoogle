@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This code example gets the current user. """
+"""This code example gets the current user."""
 
 __author__ = 'api.shamjeff@gmail.com (Jeff Sham)'
 

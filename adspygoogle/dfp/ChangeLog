@@ -1,3 +1,7 @@
+7.0.0:
+- Added support for v201108 and set it as default version.
+- Sunset versions v201004, v201010, v201101.
+
 6.0.0:
 - Added support for v201104 and v201107. v201107 is set as default.
 - Update services to use a new sanity check mechanism.

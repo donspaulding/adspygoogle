@@ -91,6 +91,11 @@ for target in API_TARGETS:
         data = data.replace('ZSI.TCnumbers.Ilong', 'ZSI.TC.String')
         data = data.replace('ZSI.TCnumbers.FPdouble', 'ZSI.TC.String')
         data = data.replace('ZSI.TC.Boolean', 'ZSI.TC.String')
+        # Hack AdUnitSize and CreativePlaceholder to be lazy loaded, so the
+        # parent Location field doesn't cause infinite loops.
+        data = data.replace('"AdUnitSize",lazy=False', '"AdUnitSize",lazy=True')
+        data = data.replace('"CreativePlaceholder",lazy=False',
+                            '"CreativePlaceholder",lazy=True')
       finally:
         fh.close()
       fh = open(f_path, 'w')

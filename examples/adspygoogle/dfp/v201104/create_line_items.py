@@ -23,6 +23,7 @@ __author__ = 'api.shamjeff@gmail.com (Jeff Sham)'
 
 # Locate the client library. If module was installed via "setup.py" script, then
 # the following two lines are not needed.
+from datetime import date
 import os
 import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
@@ -122,7 +123,7 @@ for i in xrange(5):
       'lineItemType': 'STANDARD',
       'endDateTime': {
           'date': {
-              'year': '2011',
+              'year': str(date.today().year + 1),
               'month': '9',
               'day': '30'
           },

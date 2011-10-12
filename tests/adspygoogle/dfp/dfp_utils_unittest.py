@@ -27,239 +27,16 @@ from adspygoogle.common import Utils
 from adspygoogle.common.Errors import ValidationError
 from adspygoogle.dfp import DfpUtils
 from adspygoogle.dfp.DfpSoapBuffer import DfpSoapBuffer
+from tests.adspygoogle.dfp import client
 from tests.adspygoogle.dfp import HTTP_PROXY
-from tests.adspygoogle.dfp import SERVER_V201004
-from tests.adspygoogle.dfp import SERVER_V201010
-from tests.adspygoogle.dfp import SERVER_V201101
 from tests.adspygoogle.dfp import SERVER_V201103
 from tests.adspygoogle.dfp import SERVER_V201104
 from tests.adspygoogle.dfp import SERVER_V201107
-from tests.adspygoogle.dfp import VERSION_V201004
-from tests.adspygoogle.dfp import VERSION_V201010
-from tests.adspygoogle.dfp import VERSION_V201101
+from tests.adspygoogle.dfp import SERVER_V201108
 from tests.adspygoogle.dfp import VERSION_V201103
 from tests.adspygoogle.dfp import VERSION_V201104
 from tests.adspygoogle.dfp import VERSION_V201107
-from tests.adspygoogle.dfp import client
-
-
-class DfpUtilsTestV201004(unittest.TestCase):
-
-  """Unittest suite for DfpUtils using v201004."""
-
-  SERVER = SERVER_V201004
-  VERSION = VERSION_V201004
-  client.debug = False
-  TRIGGER_MSG = ('502 Server Error. The server encountered a temporary error'
-                 ' and could not complete yourrequest. Please try again in 30 '
-                 'seconds.')
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-
-  def testError502(self):
-    """Test whether we can handle and report 502 errors."""
-    # Temporarily redirect STDOUT into a buffer.
-    buf = DfpSoapBuffer()
-    sys.stdout = buf
-
-    html_code = Utils.ReadFile(os.path.join('data', 'http_error_502.html'))
-    print html_code
-
-    # Restore STDOUT.
-    sys.stdout = sys.__stdout__
-
-    if not buf.IsHandshakeComplete():
-      data = buf.GetBufferAsStr()
-    else:
-      data = ''
-
-    self.assertEqual(Utils.GetErrorFromHtml(data), self.__class__.TRIGGER_MSG)
-
-  def testDataFileCurrencies(self):
-    """Test whether csv data file with currencies is valid."""
-    cols = 2
-    for item in DfpUtils.GetCurrencies():
-      self.assertEqual(len(item), cols)
-
-  def testDataFileTimezones(self):
-    """Test whether csv data file with timezones is valid."""
-    cols = 1
-    for item in DfpUtils.GetTimezones():
-      self.assertEqual(len(item), cols)
-
-  def testGetAllEntitiesByStatement(self):
-    """Test whether GetAllEntitiesByStatement() does what it suppose to."""
-    users = DfpUtils.GetAllEntitiesByStatement(
-        client, 'User', 'ORDER BY name',
-        server=self.__class__.SERVER, version=self.__class__.VERSION,
-        http_proxy=HTTP_PROXY)
-    self.assert_(isinstance(users, list))
-
-  def testGetAllEntitiesByStatementWithLimit(self):
-    """Test whether GetAllEntitiesByStatement() does what it suppose to do when
-    LIMIT is provided as part of the query."""
-    self.failUnlessRaises(
-        ValidationError, DfpUtils.GetAllEntitiesByStatement,
-        client, 'User', 'ORDER BY name LIMIT 1',
-        server=self.__class__.SERVER, version=self.__class__.VERSION,
-        http_proxy=HTTP_PROXY)
-
-  def testGetAllEntitiesByStatementWithService(self):
-    """Test whether GetAllEntitiesByStatementWithService() does what it suppose
-    to."""
-    user_service = client.GetUserService(self.__class__.SERVER,
-                                         self.__class__.VERSION)
-    users = DfpUtils.GetAllEntitiesByStatementWithService(
-        user_service, 'ORDER BY name')
-    self.assert_(isinstance(users, list))
-
-
-class DfpUtilsTestV201010(unittest.TestCase):
-
-  """Unittest suite for DfpUtils using v201010."""
-
-  SERVER = SERVER_V201010
-  VERSION = VERSION_V201010
-  client.debug = False
-  TRIGGER_MSG = ('502 Server Error. The server encountered a temporary error'
-                 ' and could not complete yourrequest. Please try again in 30 '
-                 'seconds.')
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-
-  def testError502(self):
-    """Test whether we can handle and report 502 errors."""
-    # Temporarily redirect STDOUT into a buffer.
-    buf = DfpSoapBuffer()
-    sys.stdout = buf
-
-    html_code = Utils.ReadFile(os.path.join('data', 'http_error_502.html'))
-    print html_code
-
-    # Restore STDOUT.
-    sys.stdout = sys.__stdout__
-
-    if not buf.IsHandshakeComplete():
-      data = buf.GetBufferAsStr()
-    else:
-      data = ''
-
-    self.assertEqual(Utils.GetErrorFromHtml(data), self.__class__.TRIGGER_MSG)
-
-  def testDataFileCurrencies(self):
-    """Test whether csv data file with currencies is valid."""
-    cols = 2
-    for item in DfpUtils.GetCurrencies():
-      self.assertEqual(len(item), cols)
-
-  def testDataFileTimezones(self):
-    """Test whether csv data file with timezones is valid."""
-    cols = 1
-    for item in DfpUtils.GetTimezones():
-      self.assertEqual(len(item), cols)
-
-  def testGetAllEntitiesByStatement(self):
-    """Test whether GetAllEntitiesByStatement() does what it suppose to."""
-    users = DfpUtils.GetAllEntitiesByStatement(
-        client, 'User', 'ORDER BY name',
-        server=self.__class__.SERVER, version=self.__class__.VERSION,
-        http_proxy=HTTP_PROXY)
-    self.assert_(isinstance(users, list))
-
-  def testGetAllEntitiesByStatementWithLimit(self):
-    """Test whether GetAllEntitiesByStatement() does what it suppose to do when
-    LIMIT is provided as part of the query."""
-    self.failUnlessRaises(
-        ValidationError, DfpUtils.GetAllEntitiesByStatement,
-        client, 'User', 'ORDER BY name LIMIT 1',
-        server=self.__class__.SERVER, version=self.__class__.VERSION,
-        http_proxy=HTTP_PROXY)
-
-  def testGetAllEntitiesByStatementWithService(self):
-    """Test whether GetAllEntitiesByStatementWithService() does what it suppose
-    to."""
-    user_service = client.GetUserService(self.__class__.SERVER,
-                                         self.__class__.VERSION)
-    users = DfpUtils.GetAllEntitiesByStatementWithService(
-        user_service, 'ORDER BY name')
-    self.assert_(isinstance(users, list))
-
-
-class DfpUtilsTestV201101(unittest.TestCase):
-
-  """Unittest suite for DfpUtils using v201101."""
-
-  SERVER = SERVER_V201101
-  VERSION = VERSION_V201101
-  client.debug = False
-  TRIGGER_MSG = ('502 Server Error. The server encountered a temporary error'
-                 ' and could not complete yourrequest. Please try again in 30 '
-                 'seconds.')
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-
-  def testError502(self):
-    """Test whether we can handle and report 502 errors."""
-    # Temporarily redirect STDOUT into a buffer.
-    buf = DfpSoapBuffer()
-    sys.stdout = buf
-
-    html_code = Utils.ReadFile(os.path.join('data', 'http_error_502.html'))
-    print html_code
-
-    # Restore STDOUT.
-    sys.stdout = sys.__stdout__
-
-    if not buf.IsHandshakeComplete():
-      data = buf.GetBufferAsStr()
-    else:
-      data = ''
-
-    self.assertEqual(Utils.GetErrorFromHtml(data), self.__class__.TRIGGER_MSG)
-
-  def testDataFileCurrencies(self):
-    """Test whether csv data file with currencies is valid."""
-    cols = 2
-    for item in DfpUtils.GetCurrencies():
-      self.assertEqual(len(item), cols)
-
-  def testDataFileTimezones(self):
-    """Test whether csv data file with timezones is valid."""
-    cols = 1
-    for item in DfpUtils.GetTimezones():
-      self.assertEqual(len(item), cols)
-
-  def testGetAllEntitiesByStatement(self):
-    """Test whether GetAllEntitiesByStatement() does what it suppose to."""
-    users = DfpUtils.GetAllEntitiesByStatement(
-        client, 'User', 'ORDER BY name',
-        server=self.__class__.SERVER, version=self.__class__.VERSION,
-        http_proxy=HTTP_PROXY)
-    self.assert_(isinstance(users, list))
-
-  def testGetAllEntitiesByStatementWithLimit(self):
-    """Test whether GetAllEntitiesByStatement() does what it suppose to do when
-    LIMIT is provided as part of the query."""
-    self.failUnlessRaises(
-        ValidationError, DfpUtils.GetAllEntitiesByStatement,
-        client, 'User', 'ORDER BY name LIMIT 1',
-        server=self.__class__.SERVER, version=self.__class__.VERSION,
-        http_proxy=HTTP_PROXY)
-
-  def testGetAllEntitiesByStatementWithService(self):
-    """Test whether GetAllEntitiesByStatementWithService() does what it suppose
-    to."""
-    user_service = client.GetUserService(self.__class__.SERVER,
-                                         self.__class__.VERSION)
-    users = DfpUtils.GetAllEntitiesByStatementWithService(
-        user_service, 'ORDER BY name')
-    self.assert_(isinstance(users, list))
+from tests.adspygoogle.dfp import VERSION_V201108
 
 
 class DfpUtilsTestV201103(unittest.TestCase):
@@ -481,37 +258,77 @@ class DfpUtilsTestV201107(unittest.TestCase):
     self.assert_(isinstance(users, list))
 
 
-def makeTestSuiteV201004():
-  """Set up test suite using v201004.
+class DfpUtilsTestV201108(unittest.TestCase):
 
-  Returns:
-    TestSuite test suite using v201004.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(DfpUtilsTestV201004))
-  return suite
+  """Unittest suite for DfpUtils using v201108."""
 
+  SERVER = SERVER_V201108
+  VERSION = VERSION_V201108
+  client.debug = False
+  TRIGGER_MSG = ('502 Server Error. The server encountered a temporary error'
+                 ' and could not complete yourrequest. Please try again in 30 '
+                 'seconds.')
 
-def makeTestSuiteV201010():
-  """Set up test suite using v201010.
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
 
-  Returns:
-    TestSuite test suite using v201010.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(DfpUtilsTestV201010))
-  return suite
+  def testError502(self):
+    """Test whether we can handle and report 502 errors."""
+    # Temporarily redirect STDOUT into a buffer.
+    buf = DfpSoapBuffer()
+    sys.stdout = buf
 
+    html_code = Utils.ReadFile(os.path.join('data', 'http_error_502.html'))
+    print html_code
 
-def makeTestSuiteV201101():
-  """Set up test suite using v201101.
+    # Restore STDOUT.
+    sys.stdout = sys.__stdout__
 
-  Returns:
-    TestSuite test suite using v201101.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(DfpUtilsTestV201101))
-  return suite
+    if not buf.IsHandshakeComplete():
+      data = buf.GetBufferAsStr()
+    else:
+      data = ''
+
+    self.assertEqual(Utils.GetErrorFromHtml(data), self.__class__.TRIGGER_MSG)
+
+  def testDataFileCurrencies(self):
+    """Test whether csv data file with currencies is valid."""
+    cols = 2
+    for item in DfpUtils.GetCurrencies():
+      self.assertEqual(len(item), cols)
+
+  def testDataFileTimezones(self):
+    """Test whether csv data file with timezones is valid."""
+    cols = 1
+    for item in DfpUtils.GetTimezones():
+      self.assertEqual(len(item), cols)
+
+  def testGetAllEntitiesByStatement(self):
+    """Test whether GetAllEntitiesByStatement() does what it suppose to."""
+    users = DfpUtils.GetAllEntitiesByStatement(
+        client, 'User', 'ORDER BY name',
+        server=self.__class__.SERVER, version=self.__class__.VERSION,
+        http_proxy=HTTP_PROXY)
+    self.assert_(isinstance(users, list))
+
+  def testGetAllEntitiesByStatementWithLimit(self):
+    """Test whether GetAllEntitiesByStatement() does what it suppose to do when
+    LIMIT is provided as part of the query."""
+    self.failUnlessRaises(
+        ValidationError, DfpUtils.GetAllEntitiesByStatement,
+        client, 'User', 'ORDER BY name LIMIT 1',
+        server=self.__class__.SERVER, version=self.__class__.VERSION,
+        http_proxy=HTTP_PROXY)
+
+  def testGetAllEntitiesByStatementWithService(self):
+    """Test whether GetAllEntitiesByStatementWithService() does what it suppose
+    to."""
+    user_service = client.GetUserService(self.__class__.SERVER,
+                                         self.__class__.VERSION)
+    users = DfpUtils.GetAllEntitiesByStatementWithService(
+        user_service, 'ORDER BY name')
+    self.assert_(isinstance(users, list))
 
 
 def makeTestSuiteV201103():
@@ -547,13 +364,22 @@ def makeTestSuiteV201107():
   return suite
 
 
+def makeTestSuiteV201108():
+  """Set up test suite using v201108.
+
+  Returns:
+    TestSuite test suite using v201108.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(DfpUtilsTestV201108))
+  return suite
+
+
 if __name__ == '__main__':
-  suite_v201004 = makeTestSuiteV201004()
-  suite_v201010 = makeTestSuiteV201010()
-  suite_v201101 = makeTestSuiteV201101()
   suite_v201103 = makeTestSuiteV201103()
   suite_v201104 = makeTestSuiteV201104()
   suite_v201107 = makeTestSuiteV201107()
-  alltests = unittest.TestSuite([suite_v201004, suite_v201010, suite_v201101,
-                                 suite_v201103, suite_v201104, suite_v201107])
+  suite_v201108 = makeTestSuiteV201108()
+  alltests = unittest.TestSuite([suite_v201103, suite_v201104, suite_v201107,
+                                 suite_v201108])
   unittest.main(defaultTest='alltests')

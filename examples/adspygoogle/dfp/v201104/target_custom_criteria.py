@@ -73,8 +73,8 @@ custom_criteria3 = {
 
 # Create the custom criteria set that will resemble:
 # (custom_criteria1.key == custom_criteria1.value OR
-# (custom_criteria2.key != custom_criteria2.value AND
-# custom_criteria13.key == custom_criteria3.value))
+#  (custom_criteria2.key != custom_criteria2.value AND
+#   custom_criteria13.key == custom_criteria3.value))
 sub_set = {
     'xsi_type': 'CustomCriteriaSet',
     'logicalOperator': 'AND',
