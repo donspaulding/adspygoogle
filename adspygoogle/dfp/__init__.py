@@ -29,10 +29,10 @@ from adspygoogle.common.Errors import MissingPackageError
 LIB_HOME = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 LIB_NAME = 'DFP API Python Client Library'
 LIB_SHORT_NAME = 'DfpApi-Python'
-LIB_URL = 'http://code.google.com/p/google-api-dfp-python'
+LIB_URL = 'http://code.google.com/p/google-api-ads-python'
 LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '7.0.0'
+LIB_VERSION = '7.0.1'
 LIB_MIN_COMMON_VERSION = '2.2.1'
 LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
 

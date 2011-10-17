@@ -1,3 +1,6 @@
+7.0.1:
+- Added postal code targeting examples.
+
 7.0.0:
 - Added support for v201108 and set it as default version.
 - Sunset versions v201004, v201010, v201101.

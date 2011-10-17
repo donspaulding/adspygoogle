@@ -67,6 +67,11 @@ for i in xrange(5):
                       'id': '20123',
                       'xsi_type': 'RegionLocation',
                       'regionCode': 'CA-QC'
+                  },
+                  {
+                      'id': '9000093',
+                      'xsi_type': 'PostalCodeLocation',
+                      'postalCode': 'B3P'
                   }
               ],
               'excludedLocations': [
