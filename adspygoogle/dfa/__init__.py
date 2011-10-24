@@ -32,8 +32,8 @@ LIB_SHORT_NAME = 'DfaApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python/'
 LIB_AUTHOR = 'Joseph DiLallo'
 LIB_AUTHOR_EMAIL = 'api.jdilallo@gmail.com'
-LIB_VERSION = '1.3.0'
-LIB_MIN_COMMON_VERSION = '2.2.0'
+LIB_VERSION = '2.0.0'
+LIB_MIN_COMMON_VERSION = '3.0.0'
 LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:
@@ -41,11 +41,9 @@ if VERSION < LIB_MIN_COMMON_VERSION:
          'the latest version of client library at %s.' % LIB_URL)
   raise MissingPackageError(msg)
 
-# Tuple of tuples representing API versions, where each inner tuple is a
-# combination of the API vesrion and whether API used JAXB.
-API_VERSIONS_MAP = (('v1.13', False), ('v1.14', False), ('v1.15', False))
-API_VERSIONS = [version for version, is_jaxb_api in API_VERSIONS_MAP]
-MIN_API_VERSION = API_VERSIONS[2]
+# Tuple of strings representing API versions.
+API_VERSIONS = ('v1.14', 'v1.15')
+DEFAULT_API_VERSION = API_VERSIONS[len(API_VERSIONS) - 1]
 
 # Accepted combinations of headers which user has to provide. Either one of
 # these is required in order to make a succesful API request.
@@ -54,9 +52,3 @@ REQUIRED_SOAP_HEADERS = (('Username', 'Password'),
 
 WSSE_NS = ('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-'
            'secext-1.0.xsd')
-
-# Ready the defintions from the WSDL.
-WSDL_MAP = pickle.load(open(os.path.join(LIB_HOME, 'data',
-                                         'wsdl_type_defs.pkl'), 'r'))
-OPERATIONS_MAP = pickle.load(open(os.path.join(LIB_HOME, 'data',
-                                               'wsdl_ops_defs.pkl'), 'r'))

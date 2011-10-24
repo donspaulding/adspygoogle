@@ -201,7 +201,7 @@ class AdServiceTestV1_14(unittest.TestCase):
       self.testGetCountries()
     country_ids = [self.__class__.country_id]
     self.assert_(isinstance(self.__class__.service.GetAreaCodes(country_ids),
-                            tuple))
+                            (tuple, type(None))))
 
   def testGetBandwidths(self):
     """Test whether we can fetch bandwidths."""
@@ -461,7 +461,7 @@ class AdServiceTestV1_13(unittest.TestCase):
       self.testGetCountries()
     country_ids = [self.__class__.country_id]
     self.assert_(isinstance(self.__class__.service.GetAreaCodes(country_ids),
-                            tuple))
+                            (tuple, type(None))))
 
   def testGetBandwidths(self):
     """Test whether we can fetch bandwidths."""
@@ -721,7 +721,7 @@ class AdServiceTestV1_15(unittest.TestCase):
       self.testGetCountries()
     country_ids = [self.__class__.country_id]
     self.assert_(isinstance(self.__class__.service.GetAreaCodes(country_ids),
-                            tuple))
+                            (tuple, type(None))))
 
   def testGetBandwidths(self):
     """Test whether we can fetch bandwidths."""
@@ -793,7 +793,7 @@ class AdServiceTestV1_15(unittest.TestCase):
       self.testGetCountries()
     country_ids = [self.__class__.country_id]
     self.assert_(isinstance(self.__class__.service.GetRegions(country_ids),
-                            tuple))
+                            (tuple, type(None))))
 
   def testGetStates(self):
     """Test whether we can fetch states."""
@@ -801,21 +801,21 @@ class AdServiceTestV1_15(unittest.TestCase):
       self.testGetCountries()
     country_ids = [self.__class__.country_id]
     self.assert_(isinstance(self.__class__.service.GetStates(country_ids),
-                            tuple))
+                            (tuple, type(None))))
 
   def testGetUserListGroupsByCriteria(self):
     """Test whether we can fetch user list groups by criteria."""
     user_list_search_criteria = {}
     self.assert_(isinstance(
         self.__class__.service.GetUserListGroupsByCriteria(
-        user_list_search_criteria), tuple))
+        user_list_search_criteria), (tuple, type(None))))
 
   def testGetUserListsByCriteria(self):
     """Test whether we can fetch user lists by criteria."""
     user_list_search_criteria = {}
     self.assert_(isinstance(
         self.__class__.service.GetUserListsByCriteria(
-        user_list_search_criteria), tuple))
+        user_list_search_criteria), (tuple, type(None))))
 
 
 def makeTestSuiteV1_14():

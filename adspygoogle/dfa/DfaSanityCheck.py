@@ -19,7 +19,6 @@
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
 from adspygoogle.common.Errors import ValidationError
-from adspygoogle.dfa import API_VERSIONS_MAP
 
 
 def ValidateServer(server, version):
@@ -28,6 +27,9 @@ def ValidateServer(server, version):
   Args:
     server: str API server to access for this API call.
     version: str API version being used to access the server.
+
+  Raises:
+    ValidationError: if the given API server or version is not valid.
   """
   # Map of supported API servers and versions.
   prod = {'v1.13': 'http://advertisersapi.doubleclick.net',
@@ -58,22 +60,3 @@ def ValidateServer(server, version):
     msg = ('Given API version, \'%s\', is not compatible with given server, '
            '\'%s\'.' % (version, server))
     raise ValidationError(msg)
-
-
-def IsJaxbApi(version):
-  """Check if request is being made against API that used JAXB.
-
-  Args:
-    version: str Version of the API being used.
-
-  Returns:
-    bool True if request is made against an API that used JAXB, False otherwise.
-  """
-  valid_versions = []
-  for api_version, is_jaxb in API_VERSIONS_MAP:
-    valid_versions.append(api_version)
-    if api_version == version:
-      return is_jaxb
-  msg = ('Given API version, \'%s\' is not valid. Expecting one of %s.'
-         % (version, valid_versions))
-  raise ValidationError(msg)

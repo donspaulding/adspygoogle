@@ -25,8 +25,6 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import Utils
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
@@ -161,8 +159,7 @@ class CreativeServiceTestV1_14(unittest.TestCase):
     """Test whether we can save a creative asset."""
     advertiser_id = self.__class__.campaign['advertiserId']
     content = Utils.ReadFile(os.path.join('data', 'code_logo.gif'))
-    if client._config['soap_lib'] == SOAPPY:
-      content = base64.encodestring(content)
+    content = base64.encodestring(content)
     creative_asset = {
         'name': 'CreativeAsset%s.gif' % Utils.GetUniqueName(),
         'advertiserId': advertiser_id,
@@ -303,8 +300,7 @@ class CreativeServiceTestV1_14(unittest.TestCase):
     advertiser_id = self.__class__.campaign['advertiserId']
     upload_session_id = self.__class__.upload_session_id
     content = Utils.ReadFile(os.path.join('data', 'code_logo.gif'))
-    if client._config['soap_lib'] == SOAPPY:
-      content = base64.encodestring(content)
+    content = base64.encodestring(content)
     creative_upload_request = {
         'creativeUploadSessionSummary': {
             'campaignId': campaign_id,
@@ -348,8 +344,7 @@ class CreativeServiceTestV1_14(unittest.TestCase):
     """Test whether we can upload a RichMedia asset."""
     if self.__class__.test_rich_media:
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       upload_request = {
           'assetFileName': 'RichmediaAsset%s.mtf' % Utils.GetUniqueName(),
           'fileData': content
@@ -365,8 +360,7 @@ class CreativeServiceTestV1_14(unittest.TestCase):
     if self.__class__.test_rich_media:
       advertiser_id = self.__class__.campaign['advertiserId']
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       rich_media = self.__class__.service.UploadRichMediaCreativePackage(
               advertiser_id, content, 'False')
       self.__class__.richmedia_package = upload_request[0]
@@ -400,8 +394,7 @@ class CreativeServiceTestV1_14(unittest.TestCase):
       if self.__class__.richmedia_asset is None:
         self.testUploadRichMediaAsset()
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       replace_request = {
           'assetFileName': 'RichmediaAsset%s.mtf' % Utils.GetUniqueName(),
           'creativeId': self.__class__.richmedia_asset['id'],
@@ -418,8 +411,7 @@ class CreativeServiceTestV1_14(unittest.TestCase):
       if self.__class__.richmedia_package is None:
         self.testUploadRichMediaCreativePackage()
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       self.assert_(isinstance(
           self.__class__.service.ReplaceRichMediaCreativePackage(
           self.__class__.richmedia_package['id'], content), tuple))
@@ -545,8 +537,7 @@ class CreativeServiceTestV1_13(unittest.TestCase):
     """Test whether we can save a creative asset."""
     advertiser_id = self.__class__.campaign['advertiserId']
     content = Utils.ReadFile(os.path.join('data', 'code_logo.gif'))
-    if client._config['soap_lib'] == SOAPPY:
-      content = base64.encodestring(content)
+    content = base64.encodestring(content)
     creative_asset = {
         'name': 'CreativeAsset%s.gif' % Utils.GetUniqueName(),
         'advertiserId': advertiser_id,
@@ -687,8 +678,7 @@ class CreativeServiceTestV1_13(unittest.TestCase):
     advertiser_id = self.__class__.campaign['advertiserId']
     upload_session_id = self.__class__.upload_session_id
     content = Utils.ReadFile(os.path.join('data', 'code_logo.gif'))
-    if client._config['soap_lib'] == SOAPPY:
-      content = base64.encodestring(content)
+    content = base64.encodestring(content)
     creative_upload_request = {
         'creativeUploadSessionSummary': {
             'campaignId': campaign_id,
@@ -732,8 +722,7 @@ class CreativeServiceTestV1_13(unittest.TestCase):
     """Test whether we can upload a RichMedia asset."""
     if self.__class__.test_rich_media:
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       upload_request = {
           'assetFileName': 'RichmediaAsset%s.mtf' % Utils.GetUniqueName(),
           'fileData': content
@@ -749,8 +738,7 @@ class CreativeServiceTestV1_13(unittest.TestCase):
     if self.__class__.test_rich_media:
       advertiser_id = self.__class__.campaign['advertiserId']
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       rich_media = self.__class__.service.UploadRichMediaCreativePackage(
               advertiser_id, content, 'False')
       self.__class__.richmedia_package = upload_request[0]
@@ -784,8 +772,7 @@ class CreativeServiceTestV1_13(unittest.TestCase):
       if self.__class__.richmedia_asset is None:
         self.testUploadRichMediaAsset()
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       replace_request = {
           'assetFileName': 'RichmediaAsset%s.mtf' % Utils.GetUniqueName(),
           'creativeId': self.__class__.richmedia_asset['id'],
@@ -802,8 +789,7 @@ class CreativeServiceTestV1_13(unittest.TestCase):
       if self.__class__.richmedia_package is None:
         self.testUploadRichMediaCreativePackage()
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       self.assert_(isinstance(
           self.__class__.service.ReplaceRichMediaCreativePackage(
           self.__class__.richmedia_package['id'], content), tuple))
@@ -929,8 +915,7 @@ class CreativeServiceTestV1_15(unittest.TestCase):
     """Test whether we can save a creative asset."""
     advertiser_id = self.__class__.campaign['advertiserId']
     content = Utils.ReadFile(os.path.join('data', 'code_logo.gif'))
-    if client._config['soap_lib'] == SOAPPY:
-      content = base64.encodestring(content)
+    content = base64.encodestring(content)
     creative_asset = {
         'name': 'CreativeAsset%s.gif' % Utils.GetUniqueName(),
         'advertiserId': advertiser_id,
@@ -1071,8 +1056,7 @@ class CreativeServiceTestV1_15(unittest.TestCase):
     advertiser_id = self.__class__.campaign['advertiserId']
     upload_session_id = self.__class__.upload_session_id
     content = Utils.ReadFile(os.path.join('data', 'code_logo.gif'))
-    if client._config['soap_lib'] == SOAPPY:
-      content = base64.encodestring(content)
+    content = base64.encodestring(content)
     creative_upload_request = {
         'creativeUploadSessionSummary': {
             'campaignId': campaign_id,
@@ -1116,8 +1100,7 @@ class CreativeServiceTestV1_15(unittest.TestCase):
     """Test whether we can upload a RichMedia asset."""
     if self.__class__.test_rich_media:
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       upload_request = {
           'assetFileName': 'RichmediaAsset%s.mtf' % Utils.GetUniqueName(),
           'fileData': content
@@ -1133,8 +1116,7 @@ class CreativeServiceTestV1_15(unittest.TestCase):
     if self.__class__.test_rich_media:
       advertiser_id = self.__class__.campaign['advertiserId']
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       rich_media = self.__class__.service.UploadRichMediaCreativePackage(
               advertiser_id, content, 'False')
       self.__class__.richmedia_package = upload_request[0]
@@ -1168,8 +1150,7 @@ class CreativeServiceTestV1_15(unittest.TestCase):
       if self.__class__.richmedia_asset is None:
         self.testUploadRichMediaAsset()
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       replace_request = {
           'assetFileName': 'RichmediaAsset%s.mtf' % Utils.GetUniqueName(),
           'creativeId': self.__class__.richmedia_asset['id'],
@@ -1186,8 +1167,7 @@ class CreativeServiceTestV1_15(unittest.TestCase):
       if self.__class__.richmedia_package is None:
         self.testUploadRichMediaCreativePackage()
       content = Utils.ReadFile(os.path.join('data', 'Inpage.mtf'))
-      if client._config['soap_lib'] == SOAPPY:
-        content = base64.encodestring(content)
+      content = base64.encodestring(content)
       self.assert_(isinstance(
           self.__class__.service.ReplaceRichMediaCreativePackage(
           self.__class__.richmedia_package['id'], content), tuple))

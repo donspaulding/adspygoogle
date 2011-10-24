@@ -55,24 +55,6 @@ def GetCreativeXsiTypes():
                                                'creative_types.csv'))
 
 
-def TransformDates(obj):
-  """Transforms tuple-represented dates within the given object to strings.
-
-  This function is retained for legacy use. Dates should never be given in tuple
-  format.
-
-  Args:
-    obj: dict The object whose dates need to all be strings.
-  """
-  for key in obj:
-    if key in ('startDate', 'startTime', 'endDate', 'endTime'):
-      if isinstance(obj[key], tuple):
-        if len(obj[key]) == 6:
-          obj[key] = '%04s-%02d-%02dT%02d:%02d:%02d' % obj[key]
-        else:
-          raise ValidationError('The date in field %s is malformed.' % key)
-
-
 def AssignAdXsi(ad):
   """Assigns an xsi type to an Ad object if one is not present.
 
@@ -105,3 +87,15 @@ def AssignCreativeXsi(creative):
       creative['xsi_type'] = GetCreativeXsiTypes()[creative['typeId']]
     else:
       raise ValidationError('The type of the creative is missing.')
+
+
+def DetermineServiceFromUrl(url):
+  """Takes a DFA service's URL and returns the service name.
+
+  Args:
+    url: string The DFA service's URL.
+
+  Returns:
+    string The name of the service this URL points to.
+  """
+  return url.split('/')[-1]

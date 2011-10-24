@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests to cover DfaWebService."""
+"""Unit tests to cover GenericDfaService."""
 
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
@@ -25,10 +25,9 @@ import thread
 import threading
 import unittest
 
-from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
 from adspygoogle.dfa.DfaErrors import DfaApiError
-from adspygoogle.dfa.DfaWebService import DfaWebService
+from adspygoogle.dfa.GenericDfaService import GenericDfaService
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
 from tests.adspygoogle.dfa import SERVER_V1_13
@@ -64,25 +63,6 @@ class DfaWebServiceTestV1_14(unittest.TestCase):
         self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(search_criteria),
                             tuple))
 
-  def testCallMethodDirect(self):
-    """Test whether we can call an API method directly."""
-    headers = client.GetAuthCredentials()
-    config = client.GetConfigValues()
-    url = '/'.join([DfaWebServiceTestV1_14.SERVER,
-                    'v1.14/api/dfa-api', 'placement'])
-    op_config = {
-        'server': self.__class__.SERVER,
-        'version': self.__class__.VERSION,
-        'http_proxy': HTTP_PROXY
-    }
-
-    lock = thread.allocate_lock()
-    service = DfaWebService(headers, config, op_config, url, lock)
-    method_name = 'getPlacementTypes'
-    if config['soap_lib'] == SOAPPY:
-      self.assert_(isinstance(service.CallMethod(method_name, (),
-                                                 'placement'), tuple))
-
   def testCallRawMethod(self):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
@@ -90,8 +70,8 @@ class DfaWebServiceTestV1_14(unittest.TestCase):
     url = '/v1.14/api/dfa-api/advertiser'
     http_proxy = None
 
-    self.failUnlessRaises(DfaApiError, client.CallRawMethod, soap_message, url,
-                          self.__class__.SERVER, http_proxy)
+    self.assert_(isinstance(client.CallRawMethod(
+        soap_message, url, self.__class__.SERVER, http_proxy), tuple))
 
   def testMultiThreads(self):
     """Test whether we can safely execute multiple threads."""
@@ -144,25 +124,6 @@ class DfaWebServiceTestV1_13(unittest.TestCase):
         self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(search_criteria),
                             tuple))
 
-  def testCallMethodDirect(self):
-    """Test whether we can call an API method directly."""
-    headers = client.GetAuthCredentials()
-    config = client.GetConfigValues()
-    url = '/'.join([DfaWebServiceTestV1_13.SERVER,
-                    'v1.13/api/dfa-api', 'placement'])
-    op_config = {
-        'server': self.__class__.SERVER,
-        'version': self.__class__.VERSION,
-        'http_proxy': HTTP_PROXY
-    }
-
-    lock = thread.allocate_lock()
-    service = DfaWebService(headers, config, op_config, url, lock)
-    method_name = 'getPlacementTypes'
-    if config['soap_lib'] == SOAPPY:
-      self.assert_(isinstance(service.CallMethod(method_name, (),
-                                                 'placement'), tuple))
-
   def testCallRawMethod(self):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
@@ -170,8 +131,8 @@ class DfaWebServiceTestV1_13(unittest.TestCase):
     url = '/v1.13/api/dfa-api/advertiser'
     http_proxy = None
 
-    self.failUnlessRaises(DfaApiError, client.CallRawMethod, soap_message, url,
-                          self.__class__.SERVER, http_proxy)
+    self.assert_(isinstance(client.CallRawMethod(
+        soap_message, url, self.__class__.SERVER, http_proxy), tuple))
 
   def testMultiThreads(self):
     """Test whether we can safely execute multiple threads."""
@@ -224,25 +185,6 @@ class DfaWebServiceTestV1_15(unittest.TestCase):
         self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(search_criteria),
                             tuple))
 
-  def testCallMethodDirect(self):
-    """Test whether we can call an API method directly."""
-    headers = client.GetAuthCredentials()
-    config = client.GetConfigValues()
-    url = '/'.join([DfaWebServiceTestV1_15.SERVER,
-                    'v1.15/api/dfa-api', 'placement'])
-    op_config = {
-        'server': self.__class__.SERVER,
-        'version': self.__class__.VERSION,
-        'http_proxy': HTTP_PROXY
-    }
-
-    lock = thread.allocate_lock()
-    service = DfaWebService(headers, config, op_config, url, lock)
-    method_name = 'getPlacementTypes'
-    if config['soap_lib'] == SOAPPY:
-      self.assert_(isinstance(service.CallMethod(method_name, (),
-                                                 'placement'), tuple))
-
   def testCallRawMethod(self):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
@@ -250,8 +192,8 @@ class DfaWebServiceTestV1_15(unittest.TestCase):
     url = '/v1.15/api/dfa-api/advertiser'
     http_proxy = None
 
-    self.failUnlessRaises(DfaApiError, client.CallRawMethod, soap_message, url,
-                          self.__class__.SERVER, http_proxy)
+    self.assert_(isinstance(client.CallRawMethod(
+        soap_message, url, self.__class__.SERVER, http_proxy), tuple))
 
   def testMultiThreads(self):
     """Test whether we can safely execute multiple threads."""
@@ -276,7 +218,7 @@ class TestThreadV1_15(threading.Thread):
 
   def run(self):
     """Represent thread's activity."""
-    search_criteria = {'pageSize': '10'}
+    search_criteria = {'pageSize': '1'}
     DfaWebServiceTestV1_15.res.append(client.GetAdvertiserService(
         DfaWebServiceTestV1_15.SERVER, DfaWebServiceTestV1_15.VERSION,
         HTTP_PROXY).GetAdvertisers(search_criteria))

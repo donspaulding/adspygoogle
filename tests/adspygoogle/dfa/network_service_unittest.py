@@ -25,7 +25,6 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
-from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
@@ -131,8 +130,7 @@ class NetworkServiceTestV1_14(unittest.TestCase):
   def testUploadNetworkWidgetImage(self):
     """Test whether we can upload a widget backup image."""
     image = Utils.ReadFile(os.path.join('data', 'code_logo.gif'))
-    if client._config['soap_lib'] == SOAPPY:
-      image = base64.encodestring(image)
+    image = base64.encodestring(image)
     widget_image_upload_request = {
         'network': self.__class__.user_self['networkId'],
         'filedata': image,
@@ -235,8 +233,7 @@ class NetworkServiceTestV1_13(unittest.TestCase):
   def testUploadNetworkWidgetImage(self):
     """Test whether we can upload a widget backup image."""
     image = Utils.ReadFile(os.path.join('data', 'code_logo.gif'))
-    if client._config['soap_lib'] == SOAPPY:
-      image = base64.encodestring(image)
+    image = base64.encodestring(image)
     widget_image_upload_request = {
         'network': self.__class__.user_self['networkId'],
         'filedata': image,
@@ -339,8 +336,7 @@ class NetworkServiceTestV1_15(unittest.TestCase):
   def testUploadNetworkWidgetImage(self):
     """Test whether we can upload a widget backup image."""
     image = Utils.ReadFile(os.path.join('data', 'code_logo.gif'))
-    if client._config['soap_lib'] == SOAPPY:
-      image = base64.encodestring(image)
+    image = base64.encodestring(image)
     widget_image_upload_request = {
         'network': self.__class__.user_self['networkId'],
         'filedata': image,

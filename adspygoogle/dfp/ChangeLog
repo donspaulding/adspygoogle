@@ -1,3 +1,8 @@
+8.0.0:
+- Updated adspygoogle.common module to v3.0.0.
+- Removed individual service classes in favor of single GenericDfpService class.
+- Moved DownloadReport function from ReportService class to DfpUtils module.
+
 7.0.1:
 - Added postal code targeting examples.
 

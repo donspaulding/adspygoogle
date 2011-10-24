@@ -21,15 +21,6 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 API_TARGETS = [
     {
-        'version': 'v1.13',
-        'server': 'http://advertisersapi.doubleclick.net',
-        'services': ('ad', 'advertiser', 'advertisergroup', 'campaign',
-                     'changelog', 'contentcategory', 'creative',
-                     'creativefield', 'creativegroup', 'login', 'network',
-                     'placement', 'report', 'site', 'size', 'spotlight',
-                     'strategy', 'subnetwork', 'user', 'userrole')
-    },
-    {
         'version': 'v1.14',
         'server': 'http://advertisersapi.doubleclick.net',
         'services': ('ad', 'advertiser', 'advertisergroup', 'campaign',

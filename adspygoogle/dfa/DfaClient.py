@@ -19,40 +19,18 @@
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
 import os
-import thread
+import threading
 
-from adspygoogle.common import SOAPPY
 from adspygoogle.common import SanityCheck
 from adspygoogle.common import Utils
 from adspygoogle.common.Client import Client
-from adspygoogle.common.Errors import AuthTokenError
-from adspygoogle.common.Errors import ValidationError
 from adspygoogle.common.Logger import Logger
-from adspygoogle.dfa import LIB_SIG
-from adspygoogle.dfa import MIN_API_VERSION
-from adspygoogle.dfa import REQUIRED_SOAP_HEADERS
+from adspygoogle.dfa import DEFAULT_API_VERSION
 from adspygoogle.dfa import DfaSanityCheck
-from adspygoogle.dfa.AdRemoteService import AdRemoteService
-from adspygoogle.dfa.AdvertiserGroupRemoteService import AdvertiserGroupRemoteService
-from adspygoogle.dfa.AdvertiserRemoteService import AdvertiserRemoteService
-from adspygoogle.dfa.CampaignRemoteService import CampaignRemoteService
-from adspygoogle.dfa.ChangeLogRemoteService import ChangeLogRemoteService
-from adspygoogle.dfa.ContentCategoryRemoteService import ContentCategoryRemoteService
-from adspygoogle.dfa.CreativeFieldRemoteService import CreativeFieldRemoteService
-from adspygoogle.dfa.CreativeGroupRemoteService import CreativeGroupRemoteService
-from adspygoogle.dfa.CreativeRemoteService import CreativeRemoteService
-from adspygoogle.dfa.DfaWebService import DfaWebService
-from adspygoogle.dfa.LoginRemoteService import LoginRemoteService
-from adspygoogle.dfa.NetworkRemoteService import NetworkRemoteService
-from adspygoogle.dfa.PlacementRemoteService import PlacementRemoteService
-from adspygoogle.dfa.ReportRemoteService import ReportRemoteService
-from adspygoogle.dfa.SiteRemoteService import SiteRemoteService
-from adspygoogle.dfa.SizeRemoteService import SizeRemoteService
-from adspygoogle.dfa.SpotlightRemoteService import SpotlightRemoteService
-from adspygoogle.dfa.StrategyRemoteService import StrategyRemoteService
-from adspygoogle.dfa.SubnetworkRemoteService import SubnetworkRemoteService
-from adspygoogle.dfa.UserRemoteService import UserRemoteService
-from adspygoogle.dfa.UserRoleRemoteService import UserRoleRemoteService
+from adspygoogle.dfa import DfaUtils
+from adspygoogle.dfa import LIB_SIG
+from adspygoogle.dfa import REQUIRED_SOAP_HEADERS
+from adspygoogle.dfa.GenericDfaService import GenericDfaService
 
 
 class DfaClient(Client):
@@ -75,31 +53,30 @@ class DfaClient(Client):
       path: str Relative or absolute path to home directory (i.e. location of
             pickles and logs/).
 
-      Example:
-        headers = {
-          'Username': 'johndoe@example.com',
-          'Password': 'secret',
-          'AuthToken': '...'
-        }
-        config = {
-          'home': '/path/to/home',
-          'log_home': '/path/to/logs/home',
-          'xml_parser': PYXML,
-          'debug': 'n',
-          'raw_debug': 'n',
-          'xml_log': 'y',
-          'request_log': 'y',
-          'raw_response': 'n',
-          'strict': 'y',
-          'pretty_xml': 'y',
-          'compress': 'y',
-          'force_data_inject': 'y'
-        }
-        path = '/path/to/home'
+    Example:
+      headers = {
+        'Username': 'johndoe@example.com',
+        'Password': 'secret',
+        'AuthToken': '...'
+      }
+      config = {
+        'home': '/path/to/home',
+        'log_home': '/path/to/logs/home',
+        'xml_parser': PYXML,
+        'debug': 'n',
+        'raw_debug': 'n',
+        'xml_log': 'y',
+        'request_log': 'y',
+        'raw_response': 'n',
+        'strict': 'y',
+        'pretty_xml': 'y',
+        'compress': 'y',
+      }
+      path = '/path/to/home'
     """
     super(DfaClient, self).__init__(headers, config, path)
 
-    self.__lock = thread.allocate_lock()
+    self.__lock = threading.RLock()
     self.__loc = None
 
     if path is not None:
@@ -173,19 +150,18 @@ class DfaClient(Client):
     """
     return super(DfaClient, self)._LoadConfigValues()
 
-  def __SetMissingDefaultConfigValues(self, config={}):
+  def __SetMissingDefaultConfigValues(self, config=None):
     """Set default configuration values for missing elements in the config dict.
 
     Args:
       config: dict Object with client configuration values.
-    """
-    config = super(DfaClient, self)._SetMissingDefaultConfigValues(config)
 
-    # Ensure that the 'force_data_inject' value is set for the DFA library to
-    # function properly.
-    self._config['force_data_inject'] = 'y'
-    # TODO(api.jdilallo) Remove the following line once ZSI support is added.
-    self._config['soap_lib'] = SOAPPY
+    Returns:
+      dictionary Configuration values with defaults added in.
+    """
+    if config is None:
+      config = {}
+    config = super(DfaClient, self)._SetMissingDefaultConfigValues(config)
 
     default_config = {
         'home': DfaClient.home,
@@ -195,35 +171,6 @@ class DfaClient(Client):
       if key not in config:
         config[key] = default_config[key]
     return config
-
-  def __SetAuthToken(self, server, version, http_proxy):
-    """Return auth token.
-
-    Args:
-      server: str API server to access for this API call.
-      version: str API version to use.
-      http_proxy: str HTTP proxy to use.
-
-    Returns:
-      dict Authentiaction credentials.
-    """
-    # Load/set authentication token.
-    try:
-      if (self._headers and 'AuthToken' in self._headers and
-          self._headers['AuthToken']):
-        self._headers['AuthToken'] = self._headers['AuthToken']
-      elif 'Username' in self._headers and 'Password' in self._headers:
-        self._headers['AuthToken'] = self.GetLoginService(
-            server, version, http_proxy).Authenticate(
-                self._headers['Username'],
-                self._headers['Password'])[0]['token']
-      else:
-        msg = 'Authentication data, username or/and password, is missing.'
-        raise ValidationError(msg)
-    except AuthTokenError:
-      # We would end up here if non-valid DFA Account's credentials were
-      # specified.
-      self._headers['AuthToken'] = None
 
   def CallRawMethod(self, soap_message, url, server, http_proxy):
     """Call API method directly, using raw SOAP message.
@@ -240,17 +187,10 @@ class DfaClient(Client):
     Returns:
       tuple Response from the API method (SOAP XML response message).
     """
-    headers = self._headers
+    service_name = DfaUtils.DetermineServiceFromUrl(url).capitalize()
+    service = getattr(self, 'Get' + service_name + 'Service')(
+        server=server, http_proxy=http_proxy)
 
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'http_proxy': http_proxy,
-        'server': server
-    }
-
-    service = DfaWebService(headers, self._config, op_config, url,
-                            self.__lock, self.__logger)
     return service.CallRawMethod(soap_message)
 
   def GetAdService(self, server='http://advertisersapi.doubleclick.net',
@@ -268,26 +208,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      AdRemoteService New instance of AdRemoteService object.
+      GenericDfaService New instance of AdRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
-    self.__SetAuthToken(server, version, http_proxy)
-
     # Load additional configuration data.
-    self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return AdRemoteService(headers, self._config, op_config, self.__lock,
-                           self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'ad')
 
   def GetAdvertiserService(self, server='http://advertisersapi.doubleclick.net',
                            version=None, http_proxy=None):
@@ -304,26 +241,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      AdvertiserRemoteService New instance of AdvertiserRemoteService object.
+      GenericDfaService New instance of AdvertiserRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
-    self.__SetAuthToken(server, version, http_proxy)
-
     # Load additional configuration data.
-    self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return AdvertiserRemoteService(headers, self._config, op_config,
-                                   self.__lock, self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'advertiser')
 
   def GetAdvertiserGroupService(self,
                                 server='http://advertisersapi.doubleclick.net',
@@ -341,27 +275,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      AdvertiserGroupRemoteService New instance of AdvertiserGroupRemoteService
-                                   object.
+      GenericDfaService New instance of AdvertiserGroupRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
-    self.__SetAuthToken(server, version, http_proxy)
-
     # Load additional configuration data.
-    self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return AdvertiserGroupRemoteService(headers, self._config, op_config,
-                                        self.__lock, self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'advertisergroup')
 
   def GetCampaignService(self, server='http://advertisersapi.doubleclick.net',
                          version=None, http_proxy=None):
@@ -378,26 +308,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      CampaignRemoteService New instance of CampaignRemoteService object.
+      GenericDfaService New instance of CampaignRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
-    self.__SetAuthToken(server, version, http_proxy)
-
     # Load additional configuration data.
-    self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return CampaignRemoteService(headers, self._config, op_config, self.__lock,
-                                 self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'campaign')
 
   def GetChangeLogService(self, server='http://advertisersapi.doubleclick.net',
                           version=None, http_proxy=None):
@@ -414,26 +341,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      ChangeLogRemoteService New instance of ChangeLogRemoteService object.
+      GenericDfaService New instance of ChangeLogRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
-    self.__SetAuthToken(server, version, http_proxy)
-
     # Load additional configuration data.
-    self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return ChangeLogRemoteService(headers, self._config, op_config, self.__lock,
-                                  self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'changelog')
 
   def GetContentCategoryService(self,
                                 server='http://advertisersapi.doubleclick.net',
@@ -451,27 +375,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      ContentCategoryRemoteService New instance of ContentCategoryRemoteService
-                                   object.
+      GenericDfaService New instance of ContentCategoryRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
-    self.__SetAuthToken(server, version, http_proxy)
-
     # Load additional configuration data.
-    self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return ContentCategoryRemoteService(headers, self._config, op_config,
-                                        self.__lock, self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'contentcategory')
 
   def GetCreativeService(self, server='http://advertisersapi.doubleclick.net',
                          version=None, http_proxy=None):
@@ -488,26 +408,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      CreativeRemoteService New instance of CreativeRemoteService object.
+      GenericDfaService New instance of CreativeRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
-    self.__SetAuthToken(server, version, http_proxy)
-
     # Load additional configuration data.
-    self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return CreativeRemoteService(headers, self._config, op_config, self.__lock,
-                                 self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'creative')
 
   def GetCreativeFieldService(self,
                               server='http://advertisersapi.doubleclick.net',
@@ -525,27 +442,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      CreativeFieldRemoteService New instance of CreativeFieldRemoteService
-                                 object.
+      GenericDfaService New instance of CreativeFieldRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
-    self.__SetAuthToken(server, version, http_proxy)
-
     # Load additional configuration data.
-    self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return CreativeFieldRemoteService(headers, self._config, op_config,
-                                      self.__lock, self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'creativefield')
 
   def GetCreativeGroupService(self,
                               server='http://advertisersapi.doubleclick.net',
@@ -563,27 +476,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      CreativeGroupRemoteService New instance of CreativeGroupRemoteService
-                                 object.
+      GenericDfaService New instance of CreativeGroupRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
-    self.__SetAuthToken(server, version, http_proxy)
-
     # Load additional configuration data.
-    self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return CreativeGroupRemoteService(headers, self._config, op_config,
-                                      self.__lock, self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'creativegroup')
 
   def GetLoginService(self, server='http://advertisersapi.doubleclick.net',
                       version=None, http_proxy=None):
@@ -600,24 +509,23 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      LoginRemoteService New instance of LoginRemoteService object.
+      GenericDfaService New instance of LoginRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
-    self._config['wsse'] = 'n'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return LoginRemoteService(headers, self._config, op_config, self.__lock,
-                              self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'login')
 
   def GetNetworkService(self, server='http://advertisersapi.doubleclick.net',
                         version=None, http_proxy=None):
@@ -634,26 +542,24 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      NetworkRemoteService New instance of NetworkRemoteService object.
+      GenericDfaService New instance of NetworkRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return NetworkRemoteService(headers, self._config, op_config, self.__lock,
-                                self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'network')
 
   def GetPlacementService(self, server='http://advertisersapi.doubleclick.net',
                           version=None, http_proxy=None):
@@ -670,26 +576,24 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      PlacementRemoteService New instance of PlacementRemoteService object.
+      GenericDfaService New instance of PlacementRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return PlacementRemoteService(headers, self._config, op_config, self.__lock,
-                                  self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'placement')
 
   def GetReportService(self, server='http://advertisersapi.doubleclick.net',
                        version=None, http_proxy=None):
@@ -706,29 +610,27 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      ReportingRemoteService New instance of ReportRemoteService object.
+      GenericDfaService New instance of ReportRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return ReportRemoteService(headers, self._config, op_config, self.__lock,
-                               self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'report')
 
   def GetSiteService(self, server='http://advertisersapi.doubleclick.net',
-                      version=None, http_proxy=None):
+                     version=None, http_proxy=None):
     """Call API method in SiteRemoteService.
 
     Args:
@@ -742,26 +644,24 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      SiteRemoteService New instance of SiteRemoteService object.
+      GenericDfaService New instance of SiteRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return SiteRemoteService(headers, self._config, op_config, self.__lock,
-                             self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'site')
 
   def GetSizeService(self, server='http://advertisersapi.doubleclick.net',
                      version=None, http_proxy=None):
@@ -778,26 +678,24 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      SizeRemoteService New instance of SizeRemoteService object.
+      GenericDfaService New instance of SizeRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return SizeRemoteService(headers, self._config, op_config, self.__lock,
-                             self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'size')
 
   def GetSpotlightService(self, server='http://advertisersapi.doubleclick.net',
                           version=None, http_proxy=None):
@@ -814,26 +712,24 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      SpotlightRemoteService New instance of SpotlightRemoteService object.
+      GenericDfaService New instance of SpotlightRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return SpotlightRemoteService(headers, self._config, op_config, self.__lock,
-                                  self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'spotlight')
 
   def GetStrategyService(self, server='http://advertisersapi.doubleclick.net',
                          version=None, http_proxy=None):
@@ -850,26 +746,24 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      StrategyRemoteService New instance of StrategyRemoteService object.
+      GenericDfaService New instance of StrategyRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return StrategyRemoteService(headers, self._config, op_config, self.__lock,
-                                 self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'strategy')
 
   def GetSubnetworkService(self, server='http://advertisersapi.doubleclick.net',
                            version=None, http_proxy=None):
@@ -886,26 +780,24 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      SubnetworkRemoteService New instance of SubnetworkRemoteService object.
+      GenericDfaService New instance of SubnetworkRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return SubnetworkRemoteService(headers, self._config, op_config,
-                                   self.__lock, self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'subnetwork')
 
   def GetUserService(self, server='http://advertisersapi.doubleclick.net',
                      version=None, http_proxy=None):
@@ -922,26 +814,24 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      UserRemoteService New instance of UserRemoteService object.
+      GenericDfaService New instance of UserRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return UserRemoteService(headers, self._config, op_config, self.__lock,
-                             self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'user')
 
   def GetUserRoleService(self, server='http://advertisersapi.doubleclick.net',
                          version=None, http_proxy=None):
@@ -958,23 +848,21 @@ class DfaClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      UserRoleRemoteService New instance of UserRoleRemoteService object.
+      GenericDfaService New instance of UserRoleRemoteService object.
     """
     headers = self._headers
 
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfaSanityCheck.ValidateServer(server, version)
-
-    self.__SetAuthToken(server, version, http_proxy)
 
     # Load additional configuration data.
     self._config['wsse'] = 'y'
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return UserRoleRemoteService(headers, self._config, op_config, self.__lock,
-                                 self.__logger)
+    return GenericDfaService(headers, self._config, op_config, self.__lock,
+                             self.__logger, 'userrole')

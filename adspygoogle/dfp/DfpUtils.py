@@ -18,12 +18,17 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
+import gzip
 import os
+import StringIO
+import time
+import urllib
 
+from adspygoogle.common import SanityCheck
 from adspygoogle.common import Utils
 from adspygoogle.common.Errors import ValidationError
+from adspygoogle.dfp import DEFAULT_API_VERSION
 from adspygoogle.dfp import LIB_HOME
-from adspygoogle.dfp import MIN_API_VERSION
 
 
 def GetCurrencies():
@@ -48,7 +53,7 @@ def GetTimezones():
 
 def GetAllEntitiesByStatement(client, service_name, query='', page_size=500,
                               server='https://sandbox.google.com',
-                              version=MIN_API_VERSION, http_proxy=None):
+                              version=DEFAULT_API_VERSION, http_proxy=None):
   """Get all existing entities by statement.
 
   All existing entities are retrieved for a given statement and page size. The
@@ -64,9 +69,9 @@ def GetAllEntitiesByStatement(client, service_name, query='', page_size=500,
     page_size: int size of the page to use. If page size is less than 0 or
                greater than 500, defaults to 500.
     server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+            are: 'https://www.google.com' for live site and
+            'https://sandbox.google.com' for sandbox. The default behavior is
+            to access sandbox site.
     version: str API version to use.
     http_proxy: str HTTP proxy to use.
 
@@ -97,8 +102,7 @@ def GetAllEntitiesByStatementWithService(service, query='', page_size=500):
     list a list of existing entities.
   """
 
-  service_class_name = service.__class__.__name__
-  service_name = service_class_name[0:service_class_name.rfind("Service")]
+  service_name = service._service_name[0:service._service_name.rfind('Service')]
 
   if service_name == 'Inventory':
     service_name = 'AdUnit'
@@ -129,3 +133,41 @@ def GetAllEntitiesByStatementWithService(service, query='', page_size=500):
     if len(entities) < page_size: break
     offset += page_size
   return all_entities
+
+
+def DownloadReport(report_job_id, export_format, service):
+  """Download and return report data.
+
+  Args:
+    report_job_id: str ID of the report job.
+    export_format: str Export format for the report file.
+    service: GenericDfpService A service pointing to the ReportService.
+
+  Returns:
+    str Report data or empty string if report failed.
+  """
+  SanityCheck.ValidateTypes(((report_job_id, (str, unicode)),))
+
+  # Wait for report to complete.
+  status = service.GetReportJob(report_job_id)[0]['reportJobStatus']
+  while status != 'COMPLETED' and status != 'FAILED':
+    if Utils.BoolTypeConvert(service._config['debug']):
+      print 'Report job status: %s' % status
+    time.sleep(30)
+    status = service.GetReportJob(report_job_id)[0]['reportJobStatus']
+
+  if status == 'FAILED':
+    if Utils.BoolTypeConvert(service._config['debug']):
+      print 'Report process failed'
+    return ''
+  else:
+    if Utils.BoolTypeConvert(service._config['debug']):
+      print 'Report has completed successfully'
+
+  # Get report download URL.
+  report_url = service.GetReportDownloadURL(report_job_id, export_format)[0]
+
+  # Download report.
+  data = urllib.urlopen(report_url).read()
+  data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
+  return data

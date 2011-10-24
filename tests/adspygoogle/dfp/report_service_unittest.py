@@ -24,6 +24,7 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
+from adspygoogle.dfp import DfpUtils
 from tests.adspygoogle.dfp import client
 from tests.adspygoogle.dfp import HTTP_PROXY
 from tests.adspygoogle.dfp import SERVER_V201103
@@ -113,15 +114,15 @@ class ReportServiceTestV201103(unittest.TestCase):
     """Test whether we can download a CSV report."""
     if self.__class__.report_job_id == '0':
       self.testRunDeliveryReport()
-    self.assert_(isinstance(self.__class__.service.DownloadReport(
-        self.__class__.report_job_id, 'CSV'), str))
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'CSV', self.__class__.service), str))
 
   def testDownloadTsvReport(self):
     """Test whether we can download a TSV report."""
     if self.__class__.report_job_id == '0':
       self.testRunDeliveryReport()
-    self.assert_(isinstance(self.__class__.service.DownloadReport(
-        self.__class__.report_job_id, 'TSV'), str))
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'TSV', self.__class__.service), str))
 
 
 class ReportServiceTestV201104(unittest.TestCase):
@@ -201,15 +202,15 @@ class ReportServiceTestV201104(unittest.TestCase):
     """Test whether we can download a CSV report."""
     if self.__class__.report_job_id == '0':
       self.testRunDeliveryReport()
-    self.assert_(isinstance(self.__class__.service.DownloadReport(
-        self.__class__.report_job_id, 'CSV'), str))
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'CSV', self.__class__.service), str))
 
   def testDownloadTsvReport(self):
     """Test whether we can download a TSV report."""
     if self.__class__.report_job_id == '0':
       self.testRunDeliveryReport()
-    self.assert_(isinstance(self.__class__.service.DownloadReport(
-        self.__class__.report_job_id, 'TSV'), str))
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'TSV', self.__class__.service), str))
 
 
 class ReportServiceTestV201107(unittest.TestCase):
@@ -289,15 +290,15 @@ class ReportServiceTestV201107(unittest.TestCase):
     """Test whether we can download a CSV report."""
     if self.__class__.report_job_id == '0':
       self.testRunDeliveryReport()
-    self.assert_(isinstance(self.__class__.service.DownloadReport(
-        self.__class__.report_job_id, 'CSV'), str))
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'CSV', self.__class__.service), str))
 
   def testDownloadTsvReport(self):
     """Test whether we can download a TSV report."""
     if self.__class__.report_job_id == '0':
       self.testRunDeliveryReport()
-    self.assert_(isinstance(self.__class__.service.DownloadReport(
-        self.__class__.report_job_id, 'TSV'), str))
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'TSV', self.__class__.service), str))
 
 
 class ReportServiceTestV201108(unittest.TestCase):
@@ -377,15 +378,15 @@ class ReportServiceTestV201108(unittest.TestCase):
     """Test whether we can download a CSV report."""
     if self.__class__.report_job_id == '0':
       self.testRunDeliveryReport()
-    self.assert_(isinstance(self.__class__.service.DownloadReport(
-        self.__class__.report_job_id, 'CSV'), str))
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'CSV', self.__class__.service), str))
 
   def testDownloadTsvReport(self):
     """Test whether we can download a TSV report."""
     if self.__class__.report_job_id == '0':
       self.testRunDeliveryReport()
-    self.assert_(isinstance(self.__class__.service.DownloadReport(
-        self.__class__.report_job_id, 'TSV'), str))
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'TSV', self.__class__.service), str))
 
 
 def makeTestSuiteV201103():

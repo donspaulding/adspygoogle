@@ -21,11 +21,11 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 import os
 import pickle
 
-from adspygoogle.dfp import LIB_SIG
-from adspygoogle.dfp import REQUIRED_SOAP_HEADERS
 from adspygoogle.common import SanityCheck
 from adspygoogle.common.Errors import InvalidInputError
 from adspygoogle.common.Logger import Logger
+from adspygoogle.dfp import LIB_SIG
+from adspygoogle.dfp import REQUIRED_SOAP_HEADERS
 
 
 HOME = os.getcwd()
@@ -74,7 +74,6 @@ prompts = (('Your DFP account\'s login email', 'email',
            ('Login password', 'password', 'auth'),
            ('Network code [optional]', 'networkCode', 'auth'),
            ('Application name', 'applicationName', 'auth'),
-           ('Select SOAP library [1=SOAPpy, 2=ZSI]', 'soap_lib', 'config'),
            ('Select XML parser [1=PyXML, 2=ElementTree]', 'xml_parser',
             'config'),
            ('Enable debugging mode', 'debug', 'config'),
@@ -110,7 +109,7 @@ for prompt_msg, header, source in prompts:
         auth[header] = '%s|%s' % (LIB_SIG, auth[header])
   elif source == 'config':
     # Prompt user to update configuration values.
-    if header == 'soap_lib' or header == 'xml_parser':
+    if header == 'xml_parser':
       res = raw_input('%s: ' % prompt_msg).rstrip('\r')
       if not SanityCheck.IsConfigUserInputValid(res, ['1', '2']):
         msg = 'Possible values are \'1\' or \'2\'.'

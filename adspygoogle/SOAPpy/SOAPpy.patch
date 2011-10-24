@@ -1,0 +1,171 @@
+diff -Naurb SOAPpy-0.12.0/ChangeLog.adspygoogle adspygoogle/SOAPpy/ChangeLog.adspygoogle
+--- SOAPpy-0.12.0/ChangeLog.adspygoogle	1969-12-31 19:00:00.000000000 -0500
++++ adspygoogle/SOAPpy/ChangeLog.adspygoogle	2011-10-24 13:09:10.404348000 -0400
+@@ -0,0 +1,13 @@
++1.0.0:
++- Namespaces [124-126]: Added JAXB namespace
++- XMLSchema [19, 678]: Added JAXB namespace as a recognized value.
++            [2864, 2871-2872]: Modified TypeDescriptionComponent class to define
++                               __new__ method instead of __init__. This removes
++                               the deprecation warning on calling
++                               tuple.__init__.
++- SOAPBuilder [137-140]: No longer always puts a newline after a method element.
++                         Will only put a newline if there is at least one arg or
++                         kw arg.
++              [584 and 590]: Passed the "typed" flag down instead of hardcoding
++                             it to 1.
++- Client [115-117, 160-193]: Added support for custom HTTP headers to SOAPpy's
++                             HTTPTransport.
+diff -Naurb SOAPpy-0.12.0/README adspygoogle/SOAPpy/README
+--- SOAPpy-0.12.0/README	1969-12-31 19:00:00.000000000 -0500
++++ adspygoogle/SOAPpy/README	2011-10-19 09:49:44.715338000 -0400
+@@ -0,0 +1,2 @@
++This directory contains a custom version of SOAPpy. It is slightly patched to
++better serve the Google Ads APIs client libraries.
+diff -Naurb SOAPpy-0.12.0/SOAPBuilder.py adspygoogle/SOAPpy/SOAPBuilder.py
+--- SOAPpy-0.12.0/SOAPBuilder.py	2008-12-22 14:42:14.000000000 -0500
++++ adspygoogle/SOAPpy/SOAPBuilder.py	2011-10-05 11:15:33.454752000 -0400
+@@ -134,8 +134,10 @@
+             else:
+                 methodns, n = '', ''
+
+-            self.out.append('<%s%s%s%s%s>\n' % (
++            self.out.append('<%s%s%s%s%s>' % (
+                 methodns, self.method, n, a, self.genroot(ns_map)))
++            if self.args or self.kw:
++              self.out.append('\n')
+
+         try:
+             if type(self.args) != TupleType:
+@@ -581,13 +581,13 @@
+             # first write out items with order information
+             if hasattr(obj, '_keyord'):
+                 for i in range(len(obj._keyord)):
+-                    self.dump(obj._aslist(i), obj._keyord[i], 1, ns_map)
++                    self.dump(obj._aslist(i), obj._keyord[i], typed, ns_map)
+                     keylist.remove(obj._keyord[i])
+
+             # now write out the rest
+             for k in keylist:
+                 if (k[0] != "_"):
+-                    self.dump(getattr(obj,k), k, 1, ns_map)
++                    self.dump(getattr(obj,k), k, typed, ns_map)
+
+             if isinstance(obj, bodyType):
+                 self.multis = 1
+diff -Naurb SOAPpy-0.12.0/wstools/Namespaces.py adspygoogle/SOAPpy/wstools/Namespaces.py
+--- SOAPpy-0.12.0/wstools/Namespaces.py	2008-12-22 14:42:13.000000000 -0500
++++ adspygoogle/SOAPpy/wstools/Namespaces.py	2011-10-05 09:09:17.811673000 -0400
+@@ -121,4 +121,7 @@
+     CORE    = "http://www.globus.org/namespaces/2004/06/core"
+     SIG     = "http://www.globus.org/2002/04/xmlenc#gssapi-sign"
+
++class JAXB:
++    NS = "http://java.sun.com/xml/ns/jaxb"
++
+ ZSI_SCHEMA_URI = 'http://www.zolera.com/schemas/ZSI/'
+diff -Naurb SOAPpy-0.12.0/wstools/XMLSchema.py adspygoogle/SOAPpy/wstools/XMLSchema.py
+--- SOAPpy-0.12.0/wstools/XMLSchema.py	2005-02-18 08:50:14.000000000 -0500
++++ adspygoogle/SOAPpy/wstools/XMLSchema.py	2011-10-10 10:42:57.382400000 -0400
+@@ -16,6 +16,7 @@
+
+ import types, weakref, urllib, sys
+ from threading import RLock
++from Namespaces import JAXB
+ from Namespaces import XMLNS
+ from Utility import DOM, DOMException, Collection, SplitQName
+ from StringIO import StringIO
+@@ -674,7 +675,7 @@
+                     'class instance %s, missing required attribute %s'\
+                     %(self.__class__, a)
+         for a in self.attributes.keys():
+-            if (a not in (XMLSchemaComponent.xmlns, XMLNS.XML)) and\
++            if (a not in (XMLSchemaComponent.xmlns, XMLNS.XML, JAXB.NS)) and\
+                 (a not in self.__class__.attributes.keys()) and not\
+                 (self.isAttribute() and self.isReference()):
+                 raise SchemaError, '%s, unknown attribute(%s,%s)' \
+@@ -2860,7 +2861,7 @@
+     """Tuple of length 2, consisting of
+        a namespace and unprefixed name.
+     """
+-    def __init__(self, args):
++    def __new__(self, args):
+         """args -- (namespace, name)
+            Remove the name's prefix, irrelevant.
+         """
+@@ -2868,8 +2869,7 @@
+             raise TypeError, 'expecting tuple (namespace, name), got %s' %args
+         elif args[1].find(':') >= 0:
+             args = (args[0], SplitQName(args[1])[1])
+-        tuple.__init__(self, args)
+-        return
++        return tuple.__new__(TypeDescriptionComponent, args)
+
+     def getTargetNamespace(self):
+         return self[0]
+diff -Naurb SOAPpy-0.12.0/Client.py adspygoogle/SOAPpy/Client.py
+--- SOAPpy-0.12.0/Client.py	2008-12-22 14:42:14.000000000 -0500
++++ adspygoogle/SOAPpy/Client.py	2011-10-24 13:55:43.705887000 -0400
+@@ -112,6 +112,9 @@
+
+
+ class HTTPTransport:
++    def __init__(self, additional_headers = None):
++        self.additional_headers = additional_headers or {}
++
+     def getNS(self, original_namespace, data):
+         """Extract the (possibly extended) namespace from the returned
+         SOAP message."""
+@@ -153,37 +156,40 @@
+
+         r.putrequest("POST", real_path)
+
+-        r.putheader("Host", addr.host)
+-        r.putheader("User-agent", SOAPUserAgent())
++        headers = []
++
++        headers.append(("Host", addr.host))
++        headers.append(("User-agent", SOAPUserAgent()))
+         t = 'text/xml';
+         if encoding != None:
+             t += '; charset="%s"' % encoding
+-        r.putheader("Content-type", t)
+-        r.putheader("Content-length", str(len(data)))
++        headers.append(("Content-type", t))
++        headers.append(("Content-length", str(len(data))))
+
+         # if user is not a user:passwd format
+         #    we'll receive a failure from the server. . .I guess (??)
+         if addr.user != None:
+             val = base64.encodestring(addr.user)
+-            r.putheader('Authorization','Basic ' + val.replace('\012',''))
++            headers.append(('Authorization','Basic ' + val.replace('\012','')))
++
++        headers.extend(self.additional_headers.items())
+
+         # This fixes sending either "" or "None"
+         if soapaction == None or len(soapaction) == 0:
+-            r.putheader("SOAPAction", "")
++            headers.append(("SOAPAction", ""))
+         else:
+-            r.putheader("SOAPAction", '"%s"' % soapaction)
++            headers.append(("SOAPAction", '"%s"' % soapaction))
+
+         if config.dumpHeadersOut:
+             s = 'Outgoing HTTP headers'
+             debugHeader(s)
+             print "POST %s %s" % (real_path, r._http_vsn_str)
+-            print "Host:", addr.host
+-            print "User-agent: SOAPpy " + __version__ + " (http://pywebsvcs.sf.net)"
+-            print "Content-type:", t
+-            print "Content-length:", len(data)
+-            print 'SOAPAction: "%s"' % soapaction
++            for header in headers:
++                print '%s:%s' % header
+             debugFooter(s)
+
++        for header in headers:
++            r.putheader(header[0], header[1])
+         r.endheaders()
+
+         if config.dumpSOAPOut:

@@ -26,7 +26,6 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
-from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
 from tests.adspygoogle.dfp import client
 from tests.adspygoogle.dfp import HTTP_PROXY
@@ -54,8 +53,7 @@ class LicaServiceTestV201103(unittest.TestCase):
   line_item_id = None
   IMAGE_DATA = open(os.path.join('data', 'medium_rectangle.jpg').replace(
       '\\', '/'), 'r').read()
-  if client.soap_lib == SOAPPY:
-    IMAGE_DATA = base64.encodestring(IMAGE_DATA)
+  IMAGE_DATA = base64.encodestring(IMAGE_DATA)
   lica1 = None
   lica2 = None
 
@@ -189,8 +187,7 @@ class LicaServiceTestV201104(unittest.TestCase):
   line_item_id = None
   IMAGE_DATA = open(os.path.join('data', 'medium_rectangle.jpg').replace(
       '\\', '/'), 'r').read()
-  if client.soap_lib == SOAPPY:
-    IMAGE_DATA = base64.encodestring(IMAGE_DATA)
+  IMAGE_DATA = base64.encodestring(IMAGE_DATA)
   lica1 = None
   lica2 = None
 
@@ -405,8 +402,7 @@ class LicaServiceTestV201107(unittest.TestCase):
   line_item_id = None
   IMAGE_DATA = open(os.path.join('data', 'medium_rectangle.jpg').replace(
       '\\', '/'), 'r').read()
-  if client.soap_lib == SOAPPY:
-    IMAGE_DATA = base64.encodestring(IMAGE_DATA)
+  IMAGE_DATA = base64.encodestring(IMAGE_DATA)
   lica1 = None
   lica2 = None
 
@@ -620,8 +616,7 @@ class LicaServiceTestV201108(unittest.TestCase):
   line_item_id = None
   IMAGE_DATA = open(os.path.join('data', 'medium_rectangle.jpg').replace(
       '\\', '/'), 'r').read()
-  if client.soap_lib == SOAPPY:
-    IMAGE_DATA = base64.encodestring(IMAGE_DATA)
+  IMAGE_DATA = base64.encodestring(IMAGE_DATA)
   lica1 = None
   lica2 = None
 

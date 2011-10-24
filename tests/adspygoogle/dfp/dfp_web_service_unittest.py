@@ -25,11 +25,9 @@ import thread
 import threading
 import unittest
 
-from adspygoogle.common import SOAPPY
-from adspygoogle.common import ZSI
 from adspygoogle.common import Utils
 from adspygoogle.dfp.DfpErrors import DfpApiError
-from adspygoogle.dfp.DfpWebService import DfpWebService
+from adspygoogle.dfp.GenericDfpService import GenericDfpService
 from tests.adspygoogle.dfp import client
 from tests.adspygoogle.dfp import HTTP_PROXY
 from tests.adspygoogle.dfp import SERVER_V201103
@@ -63,35 +61,6 @@ class DfpWebServiceTestV201103(unittest.TestCase):
         self.__class__.VERSION, HTTP_PROXY).GetUsersByStatement(
             filter_statement), tuple))
 
-  def testCallMethodDirect(self):
-    """Test whether we can call an API method directly."""
-    headers = client.GetAuthCredentials()
-    config = client.GetConfigValues()
-    url = '/'.join([DfpWebServiceTestV201103.SERVER,
-                   'apis/ads/publisher/v201103', 'UserService'])
-    op_config = {
-        'server': self.__class__.SERVER,
-        'version': self.__class__.VERSION,
-        'http_proxy': HTTP_PROXY
-    }
-
-    lock = thread.allocate_lock()
-    service = DfpWebService(headers, config, op_config, url, lock)
-    method_name = 'getAllRoles'
-    if config['soap_lib'] == SOAPPY:
-      self.assert_(isinstance(service.CallMethod(method_name, (),
-                                                 'UserService'), tuple))
-    elif config['soap_lib'] == ZSI:
-      web_services = __import__(
-          'adspygoogle.dfp.zsi.v201103.UserService_services',
-          globals(), locals(), [''])
-      loc = web_services.UserServiceLocator()
-      request = eval('web_services.%sRequest()' % method_name)
-      self.assert_(isinstance(service.CallMethod(
-          method_name,
-          (({'filterStatement': {'query': 'ORDER BY name LIMIT 500'}},)),
-          'User', loc, request), tuple))
-
   def testCallRawMethod(self):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
@@ -99,8 +68,8 @@ class DfpWebServiceTestV201103(unittest.TestCase):
     url = '/apis/ads/publisher/v201103/UserService'
     http_proxy = None
 
-    self.failUnlessRaises(DfpApiError, client.CallRawMethod, soap_message, url,
-                          self.__class__.SERVER, http_proxy)
+    self.assert_(isinstance(client.CallRawMethod(soap_message, url,
+                            self.__class__.SERVER, http_proxy), tuple))
 
   def testMultiThreads(self):
     """Test whether we can safely execute multiple threads."""
@@ -152,35 +121,6 @@ class DfpWebServiceTestV201104(unittest.TestCase):
         self.__class__.VERSION, HTTP_PROXY).GetUsersByStatement(
             filter_statement), tuple))
 
-  def testCallMethodDirect(self):
-    """Test whether we can call an API method directly."""
-    headers = client.GetAuthCredentials()
-    config = client.GetConfigValues()
-    url = '/'.join([DfpWebServiceTestV201104.SERVER,
-                   'apis/ads/publisher/v201104', 'UserService'])
-    op_config = {
-        'server': self.__class__.SERVER,
-        'version': self.__class__.VERSION,
-        'http_proxy': HTTP_PROXY
-    }
-
-    lock = thread.allocate_lock()
-    service = DfpWebService(headers, config, op_config, url, lock)
-    method_name = 'getAllRoles'
-    if config['soap_lib'] == SOAPPY:
-      self.assert_(isinstance(service.CallMethod(method_name, (),
-                                                 'UserService'), tuple))
-    elif config['soap_lib'] == ZSI:
-      web_services = __import__(
-          'adspygoogle.dfp.zsi.v201104.UserService_services',
-          globals(), locals(), [''])
-      loc = web_services.UserServiceLocator()
-      request = eval('web_services.%sRequest()' % method_name)
-      self.assert_(isinstance(service.CallMethod(
-          method_name,
-          (({'filterStatement': {'query': 'ORDER BY name LIMIT 500'}},)),
-          'User', loc, request), tuple))
-
   def testCallRawMethod(self):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
@@ -188,8 +128,8 @@ class DfpWebServiceTestV201104(unittest.TestCase):
     url = '/apis/ads/publisher/v201104/UserService'
     http_proxy = None
 
-    self.failUnlessRaises(DfpApiError, client.CallRawMethod, soap_message, url,
-                          self.__class__.SERVER, http_proxy)
+    self.assert_(isinstance(client.CallRawMethod(soap_message, url,
+                            self.__class__.SERVER, http_proxy), tuple))
 
   def testMultiThreads(self):
     """Test whether we can safely execute multiple threads."""
@@ -241,35 +181,6 @@ class DfpWebServiceTestV201107(unittest.TestCase):
         self.__class__.VERSION, HTTP_PROXY).GetUsersByStatement(
             filter_statement), tuple))
 
-  def testCallMethodDirect(self):
-    """Test whether we can call an API method directly."""
-    headers = client.GetAuthCredentials()
-    config = client.GetConfigValues()
-    url = '/'.join([DfpWebServiceTestV201107.SERVER,
-                   'apis/ads/publisher/v201107', 'UserService'])
-    op_config = {
-        'server': self.__class__.SERVER,
-        'version': self.__class__.VERSION,
-        'http_proxy': HTTP_PROXY
-    }
-
-    lock = thread.allocate_lock()
-    service = DfpWebService(headers, config, op_config, url, lock)
-    method_name = 'getAllRoles'
-    if config['soap_lib'] == SOAPPY:
-      self.assert_(isinstance(service.CallMethod(method_name, (),
-                                                 'UserService'), tuple))
-    elif config['soap_lib'] == ZSI:
-      web_services = __import__(
-          'adspygoogle.dfp.zsi.v201107.UserService_services',
-          globals(), locals(), [''])
-      loc = web_services.UserServiceLocator()
-      request = eval('web_services.%sRequest()' % method_name)
-      self.assert_(isinstance(service.CallMethod(
-          method_name,
-          (({'filterStatement': {'query': 'ORDER BY name LIMIT 500'}},)),
-          'User', loc, request), tuple))
-
   def testCallRawMethod(self):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
@@ -277,8 +188,8 @@ class DfpWebServiceTestV201107(unittest.TestCase):
     url = '/apis/ads/publisher/v201107/UserService'
     http_proxy = None
 
-    self.failUnlessRaises(DfpApiError, client.CallRawMethod, soap_message, url,
-                          self.__class__.SERVER, http_proxy)
+    self.assert_(isinstance(client.CallRawMethod(soap_message, url,
+                            self.__class__.SERVER, http_proxy), tuple))
 
   def testMultiThreads(self):
     """Test whether we can safely execute multiple threads."""
@@ -330,35 +241,6 @@ class DfpWebServiceTestV201108(unittest.TestCase):
         self.__class__.VERSION, HTTP_PROXY).GetUsersByStatement(
             filter_statement), tuple))
 
-  def testCallMethodDirect(self):
-    """Test whether we can call an API method directly."""
-    headers = client.GetAuthCredentials()
-    config = client.GetConfigValues()
-    url = '/'.join([DfpWebServiceTestV201108.SERVER,
-                   'apis/ads/publisher/v201108', 'UserService'])
-    op_config = {
-        'server': self.__class__.SERVER,
-        'version': self.__class__.VERSION,
-        'http_proxy': HTTP_PROXY
-    }
-
-    lock = thread.allocate_lock()
-    service = DfpWebService(headers, config, op_config, url, lock)
-    method_name = 'getAllRoles'
-    if config['soap_lib'] == SOAPPY:
-      self.assert_(isinstance(service.CallMethod(method_name, (),
-                                                 'UserService'), tuple))
-    elif config['soap_lib'] == ZSI:
-      web_services = __import__(
-          'adspygoogle.dfp.zsi.v201108.UserService_services',
-          globals(), locals(), [''])
-      loc = web_services.UserServiceLocator()
-      request = eval('web_services.%sRequest()' % method_name)
-      self.assert_(isinstance(service.CallMethod(
-          method_name,
-          (({'filterStatement': {'query': 'ORDER BY name LIMIT 500'}},)),
-          'User', loc, request), tuple))
-
   def testCallRawMethod(self):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
@@ -366,8 +248,8 @@ class DfpWebServiceTestV201108(unittest.TestCase):
     url = '/apis/ads/publisher/v201108/UserService'
     http_proxy = None
 
-    self.failUnlessRaises(DfpApiError, client.CallRawMethod, soap_message, url,
-                          self.__class__.SERVER, http_proxy)
+    self.assert_(isinstance(client.CallRawMethod(soap_message, url,
+                            self.__class__.SERVER, http_proxy), tuple))
 
   def testMultiThreads(self):
     """Test whether we can safely execute multiple threads."""

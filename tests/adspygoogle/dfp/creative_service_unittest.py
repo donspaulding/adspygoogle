@@ -25,7 +25,6 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
-from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
 from tests.adspygoogle.dfp import client
 from tests.adspygoogle.dfp import HTTP_PROXY
@@ -56,10 +55,9 @@ class CreativeServiceTestV201103(unittest.TestCase):
       '\\', '/'), 'r').read()
   IMAGE_DATA3 = open(os.path.join('data', 'skyscraper.jpg').replace(
       '\\', '/'), 'r').read()
-  if client.soap_lib == SOAPPY:
-    IMAGE_DATA1 = base64.encodestring(IMAGE_DATA1)
-    IMAGE_DATA2 = base64.encodestring(IMAGE_DATA2)
-    IMAGE_DATA3 = base64.encodestring(IMAGE_DATA3)
+  IMAGE_DATA1 = base64.encodestring(IMAGE_DATA1)
+  IMAGE_DATA2 = base64.encodestring(IMAGE_DATA2)
+  IMAGE_DATA3 = base64.encodestring(IMAGE_DATA3)
 
   def setUp(self):
     """Prepare unittest."""
@@ -191,10 +189,9 @@ class CreativeServiceTestV201104(unittest.TestCase):
       '\\', '/'), 'r').read()
   IMAGE_DATA3 = open(os.path.join('data', 'skyscraper.jpg').replace(
       '\\', '/'), 'r').read()
-  if client.soap_lib == SOAPPY:
-    IMAGE_DATA1 = base64.encodestring(IMAGE_DATA1)
-    IMAGE_DATA2 = base64.encodestring(IMAGE_DATA2)
-    IMAGE_DATA3 = base64.encodestring(IMAGE_DATA3)
+  IMAGE_DATA1 = base64.encodestring(IMAGE_DATA1)
+  IMAGE_DATA2 = base64.encodestring(IMAGE_DATA2)
+  IMAGE_DATA3 = base64.encodestring(IMAGE_DATA3)
 
   def setUp(self):
     """Prepare unittest."""
@@ -325,10 +322,9 @@ class CreativeServiceTestV201107(unittest.TestCase):
       '\\', '/'), 'r').read()
   IMAGE_DATA3 = open(os.path.join('data', 'skyscraper.jpg').replace(
       '\\', '/'), 'r').read()
-  if client.soap_lib == SOAPPY:
-    IMAGE_DATA1 = base64.encodestring(IMAGE_DATA1)
-    IMAGE_DATA2 = base64.encodestring(IMAGE_DATA2)
-    IMAGE_DATA3 = base64.encodestring(IMAGE_DATA3)
+  IMAGE_DATA1 = base64.encodestring(IMAGE_DATA1)
+  IMAGE_DATA2 = base64.encodestring(IMAGE_DATA2)
+  IMAGE_DATA3 = base64.encodestring(IMAGE_DATA3)
 
   def setUp(self):
     """Prepare unittest."""
@@ -460,10 +456,9 @@ class CreativeServiceTestV201108(unittest.TestCase):
       '\\', '/'), 'r').read()
   IMAGE_DATA3 = open(os.path.join('data', 'skyscraper.jpg').replace(
       '\\', '/'), 'r').read()
-  if client.soap_lib == SOAPPY:
-    IMAGE_DATA1 = base64.encodestring(IMAGE_DATA1)
-    IMAGE_DATA2 = base64.encodestring(IMAGE_DATA2)
-    IMAGE_DATA3 = base64.encodestring(IMAGE_DATA3)
+  IMAGE_DATA1 = base64.encodestring(IMAGE_DATA1)
+  IMAGE_DATA2 = base64.encodestring(IMAGE_DATA2)
+  IMAGE_DATA3 = base64.encodestring(IMAGE_DATA3)
 
   def setUp(self):
     """Prepare unittest."""

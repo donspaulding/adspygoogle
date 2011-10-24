@@ -18,11 +18,10 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
-import pickle
 import os
+import pickle
 
 from adspygoogle.common import PYXML
-from adspygoogle.common import ZSI
 from adspygoogle.common import SanityCheck
 from adspygoogle.common import Utils
 from adspygoogle.common.Errors import ValidationError
@@ -57,6 +56,9 @@ class Client(object):
 
     Returns:
       dict Dictionary object with populated authentication credentials.
+
+    Raises:
+      ValidationError: if authentication data is missing.
     """
     auth = {}
     if os.path.exists(self.__class__.auth_pkl):
@@ -108,15 +110,18 @@ class Client(object):
       pass
     return config
 
-  def _SetMissingDefaultConfigValues(self, config={}):
+  def _SetMissingDefaultConfigValues(self, config=None):
     """Set default configuration values for missing elements in the config dict.
 
     Args:
       config: dict Object with client configuration values.
+
+    Returns:
+      dict Given config dictionary with default values added in.
     """
+    if config is None: config = {}
     default_config = {
         'proxy': None,
-        'soap_lib': ZSI,
         'xml_parser': PYXML,
         'debug': 'n',
         'raw_debug': 'n',
@@ -128,10 +133,9 @@ class Client(object):
         'auth_type': '',
         'pretty_xml': 'y',
         'compress': 'y',
-        'data_injects': (),
-        'force_data_inject': 'n',
         'access': '',
-        'wsse': 'n'
+        'oauth_enabled': 'n',
+        'wrap_in_tuple': 'y'
     }
     for key in default_config:
       if key not in config:
@@ -154,27 +158,8 @@ class Client(object):
     """
     return self._config
 
-  def __GetSoapLlib(self):
-    """Return current value of the SOAP library in use.
-
-    Returns:
-      str Value of the SOAP library in use.
-    """
-    return self._config['soap_lib']
-
-  def __SetSoapLib(self, soap_lib):
-    """Change the SOAP library to use.
-
-    Args:
-      soap_lib: str Value of the SOAP library to use.
-    """
-    SanityCheck.ValidateConfigSoapLib(soap_lib)
-    self._config['soap_lib'] = soap_lib
-
-  soap_lib = property(__GetSoapLlib, __SetSoapLib)
-
   def SetDebug(self, new_state):
-    """Temporarily change debug mode for a given AdWordsClient instance.
+    """Temporarily change debug mode for a given Client instance.
 
     Args:
       new_state: bool New state of the debug mode.
@@ -190,7 +175,7 @@ class Client(object):
     return self._config['debug']
 
   def __SetDebug(self, new_state):
-    """Temporarily change debug mode for a given AdWordsClient instance.
+    """Temporarily change debug mode for a given Client instance.
 
     Args:
       new_state: bool New state of the debug mode.
@@ -208,7 +193,7 @@ class Client(object):
     return self._config['raw_debug']
 
   def __SetRawDebug(self, new_state):
-    """Temporarily change raw debug mode for a given AdWordsClient instance.
+    """Temporarily change raw debug mode for a given Client instance.
 
     Args:
       new_state: bool New state of the raw debug mode.
@@ -226,7 +211,7 @@ class Client(object):
     return self._config['strict']
 
   def __SetUseStrict(self, new_state):
-    """Temporarily change strictness mode for a given AdWordsClient instance.
+    """Temporarily change strictness mode for a given Client instance.
 
     Args:
       new_state: bool New state of the strictness mode.
@@ -267,23 +252,6 @@ class Client(object):
 
     Returns:
       tuple Response from the API method (SOAP XML response message).
-    """
-    pass
-
-  def CallMethod(self, url, method, params, http_proxy):
-    """Call API method directly, using its service's URL.
-
-    For API calls performed with this method, outgoing data is not run through
-    library's validation logic.
-
-    Args:
-      url: str URL of the API service for the method to call.
-      method: str Name of the API method to call.
-      params: list List of parameters to send to the API method.
-      http_proxy: str HTTP proxy to use for this API call.
-
-    Returns:
-      tuple Response from the API method.
     """
     pass
 
@@ -331,7 +299,7 @@ class Client(object):
     self.SetOAuthCredentials(self.GetOAuthHandler().GetAccessToken(
         self.GetOAuthCredentials(), verifier))
 
-  def SetOAuthCredentials(self, credentials):
+  def __SetOAuthCredentials(self, credentials):
     """Sets the OAuth credentials into the config.
 
     Args:
@@ -339,7 +307,7 @@ class Client(object):
     """
     self._config['oauth_credentials'] = credentials
 
-  def GetOAuthCredentials(self):
+  def __GetOAuthCredentials(self):
     """Retrieves the OAuth credentials from the config.
 
     Returns:
@@ -347,7 +315,9 @@ class Client(object):
     """
     return self._config['oauth_credentials']
 
-  def SetOAuthHandler(self, oauth_handler):
+  oauth_credentials = property(__GetOAuthCredentials, __SetOAuthCredentials)
+
+  def __SetOAuthHandler(self, oauth_handler):
     """Sets the config to use the specified OAuth Handler.
 
     Args:
@@ -355,7 +325,7 @@ class Client(object):
     """
     self._config['oauth_handler'] = oauth_handler
 
-  def GetOAuthHandler(self):
+  def __GetOAuthHandler(self):
     """Returns the currently set OAuthHandler.
 
     Returns:
@@ -363,10 +333,22 @@ class Client(object):
     """
     return self._config['oauth_handler']
 
-  def EnableOAuth(self):
-    """Enables OAuth."""
-    self._config['oauth_enabled'] = True
+  oauth_handler = property(__GetOAuthHandler, __SetOAuthHandler)
 
-  def DisableOAuth(self):
-    """Disables OAuth."""
-    self._config['oauth_enabled'] = False
+  def __SetUsingOAuth(self, is_using):
+    """Sets the config to use OAuth.
+
+    Args:
+      is_using: boolean Whether the client is using OAuth or not.
+    """
+    self._config['oauth_enabled'] = is_using
+
+  def __GetUsingOAuth(self):
+    """Returns if the client is currently set to use OAuth.
+
+    Returns:
+      boolean Whether this client is using OAuth or not
+    """
+    return self._config['oauth_enabled']
+
+  use_oauth = property(__GetUsingOAuth, __SetUsingOAuth)

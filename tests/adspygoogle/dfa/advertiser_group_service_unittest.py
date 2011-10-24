@@ -73,8 +73,10 @@ class AdvertiserGroupServiceTestV1_14(unittest.TestCase):
 
   def testGetAdvertiserGroup(self):
     """Test whether we can fetch advertiser group."""
+    if self.__class__.advertiser_group1 is None:
+      self.testSaveAdvertiserGroup()
     self.assert_(isinstance(self.__class__.service.GetAdvertiserGroup(
-        '1'), tuple))
+        self.__class__.advertiser_group1['id']), tuple))
 
   def testGetAdvertiserGroups(self):
     """Test whether we can fetch advertiser groups."""
@@ -149,8 +151,10 @@ class AdvertiserGroupServiceTestV1_13(unittest.TestCase):
 
   def testGetAdvertiserGroup(self):
     """Test whether we can fetch advertiser group."""
+    if self.__class__.advertiser_group1 is None:
+      self.testSaveAdvertiserGroup()
     self.assert_(isinstance(self.__class__.service.GetAdvertiserGroup(
-        '1'), tuple))
+        self.__class__.advertiser_group1['id']), tuple))
 
   def testGetAdvertiserGroups(self):
     """Test whether we can fetch advertiser groups."""
@@ -225,8 +229,10 @@ class AdvertiserGroupServiceTestV1_15(unittest.TestCase):
 
   def testGetAdvertiserGroup(self):
     """Test whether we can fetch advertiser group."""
+    if self.__class__.advertiser_group1 is None:
+      self.testSaveAdvertiserGroup()
     self.assert_(isinstance(self.__class__.service.GetAdvertiserGroup(
-        '1'), tuple))
+        self.__class__.advertiser_group1['id']), tuple))
 
   def testGetAdvertiserGroups(self):
     """Test whether we can fetch advertiser groups."""

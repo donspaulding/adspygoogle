@@ -18,50 +18,19 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
-from adspygoogle.common.Errors import DetailError
 from adspygoogle.common.Errors import Error
 
 
 class DfaError(Error):
 
-  """Implements DfaError.
+  """Implements a DfaError, responsible for wrapping errors."""
 
-  Responsible for handling error.
-  """
-
-  def __init(self, msg):
-    super(DfaError, self).__init__()
-
-  def __str__(self):
-    return super(DfaError, self).__str__()
-
-  def __call__(self):
-    return super(DfaError, self).__call__()
-
-
-class DfaDetailError(DetailError):
-
-  """Implements DfaDetailError.
-
-  Responsible for handling detailed ApiException error.
-  """
-
-  def __init__(self, **error):
-    super(DfaDetailError, self).__init__()
-    self.__error = error
-    for key in self.__error:
-      self.__dict__.__setitem__(key, self.__error[key])
-
-  def __call__(self):
-    return (self.__error,)
+  pass
 
 
 class DfaApiError(DfaError):
 
-  """Implements DfaApiError.
-
-  Responsible for handling API exception.
-  """
+  """Implements a DfaApiError, responsible for handling API exception."""
 
   def __init__(self, fault):
     (self.__fault, self.fault_code, self.fault_string) = (fault, '', '')
@@ -76,8 +45,8 @@ class DfaApiError(DfaError):
       if 'errorMessage' in fault['detail']['doubleclick']:
         self.error_message = fault['detail']['doubleclick']['errorMessage']
       if 'localizedMessage' in fault['detail']['doubleclick']:
-        self.localized_message = \
-            fault['detail']['doubleclick']['localizedMessage']
+        self.localized_message = fault['detail']['doubleclick'][
+            'localizedMessage']
       if 'message' in fault['detail']['doubleclick']:
         self.message = fault['detail']['doubleclick']['message']
       if 'hostname' in fault['detail']:
@@ -94,25 +63,6 @@ class DfaApiError(DfaError):
     return (self.__fault,)
 
 
-class DfaRequestError(DfaApiError):
-
-  """Implements DfaRequestError.
-
-  Responsible for handling request error."""
-
-  pass
-
-
-class DfaGoogleInternalError(DfaApiError):
-
-  """Implements DfaGoogleInternalError.
-
-  Responsible for handling Google internal error.
-  """
-
-  pass
-
-
 class DfaAuthenticationError(DfaApiError):
 
   """Implements DfaAuthenticationError.
@@ -121,30 +71,3 @@ class DfaAuthenticationError(DfaApiError):
   """
 
   pass
-
-
-class DfaAccountError(DfaApiError):
-
-  """Implements DfaAccountError.
-
-  Responsible for handling account error.
-  """
-
-  pass
-
-
-# Map error codes to their corresponding classes.
-ERRORS = {}
-ERROR_CODES = [x for x in xrange(0, 200005)]
-for index in ERROR_CODES:
-  if (index == 2 or index == 3 or (index >= 13 and index <= 26) or
-      (index >= 33 and index <= 14019) or (index >= 14023 and index <= 64024) or
-      (index >= 64100 and index <= 200005)):
-    ERRORS[index] = DfaRequestError
-  elif (index == 1 or index == 6 or index == 10):
-    ERRORS[index] = DfaGoogleInternalError
-  elif ((index >= 14020 and index <= 14022) or index == 64025):
-    ERRORS[index] = DfaAccountError
-  elif (index == 4 or index == 5 or index == 7 or
-        (index >= 27 and index <= 32)):
-    ERRORS[index] = DfaAuthenticationError

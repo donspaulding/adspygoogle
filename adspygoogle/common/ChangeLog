@@ -1,3 +1,9 @@
+3.0.0:
+- Removed support for ZSI.
+- Added patched version of SOAPpy as sole supported SOAP toolkit.
+- Removed ApiService and WebService classes in favor of joint GenericApiService
+  class.
+
 2.2.1:
 - Addressing AdWords issue 164 (cannot use super with Exception in Python 2.4).
 

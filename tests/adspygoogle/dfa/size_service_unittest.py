@@ -26,7 +26,6 @@ sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
 from adspygoogle.common import Utils
-from adspygoogle.dfa.DfaErrors import DfaRequestError
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
 from tests.adspygoogle.dfa import SERVER_V1_13
@@ -63,7 +62,7 @@ class SizeServiceTestV1_14(unittest.TestCase):
     if self.__class__.size is None:
       self.testSaveSize()
     size_id = self.__class__.size['id']
-    self.assert_(isinstance(self.__class__.service.GetSizeById(
+    self.assert_(isinstance(self.__class__.service.GetSize(
         size_id), tuple))
 
   def testSaveSize(self):
@@ -129,7 +128,7 @@ class SizeServiceTestV1_13(unittest.TestCase):
     if self.__class__.size is None:
       self.testSaveSize()
     size_id = self.__class__.size['id']
-    self.assert_(isinstance(self.__class__.service.GetSizeById(
+    self.assert_(isinstance(self.__class__.service.GetSize(
         size_id), tuple))
 
   def testSaveSize(self):
@@ -197,7 +196,7 @@ class SizeServiceTestV1_15(unittest.TestCase):
     if self.__class__.size is None:
       self.testSaveSize()
     size_id = self.__class__.size['id']
-    self.assert_(isinstance(self.__class__.service.GetSizeById(
+    self.assert_(isinstance(self.__class__.service.GetSize(
         size_id), tuple))
 
   def testSaveSize(self):

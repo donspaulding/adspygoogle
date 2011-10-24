@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc.
+# Copyright 2011 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
-from adspygoogle.common import ETREE
-from adspygoogle.common import PYXML
 from adspygoogle.common.SoapBuffer import SoapBuffer
 
 
@@ -27,7 +25,7 @@ class DfaSoapBuffer(SoapBuffer):
 
   """Implements a DfaSoapBuffer.
 
-  Catches and parses outgoing and incoming SOAP XML messages for AdWords API
+  Catches and parses outgoing and incoming SOAP XML messages for DFA API
   requests.
   """
 
@@ -82,9 +80,9 @@ class DfaSoapBuffer(SoapBuffer):
     Returns:
       str responseTime header value.
     """
-    return self.__GetXmlValueByName(self._GetXmlIn(),
-        ['responseTime', 'Header/ResponseHeader/responseTime',
-         'ns2:responseTime'])
+    return self.__GetXmlValueByName(
+        self._GetXmlIn(), ['responseTime', 'Header/ResponseHeader/responseTime',
+                           'ns1:responseTime'])
 
   def GetCallRequestId(self):
     """Get value for requestId header.
@@ -92,5 +90,6 @@ class DfaSoapBuffer(SoapBuffer):
     Returns:
       str requestId header value.
     """
-    return self.__GetXmlValueByName(self._GetXmlIn(),
-        ['requestId', 'Header/ResponseHeader/requestId', 'ns2:requestId'])
+    return self.__GetXmlValueByName(
+        self._GetXmlIn(), ['requestId', 'Header/ResponseHeader/requestId',
+                           'ns1:requestId'])

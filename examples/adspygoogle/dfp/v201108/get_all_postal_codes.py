@@ -36,7 +36,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 pql_service = client.GetPublisherQueryLanguageService(
     'https://sandbox.google.com', 'v201108')
 
-select_statement = {'query': 'SELECT * FROM Postal_Code'}
+select_statement = {'query':
+                    'SELECT * FROM Postal_Code WHERE targetable = true'}
 
 # Get browser language by statement.
 result_set = pql_service.Select(select_statement)[0]

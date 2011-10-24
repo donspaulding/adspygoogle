@@ -470,7 +470,7 @@ class InventoryServiceTestV201108(unittest.TestCase):
     self.__class__.ad_unit1['adUnitSizes'] = [ad_unit_size]
     ad_unit = self.__class__.service.UpdateAdUnit(self.__class__.ad_unit1)
     self.assert_(isinstance(ad_unit, tuple))
-    self.assertEqual(ad_unit[0]['adUnitSizes'], ad_unit_size)
+    self.assertEqual(ad_unit[0]['adUnitSizes'], [ad_unit_size])
 
   def testUpdateAdUnits(self):
     """Test whether we can update a list of ad units."""
@@ -491,7 +491,7 @@ class InventoryServiceTestV201108(unittest.TestCase):
         [self.__class__.ad_unit1, self.__class__.ad_unit2])
     self.assert_(isinstance(ad_units, tuple))
     for ad_unit in ad_units:
-      self.assertEqual(ad_unit['adUnitSizes'], ad_unit_size)
+      self.assertEqual(ad_unit['adUnitSizes'], [ad_unit_size])
 
 
 def makeTestSuiteV201103():

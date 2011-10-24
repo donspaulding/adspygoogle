@@ -30,26 +30,12 @@ from adspygoogle.common.Errors import AuthTokenError
 from adspygoogle.common.Errors import ValidationError
 from adspygoogle.common.Logger import Logger
 from adspygoogle.dfp import AUTH_TOKEN_SERVICE
+from adspygoogle.dfp import DEFAULT_API_VERSION
+from adspygoogle.dfp import DfpSanityCheck
 from adspygoogle.dfp import LIB_SHORT_NAME
 from adspygoogle.dfp import LIB_SIG
-from adspygoogle.dfp import MIN_API_VERSION
 from adspygoogle.dfp import REQUIRED_SOAP_HEADERS
-from adspygoogle.dfp import DfpSanityCheck
-from adspygoogle.dfp.CompanyService import CompanyService
-from adspygoogle.dfp.CreativeService import CreativeService
-from adspygoogle.dfp.CustomTargetingService import CustomTargetingService
-from adspygoogle.dfp.DfpWebService import DfpWebService
-from adspygoogle.dfp.ForecastService import ForecastService
-from adspygoogle.dfp.InventoryService import InventoryService
-from adspygoogle.dfp.LabelService import LabelService
-from adspygoogle.dfp.LineItemCreativeAssociationService import LineItemCreativeAssociationService
-from adspygoogle.dfp.LineItemService import LineItemService
-from adspygoogle.dfp.NetworkService import NetworkService
-from adspygoogle.dfp.OrderService import OrderService
-from adspygoogle.dfp.PlacementService import PlacementService
-from adspygoogle.dfp.PublisherQueryLanguageService import PublisherQueryLanguageService
-from adspygoogle.dfp.ReportService import ReportService
-from adspygoogle.dfp.UserService import UserService
+from adspygoogle.dfp.GenericDfpService import GenericDfpService
 
 
 class DfpClient(Client):
@@ -72,31 +58,30 @@ class DfpClient(Client):
       path: str Relative or absolute path to home directory (i.e. location of
             pickles and logs/).
 
-      Ex:
-        headers = {
-          'email': 'johndoe@example.com',
-          'password': 'secret',
-          'authToken': '...',
-          'applicationName': 'GoogleTest',
-          'networkCode': 'ca-01234567',
-        }
-        config = {
-          'home': '/path/to/home',
-          'log_home': '/path/to/logs/home',
-          'proxy': 'http://example.com:8080',
-          'soap_lib': ZSI,
-          'xml_parser': PYXML,
-          'debug': 'n',
-          'raw_debug': 'n',
-          'xml_log': 'y',
-          'request_log': 'y',
-          'raw_response': 'n',
-          'strict': 'y',
-          'pretty_xml': 'y',
-          'compress': 'y',
-          'access': ''
-        }
-        path = '/path/to/home'
+    Example:
+      headers = {
+        'email': 'johndoe@example.com',
+        'password': 'secret',
+        'authToken': '...',
+        'applicationName': 'GoogleTest',
+        'networkCode': 'ca-01234567',
+      }
+      config = {
+        'home': '/path/to/home',
+        'log_home': '/path/to/logs/home',
+        'proxy': 'http://example.com:8080',
+        'xml_parser': PYXML,
+        'debug': 'n',
+        'raw_debug': 'n',
+        'xml_log': 'y',
+        'request_log': 'y',
+        'raw_response': 'n',
+        'strict': 'y',
+        'pretty_xml': 'y',
+        'compress': 'y',
+        'access': ''
+      }
+      path = '/path/to/home'
     """
     super(DfpClient, self).__init__(headers, config, path)
 
@@ -208,12 +193,16 @@ class DfpClient(Client):
     """
     return super(DfpClient, self)._LoadConfigValues()
 
-  def __SetMissingDefaultConfigValues(self, config={}):
+  def __SetMissingDefaultConfigValues(self, config=None):
     """Set default configuration values for missing elements in the config dict.
 
     Args:
       config: dict Object with client configuration values.
+
+    Returns:
+      dict The config dictionary with default values added.
     """
+    if config is None: config = {}
     config = super(DfpClient, self)._SetMissingDefaultConfigValues(config)
     default_config = {
         'home': DfpClient.home,
@@ -239,16 +228,9 @@ class DfpClient(Client):
     Returns:
       tuple Response from the API method (SOAP XML response message).
     """
-    headers = self._headers
-
-    # Load additional configuration data.
-    op_config = {
-      'http_proxy': http_proxy,
-      'server': server
-    }
-
-    service = DfpWebService(headers, self._config, op_config, url, self.__lock,
-                            self.__logger)
+    service_name = url.split('/')[-1]
+    service = getattr(self, 'Get' + service_name)(server=server,
+                                                  http_proxy=http_proxy)
     return service.CallRawMethod(soap_message)
 
   def GetCompanyService(self, server='https://sandbox.google.com', version=None,
@@ -265,21 +247,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      CompanyService New instance of CompanyService object.
+      GenericDfpService New instance of CompanyService object.
     """
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return CompanyService(self._headers, self._config, op_config, self.__lock,
-                          self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'CompanyService')
 
   def GetCreativeService(self, server='https://sandbox.google.com',
                          version=None, http_proxy=None):
@@ -295,23 +277,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      CreativeService New instance of CreativeService object.
+      GenericDfpService New instance of CreativeService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return CreativeService(headers, self._config, op_config, self.__lock,
-                           self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'CreativeService')
 
   def GetCustomTargetingService(self, server='https://sandbox.google.com',
                                 version=None, http_proxy=None):
@@ -327,23 +307,22 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      CustomTargetingService New instance of CustomTargetingService object.
+      GenericDfpService New instance of CustomTargetingService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return CustomTargetingService(headers, self._config, op_config, self.__lock,
-                                  self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger,
+                             'CustomTargetingService')
 
   def GetForecastService(self, server='https://sandbox.google.com',
                          version=None, http_proxy=None):
@@ -359,23 +338,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      ForecastService New instance of ForecastService object.
+      GenericDfpService New instance of ForecastService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return ForecastService(headers, self._config, op_config, self.__lock,
-                           self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'ForecastService')
 
   def GetInventoryService(self, server='https://sandbox.google.com',
                           version=None, http_proxy=None):
@@ -391,23 +368,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      InventoryService New instance of InventoryService object.
+      GenericDfpService New instance of InventoryService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return InventoryService(headers, self._config, op_config, self.__lock,
-                            self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'InventoryService')
 
   def GetLabelService(self, server='https://sandbox.google.com',
                       version=None, http_proxy=None):
@@ -423,24 +398,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      LabelService New instance of
-          LabelService object.
+      GenericDfpService New instance of LabelService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return LabelService(headers, self._config, op_config, self.__lock,
-                        self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'LabelService')
 
   def GetLineItemCreativeAssociationService(self,
                                             server='https://sandbox.google.com',
@@ -457,24 +429,23 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      LineItemCreativeAssociationService New instance of
-          LineItemCreativeAssociationService object.
+      GenericDfpService New instance of LineItemCreativeAssociationService
+                        object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return LineItemCreativeAssociationService(headers, self._config, op_config,
-                                              self.__lock, self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger,
+                             'LineItemCreativeAssociationService')
 
   def GetLineItemService(self, server='https://sandbox.google.com',
                          version=None, http_proxy=None):
@@ -490,23 +461,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      LineItemService New instance of LineItemService object.
+      GenericDfpService New instance of LineItemService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return LineItemService(headers, self._config, op_config, self.__lock,
-                           self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'LineItemService')
 
   def GetNetworkService(self, server='https://sandbox.google.com', version=None,
                         http_proxy=None):
@@ -522,23 +491,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      NetworkService New instance of NetworkService object.
+      GenericDfpService New instance of NetworkService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return NetworkService(headers, self._config, op_config, self.__lock,
-                          self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'NetworkService')
 
   def GetOrderService(self, server='https://sandbox.google.com', version=None,
                       http_proxy=None):
@@ -554,23 +521,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      OrderService New instance of OrderService object.
+      GenericDfpService New instance of OrderService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return OrderService(headers, self._config, op_config, self.__lock,
-                        self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'OrderService')
 
   def GetPlacementService(self, server='https://sandbox.google.com',
                           version=None, http_proxy=None):
@@ -586,23 +551,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      PlacementService New instance of PlacementService object.
+      GenericDfpService New instance of PlacementService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return PlacementService(headers, self._config, op_config, self.__lock,
-                            self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'PlacementService')
 
   def GetPublisherQueryLanguageService(self,
                                        server='https://sandbox.google.com',
@@ -619,24 +582,22 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      PublisherQueryLanguageService New instance of
-                                    PublisherQueryLanguageService object.
+      GenericDfpService New instance of PublisherQueryLanguageService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return PublisherQueryLanguageService(headers, self._config, op_config,
-                                         self.__lock, self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger,
+                             'PublisherQueryLanguageService')
 
   def GetReportService(self, server='https://sandbox.google.com',
                        version=None, http_proxy=None):
@@ -652,23 +613,21 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      ReportService New instance of ReportService object.
+      GenericDfpService New instance of ReportService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return ReportService(headers, self._config, op_config, self.__lock,
-                         self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'ReportService')
 
   def GetUserService(self, server='https://sandbox.google.com', version=None,
                      http_proxy=None):
@@ -684,20 +643,18 @@ class DfpClient(Client):
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      UserService New instance of UserService object.
+      GenericDfpService New instance of UserService object.
     """
-    headers = self._headers
-
     if version is None:
-      version = MIN_API_VERSION
+      version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
     op_config = {
-      'server': server,
-      'version': version,
-      'http_proxy': http_proxy
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
     }
-    return UserService(headers, self._config, op_config, self.__lock,
-                       self.__logger)
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'UserService')

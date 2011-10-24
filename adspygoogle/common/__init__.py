@@ -18,10 +18,7 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
-VERSION = '2.2.1'
-
-SOAPPY = '1'
-ZSI = '2'
+VERSION = '3.0.0'
 
 MIN_PY_VERSION = '2.4.4'
 PYXML_NAME = 'PyXML'
@@ -30,6 +27,3 @@ MIN_PYXML_VERSION = '0.8.3'
 MIN_ETREE_VERSION = '1.2.6'
 PYXML = '1'
 ETREE = '2'
-
-# Maximum number of supported target namespaces in a single service.
-MAX_TARGET_NAMESPACE = 3

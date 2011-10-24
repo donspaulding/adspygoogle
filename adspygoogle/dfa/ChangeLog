@@ -1,3 +1,7 @@
+2.0.0:
+- Updated adspygoogle.common module to v3.0.0.
+- Removed individual service classes in favor of single GenericDfaService class.
+
 1.3.0:
 - Added support for v1.15, removed support for v1.12.
 - Updated adspygoogle.common module to v2.2.0.

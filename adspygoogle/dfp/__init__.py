@@ -32,8 +32,8 @@ LIB_SHORT_NAME = 'DfpApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python'
 LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '7.0.1'
-LIB_MIN_COMMON_VERSION = '2.2.1'
+LIB_VERSION = '8.0.0'
+LIB_MIN_COMMON_VERSION = '3.0.0'
 LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:
@@ -41,12 +41,9 @@ if VERSION < LIB_MIN_COMMON_VERSION:
          'the latest version of client library at %s.' % LIB_URL)
   raise MissingPackageError(msg)
 
-# Tuple of tuples representing API versions, where each inner tuple is a
-# combination of the API vesrion and whether API used JAXB.
-API_VERSIONS_MAP = (('v201103', True), ('v201104', True), ('v201107', True),
-                    ('v201108', True))
-API_VERSIONS = [version for version, is_jaxb_api in API_VERSIONS_MAP]
-MIN_API_VERSION = API_VERSIONS[3]
+# Tuple of strings representing API versions.
+API_VERSIONS = ('v201103', 'v201104', 'v201107', 'v201108')
+DEFAULT_API_VERSION = API_VERSIONS[len(API_VERSIONS) - 1]
 
 # Accepted combinations of headers which user has to provide. Either one of
 # these is required in order to make a succesful API request.
@@ -61,8 +58,3 @@ ERROR_TYPES = []
 for item in Utils.GetDataFromCsvFile(os.path.join(LIB_HOME, 'data',
                                                   'error_types.csv')):
   ERROR_TYPES.append(item[0])
-
-WSDL_MAP = pickle.load(open(os.path.join(LIB_HOME, 'data',
-                                         'wsdl_type_defs.pkl'), 'r'))
-OPERATIONS_MAP = pickle.load(open(os.path.join(LIB_HOME, 'data',
-                                               'wsdl_ops_defs.pkl'), 'r'))

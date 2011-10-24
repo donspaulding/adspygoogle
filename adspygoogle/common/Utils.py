@@ -34,6 +34,10 @@ from adspygoogle.common.Buffer import Buffer
 from adspygoogle.common.Errors import Error
 
 
+_BASE_SOAP_TYPES = ['long', 'string', 'dateTime', 'float', 'int', 'boolean',
+                    'base64Binary', 'double']
+
+
 def ReadFile(f_path):
   """Load data from a given file.
 
@@ -445,6 +449,7 @@ def HtmlUnescape(text):
   Returns:
     str/unicode Plain text, as a Unicode string, if necessary.
   """
+
   def FixUp(m):
     """Helper function for HTML Unescaping."""
     text = m.group(0)
@@ -550,28 +555,7 @@ def GetDictFromMap(entries):
   return dct
 
 
-def GenParamOrder(wsdl_types, xsi_type):
-  """Generates the order of parameters for a WSDL-defined type.
-
-  This function will place the parameters of a WSDL-defined type's base type
-  first, followed by the supertype's parameters.
-
-  Args:
-    wsdl_types: dict A map of all of the WSDL defined types in one service.
-    xsi_type: str Which WSDL-defined type to generate the order for.
-
-  Returns:
-    list Order of parameters for the given type.
-  """
-  order = []
-  if xsi_type in wsdl_types:
-    if wsdl_types[xsi_type]['base_type']:
-      order.extend(GenParamOrder(wsdl_types, wsdl_types[xsi_type]['base_type']))
-    order.extend(wsdl_types[xsi_type]['parameters'])
-  return order
-
-
-def IsXsdOrSoapenc(xsi_type):
+def IsBaseSoapType(xsi_type):
   """Checks to see if a type is in the xsd or soapenc namespaces.
 
   This function is based on the fact that the WSDL-parsing scripts remove all
@@ -583,33 +567,4 @@ def IsXsdOrSoapenc(xsi_type):
   Returns:
     bool Whether or not the given type is in the xsd or soapenc namespaces.
   """
-  return xsi_type.find(':') > -1
-
-
-def GetExplicitType(wsdl_types, obj, xsi_type):
-  """Returns the explicit type specified within a complex type, if one exists.
-
-  Args:
-    wsdl_types: dict WSDL-defined types in the same service as the given type.
-    obj: dict Object that represents an instance of the given type.
-    xsi_type: str The complex type name defined in the WSDL.
-
-  Returns:
-    obj_contained_type: str The xsi type explicitly specified in the given
-                        object. Will be the empty string if no type was
-                        specified.
-    contained_type_key: str The dictionary key in the given object which houses
-                        its specified xsi type. Will be the empty string if no
-                        type was specified.
-  """
-  obj_contained_type = contained_type_key = ''
-  for key in obj:
-    if ((key == 'xsi_type' or key == 'type' or key.find('.Type') > -1 or
-         key.find('_Type') > -1) and not
-        (key == 'type' and ('xsi_type' in obj or
-                            (xsi_type in wsdl_types and
-                             wsdl_types[xsi_type]['has_native_type'])))):
-      obj_contained_type = obj[key]
-      contained_type_key = key
-      break
-  return obj_contained_type, contained_type_key
+  return xsi_type in _BASE_SOAP_TYPES
