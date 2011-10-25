@@ -32,7 +32,6 @@ from adspygoogle.common import MessageHandler
 from adspygoogle.common import SanityCheck
 from adspygoogle.common import Utils
 from adspygoogle.common.Errors import ValidationError
-from adspygoogle.common.soappy.HTTPTransportHandler import HTTPTransportHandler
 
 SERVICE_NAME = 'ReportDefinitionService'
 DOWNLOAD_URL_BASE = '/api/adwords/reportdownload'
@@ -68,8 +67,7 @@ class ReportDownloader(object):
                                 op_config['group'], self._op_config['version']])
     wsdl_url = self._namespace + '/ReportDefinitionService?wsdl'
     self._soappyservice = SOAPpy.WSDL.Proxy(
-        wsdl_url, noroot=1,
-        transport=HTTPTransportHandler)
+        wsdl_url, noroot=1)
 
   def DownloadReport(self, report_definition_or_id, return_micros=False,
                      file_path=None):

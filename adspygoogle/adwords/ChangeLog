@@ -1,3 +1,6 @@
+15.0.1:
+- Fix for oversight in installer script.  Addresses issue # 5.
+
 15.0.0:
 - Adding support for v201109.
 - Updated adspygoogle.common module to v3.0.0.
