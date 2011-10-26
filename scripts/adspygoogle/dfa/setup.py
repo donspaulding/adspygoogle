@@ -29,7 +29,8 @@ from adspygoogle.dfa import LIB_VERSION
 
 
 PACKAGES = ['adspygoogle', 'adspygoogle.common', 'adspygoogle.common.soappy',
-            'adspygoogle.dfa']
+            'adspygoogle.dfa', 'adspygoogle.SOAPpy',
+            'adspygoogle.SOAPpy.wstools']
 PACKAGE_DATA = {'adspygoogle.dfa': [os.path.join('data', '*')]}
 
 
