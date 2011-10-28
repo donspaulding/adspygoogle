@@ -53,8 +53,11 @@ filter_statement = {'query': 'WHERE lineItemId = :lineItemId LIMIT 500',
                     'values': values}
 
 # Get LICAs by statement.
-licas = lica_service.GetLineItemCreativeAssociationsByStatement(
-    filter_statement)[0]['results']
+response = lica_service.GetLineItemCreativeAssociationsByStatement(
+    filter_statement)[0]
+licas = []
+if 'results' in response:
+  licas = response['results']
 
 # Display results.
 for lica in licas:

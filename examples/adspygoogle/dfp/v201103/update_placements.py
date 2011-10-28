@@ -37,19 +37,15 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 # sandbox environment.
 placement_service = client.GetPlacementService(
     'https://sandbox.google.com', 'v201103')
-inventory_service = client.GetInventoryService(
-    'https://sandbox.google.com', 'v201103')
-
-# Get the root ad unit by statement.
-root_ad_unit_id = inventory_service.GetAdUnitsByStatement(
-    {'query': 'WHERE parentId IS NULL LIMIT 1'})[0]['results'][0]['id']
 
 # Create a statement to select first 500 placements.
 filter_statement = {'query': 'LIMIT 500'}
 
 # Get placements by statement.
-placements = placement_service.GetPlacementsByStatement(
-    filter_statement)[0]['results']
+response = placement_service.GetPlacementsByStatement(filter_statement)[0]
+placements = []
+if 'results' in response:
+  placements = response['results']
 if placements:
   # Update each local placement object by enabling AdSense targeting.
   for placement in placements:

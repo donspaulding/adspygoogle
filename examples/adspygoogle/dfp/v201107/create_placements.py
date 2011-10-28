@@ -63,8 +63,10 @@ banner_ad_unit_placement = {
 
 # Get the first 500 ad units.
 filter_statement = {'query': 'LIMIT 500'}
-ad_units = inventory_service.GetAdUnitsByStatement(
-    filter_statement)[0]['results']
+response = inventory_service.GetAdUnitsByStatement(filter_statement)[0]
+ad_units = []
+if 'results' in response:
+  ad_units = response['results']
 
 # Separate the ad units by size.
 for ad_unit in ad_units:

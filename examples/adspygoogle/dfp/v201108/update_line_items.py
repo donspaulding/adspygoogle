@@ -46,8 +46,10 @@ filter_statement = {'query': 'WHERE deliveryRateType = \'EVENLY\' and '
                     'orderId = \'%s\' LIMIT 500' % order_id}
 
 # Get line items by statement.
-line_items = line_item_service.GetLineItemsByStatement(
-    filter_statement)[0]['results']
+response = line_item_service.GetLineItemsByStatement(filter_statement)[0]
+line_items = []
+if 'results' in response:
+  line_items = response['results']
 
 if line_items:
   # Update each local line item by changing its delivery rate type.

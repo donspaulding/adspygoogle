@@ -41,8 +41,11 @@ custom_targeting_service = client.GetCustomTargetingService(
 filter_statement = {'query': 'LIMIT 500'}
 
 # Get custom targeting keys by statement.
-keys = custom_targeting_service.GetCustomTargetingKeysByStatement(
-    filter_statement)[0]['results']
+response = custom_targeting_service.GetCustomTargetingKeysByStatement(
+    filter_statement)[0]
+keys = []
+if 'results' in response:
+  keys = response['results']
 
 # Update each local custom targeting key object by changing its display name.
 if keys:

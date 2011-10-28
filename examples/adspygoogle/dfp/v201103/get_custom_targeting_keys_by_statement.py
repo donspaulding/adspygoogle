@@ -49,8 +49,11 @@ filter_statement = {'query': 'WHERE type = :type LIMIT 500',
                     'values': values}
 
 # Get custom targeting keys by statement.
-keys = custom_targeting_service.GetCustomTargetingKeysByStatement(
-    filter_statement)[0]['results']
+response = custom_targeting_service.GetCustomTargetingKeysByStatement(
+    filter_statement)[0]
+keys = []
+if 'results' in response:
+  keys = response['results']
 
 # Display results.
 if keys:

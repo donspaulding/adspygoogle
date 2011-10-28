@@ -49,8 +49,11 @@ filter_statement = {'query': 'WHERE name = :name',
                     'values': values}
 
 # Get custom targeting keys.
-keys = custom_targeting_service.GetCustomTargetingKeysByStatement(
-    filter_statement)[0]['results']
+response = custom_targeting_service.GetCustomTargetingKeysByStatement(
+    filter_statement)[0]
+keys = []
+if 'results' in response:
+  keys = response['results']
 print 'Number of custom targeting keys to be deleted: %s' % len(keys)
 
 if keys:

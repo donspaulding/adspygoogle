@@ -55,8 +55,10 @@ filter_statement = {'query': 'WHERE parentId = :id LIMIT 1',
                     'values': values}
 
 # Get ad units by statement.
-ad_units = inventory_service.GetAdUnitsByStatement(
-    filter_statement)[0]['results']
+response = inventory_service.GetAdUnitsByStatement(filter_statement)[0]
+ad_units = []
+if 'results' in response:
+  ad_units = response['results']
 
 # Display results.
 for ad_unit in ad_units:

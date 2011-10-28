@@ -26,6 +26,7 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
+from adspygoogle.dfp import DfpUtils
 from adspygoogle.dfp.DfpClient import DfpClient
 
 
@@ -44,7 +45,7 @@ report_job_id = 'INSERT_REPORT_JOB_ID_HERE'
 export_format = 'CSV'
 
 # Download report data.
-data = report_service.DownloadReport(report_job_id, export_format)
+data = DfpUtils.DownloadReport(report_job_id, export_format, report_service)
 
 # Display results.
 print 'Data for report job with id \'%s\':\n%s' % (report_job_id, data)

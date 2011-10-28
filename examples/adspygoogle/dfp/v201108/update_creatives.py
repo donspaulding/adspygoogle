@@ -42,8 +42,10 @@ creative_service = client.GetCreativeService(
 filter_statement = {'query': 'WHERE creativeType = \'ImageCreative\' LIMIT 500'}
 
 # Get creatives by statement.
-creatives = creative_service.GetCreativesByStatement(
-    filter_statement)[0]['results']
+response = creative_service.GetCreativesByStatement(filter_statement)[0]
+creatives = []
+if 'results' in response:
+  creatives = response['results']
 
 if creatives:
   # Update each local creative object by changing its destination URL.

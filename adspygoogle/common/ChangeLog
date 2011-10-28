@@ -1,3 +1,7 @@
+3.0.1:
+- Modified MessageHandler to not pack items that evaluate to False into SOAP
+  requests.
+
 3.0.0:
 - Removed support for ZSI.
 - Added patched version of SOAPpy as sole supported SOAP toolkit.

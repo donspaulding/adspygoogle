@@ -42,8 +42,10 @@ company_service = client.GetCompanyService(
 filter_statement = {'query': 'WHERE type = \'ADVERTISER\' LIMIT 500'}
 
 # Get companies by statement.
-companies = company_service.GetCompaniesByStatement(
-    filter_statement)[0]['results']
+response = company_service.GetCompaniesByStatement(filter_statement)[0]
+companies = []
+if 'results' in response:
+  companies = response['results']
 
 if companies:
   # Update each local company object by appending ' LLC.' to its name.

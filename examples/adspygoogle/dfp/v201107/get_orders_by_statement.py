@@ -54,7 +54,10 @@ filter_statement = {'query': 'WHERE advertiserId = :advertiserId LIMIT 500',
                     'values': values}
 
 # Get orders by statement.
-orders = order_service.GetOrdersByStatement(filter_statement)[0]['results']
+response = order_service.GetOrdersByStatement(filter_statement)[0]
+orders = []
+if 'results' in response:
+  orders = response['results']
 
 # Display results.
 for order in orders:

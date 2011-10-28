@@ -51,8 +51,10 @@ filter_statement = {'query': 'WHERE type = :type ORDER BY name LIMIT 500',
                     'values': values}
 
 # Get companies by statement.
-companies = company_service.GetCompaniesByStatement(
-    filter_statement)[0]['results']
+response = company_service.GetCompaniesByStatement(filter_statement)[0]
+companies = []
+if 'results' in response:
+  companies = response['results']
 
 # Display results.
 for company in companies:

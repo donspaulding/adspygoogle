@@ -42,7 +42,10 @@ order_service = client.GetOrderService(
 filter_statement = {'query': 'LIMIT 500'}
 
 # Get orders by statement.
-orders = order_service.GetOrdersByStatement(filter_statement)[0]['results']
+response = order_service.GetOrdersByStatement(filter_statement)[0]
+orders = []
+if 'results' in response:
+  orders = response['results']
 
 if orders:
   # Update each local order object by changing its notes.

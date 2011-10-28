@@ -265,9 +265,9 @@ class Client(object):
                        authorization redirect page.
     """
     scope = self._GetOAuthScope(server)
-    self.SetOAuthCredentials(self.GetOAuthHandler().GetRequestToken(
-        self.GetOAuthCredentials(), scope, applicationname=applicationname,
-        callbackurl=callbackurl))
+    self.oauth_credentials = self.oauth_handler.GetRequestToken(
+        self.oauth_credentials, scope, applicationname=applicationname,
+        callbackurl=callbackurl)
 
   def GetOAuthAuthorizationUrl(self):
     """Gets the OAuth authorization URL for the OAuth token.
@@ -275,8 +275,7 @@ class Client(object):
     Returns:
       str The URL that will allow the user to authorize the token.
     """
-    return self.GetOAuthHandler().GetAuthorizationUrl(
-        self.GetOAuthCredentials())
+    return self.oauth_handler.GetAuthorizationUrl(self.oauth_credentials)
 
   def _GetOAuthScope(self, server):
     """Gets the OAuth scope for this user.
@@ -296,8 +295,8 @@ class Client(object):
     Args:
       verifier: str The verifier string returning from authorizing the token.
     """
-    self.SetOAuthCredentials(self.GetOAuthHandler().GetAccessToken(
-        self.GetOAuthCredentials(), verifier))
+    self.oauth_credentials = self.oauth_handler.GetAccessToken(
+        self.oauth_credentials, verifier)
 
   def __SetOAuthCredentials(self, credentials):
     """Sets the OAuth credentials into the config.

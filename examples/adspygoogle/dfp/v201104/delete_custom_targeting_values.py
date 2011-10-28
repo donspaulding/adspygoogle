@@ -50,8 +50,11 @@ filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId',
                     'values': filter_values}
 
 # Get custom targeting values.
-values = custom_targeting_service.GetCustomTargetingValuesByStatement(
-    filter_statement)[0]['results']
+response = custom_targeting_service.GetCustomTargetingValuesByStatement(
+    filter_statement)[0]
+values = []
+if 'results' in response:
+  values = response['results']
 print 'Number of custom targeting values to be deleted: %s' % len(values)
 
 if values:

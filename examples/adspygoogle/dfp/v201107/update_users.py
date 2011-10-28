@@ -41,7 +41,10 @@ user_service = client.GetUserService(
 filter_statement = {'query': 'LIMIT 500'}
 
 # Get users by statement.
-users = user_service.GetUsersByStatement(filter_statement)[0]['results']
+response = user_service.GetUsersByStatement(filter_statement)[0]
+users = []
+if 'results' in response:
+  users = response['results']
 
 if users:
   # Update each local user object by appending ' Sr.' to its name.

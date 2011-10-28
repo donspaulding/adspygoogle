@@ -53,8 +53,10 @@ filter_statement = {'query': 'WHERE orderId = :orderId LIMIT 500',
                     'values': values}
 
 # Get line items by statement.
-line_items = line_item_service.GetLineItemsByStatement(
-    filter_statement)[0]['results']
+response = line_item_service.GetLineItemsByStatement(filter_statement)[0]
+line_items = []
+if 'results' in response:
+  line_items = response['results']
 
 # Display results.
 for line_item in line_items:

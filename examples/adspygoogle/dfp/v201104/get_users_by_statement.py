@@ -42,7 +42,10 @@ user_service = client.GetUserService(
 filter_statement = {'query': 'ORDER BY name LIMIT 500'}
 
 # Get users by statement.
-users = user_service.GetUsersByStatement(filter_statement)[0]['results']
+response = user_service.GetUsersByStatement(filter_statement)[0]
+users = []
+if 'results' in response:
+  users = response['results']
 
 # Display results.
 for user in users:

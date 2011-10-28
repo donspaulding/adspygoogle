@@ -50,7 +50,10 @@ filter_statement = {'query': 'WHERE type = :type ORDER BY name LIMIT 500',
                     'values': values}
 
 # Get labels by statement.
-labels = label_service.GetLabelsByStatement(filter_statement)[0]['results']
+response = label_service.GetLabelsByStatement(filter_statement)[0]
+labels = []
+if 'results' in response:
+  labels = response['results']
 
 # Display results.
 for label in labels:

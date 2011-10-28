@@ -42,8 +42,10 @@ inventory_service = client.GetInventoryService(
 filter_statement = {'query': 'LIMIT 500'}
 
 # Get ad units by filter.
-ad_units = inventory_service.GetAdUnitsByStatement(
-    filter_statement)[0]['results']
+response = inventory_service.GetAdUnitsByStatement(filter_statement)[0]
+ad_units = []
+if 'results' in response:
+  ad_units = response['results']
 
 if ad_units:
   # Update each local ad unit object by enabling AdSense.

@@ -50,8 +50,11 @@ filter_statement = {'query': 'WHERE customTargetingKeyId = :keyId LIMIT 500',
                     'values': values}
 
 # Get custom targeting values by statement.
-values = custom_targeting_service.GetCustomTargetingValuesByStatement(
-    filter_statement)[0]['results']
+response = custom_targeting_service.GetCustomTargetingValuesByStatement(
+    filter_statement)[0]
+values = []
+if 'results' in response:
+  values = response['results']
 
 # Update each local custom targeting value object by changing its display name.
 if values:

@@ -49,8 +49,10 @@ filter_statement = {'query': 'WHERE status = :status LIMIT 500',
                     'values': values}
 
 # Get placements by statement.
-placements = placement_service.GetPlacementsByStatement(
-    filter_statement)[0]['results']
+response = placement_service.GetPlacementsByStatement(filter_statement)[0]
+placements = []
+if 'results' in response:
+  placements = response['results']
 
 # Display results.
 for placement in placements:

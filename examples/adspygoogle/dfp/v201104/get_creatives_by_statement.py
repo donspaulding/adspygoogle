@@ -50,8 +50,10 @@ filter_statement = {'query': 'WHERE creativeType = :creativeType LIMIT 500',
                     'values': values}
 
 # Get creatives by statement.
-creatives = creative_service.GetCreativesByStatement(
-    filter_statement)[0]['results']
+response = creative_service.GetCreativesByStatement(filter_statement)[0]
+creatives = []
+if 'results' in response:
+  creatives = response['results']
 
 # Display results.
 for creative in creatives:

@@ -141,7 +141,7 @@ def _PackDictForSoappy(obj, xmlns, type_name, soappy_service, wrap_lists,
     type_name = obj_contained_type
 
   for key in obj:
-    if key == type_key:
+    if key == type_key or not obj[key]:
       continue
     key_type = SoappyUtils.GetComplexFieldTypeByFieldName(
         key, type_name, xmlns, soappy_service)

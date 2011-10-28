@@ -42,8 +42,11 @@ lica_service = client.GetLineItemCreativeAssociationService(
 filter_statement = {'query': 'LIMIT 500'}
 
 # Get LICAs by statement.
-licas = lica_service.GetLineItemCreativeAssociationsByStatement(
-    filter_statement)[0]['results']
+response = lica_service.GetLineItemCreativeAssociationsByStatement(
+    filter_statement)[0]
+licas = []
+if 'results' in response:
+  licas = response['results']
 
 if licas:
   # Update each local LICA object by changing its destination URL.

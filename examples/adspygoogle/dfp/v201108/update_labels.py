@@ -61,7 +61,10 @@ filter_statement = {
     'values': values}
 
 # Get labels by filter.
-labels = label_service.GetLabelsByStatement(filter_statement)[0]['results']
+response = label_service.GetLabelsByStatement(filter_statement)[0]
+labels = []
+if 'results' in response:
+  labels = response['results']
 
 if labels:
   # Update each local label object by changing the description.
