@@ -228,6 +228,7 @@ class ReportDownloader(object):
                             self._headers['authToken'].strip()}))
 
     headers['returnMoneyInMicros'] = str(return_micros).lower()
+    headers['developerToken'] = self._headers['developerToken']
     return headers
 
   def __MakeRequest(self, url, headers=None, file_path=None, payload=None):

@@ -145,3 +145,10 @@ diff -Naurb Client.py Client.py
          r.endheaders()
 
          if config.dumpSOAPOut:
+@@ -493,3 +499,6 @@
+
+         def __repr__(self):
+             return "<%s at %d>" % (self.__class__, id(self))
++
++        def __str__(self):
++            return repr(self)

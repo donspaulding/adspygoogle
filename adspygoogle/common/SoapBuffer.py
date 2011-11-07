@@ -195,74 +195,32 @@ class SoapBuffer(Buffer):
             ('Outgoing SOAP', 'dumpSoapOut'),
             ('Incoming HTTP headers', 'dumpHeadersIn'),
             ('Incoming SOAP', 'dumpSoapIn'))
-    xml_dumps = self.GetBufferAsStr().split('_' * 33)
-    if len(xml_dumps) > 1:
-      # The HTTP and SOAP messages were delivered via ZSI.
-      if not PYXML_LIB:
-        msg = 'PyXML v%s or newer is required.' % MIN_PYXML_VERSION
-        raise MissingPackageError(msg)
-
-      for xml_part in xml_dumps:
-        xml_part = xml_part.lstrip('\n').rstrip('\n')
-        if not xml_part: continue
-        xml_part = '\n'.join(xml_part.split('\n')[1:])
-        in_parts = xml_part.split('\n\n', 1)
-        if len(in_parts) == 1:
-          from ZSI.version import Version
-          xml_out = '<?xml version="1.0" encoding="UTF-8"?>\n%s' % xml_part
+    # The HTTP and SOAP messages were delivered via SOAPpy or httplib.HTTPS.
+    xml_dumps = self.GetBufferAsStr().split('*' * 72)
+    for xml_part in xml_dumps:
+      xml_part = xml_part.lstrip('\n').rstrip('\n')
+      for name, tag in tags:
+        if xml_part.find(name) > -1:
+          # Insert XML parser signature into the SOAP header.
+          trigger = xml_part[xml_part.lower().find('content-type'):
+                             xml_part.lower().find('content-type')+12]
+          if trigger and tag == 'dumpHeadersOut':
+            xml_part = xml_part.replace(
+                trigger,
+                'XML-parser: %s\n%s' % (self.__xml_parser_sig, trigger))
           if self.__pretty_xml:
-            xml_out = self.__PrettyPrintXml(xml_out, 1)
-          self.__dump['dumpHeadersOut'] = (
-              '%s Outgoing HTTP headers %s\n'
-              'User-Agent: ZSI %s (http://pywebsvcs.sf.net); %s\n'
-              '%s' % ('*' * 3, '*' * 46, '.'.join(map(str, Version)),
-                      self.__xml_parser_sig, '*' * 72))
-          self.__dump['dumpSoapOut'] = (
-              '%s Outgoing SOAP %s\n%s\n%s'
-              % ('*' * 3, '*' * 54, xml_out, '*' * 72))
-        elif len(in_parts) == 2:
-          sub_parts = in_parts[0].split('-' * 7)
-          xml_in = ('<?xml version="1.0" encoding="UTF-8"?>\n%s'
-                    % in_parts[1].lstrip('\n'))
-          if self.__pretty_xml:
-            xml_in = self.__PrettyPrintXml(xml_in, 1)
-          self.__dump['dumpHeadersIn'] = (
-              '%s Incoming HTTP headers %s\n'
-              '%s\n%s' % ('*' * 3, '*' * 46,
-                          (' '.join(sub_parts[0].split('\n')) +
-                           sub_parts[1]).replace('\r', ''), '*' * 72))
-          self.__dump['dumpSoapIn'] = (
-              '%s Incoming SOAP %s\n%s\n%s'
-              % ('*' * 3, '*' * 54, xml_in, '*' * 72))
-        else:
-          pass
-    else:
-      # The HTTP and SOAP messages were delivered via SOAPpy or httplib.HTTPS.
-      xml_dumps = self.GetBufferAsStr().split('*' * 72)
-      for xml_part in xml_dumps:
-        xml_part = xml_part.lstrip('\n').rstrip('\n')
-        for name, tag in tags:
-          if xml_part.find(name) > -1:
-            # Insert XML parser signature into the SOAP header.
-            trigger = xml_part[xml_part.lower().find('content-type'):
-                               xml_part.lower().find('content-type')+12]
-            if trigger and tag == 'dumpHeadersOut':
-              xml_part = xml_part.replace(
-                  trigger,
-                  'XML-parser: %s\n%s' % (self.__xml_parser_sig, trigger))
-            if self.__pretty_xml:
-              doc = []
-              banner = ''
-              for line in xml_part.split('\n'):
-                if line.rfind('SOAP %s' % ('*' * 46)) > -1:
-                  banner = line
-                  continue
-                doc.append(line)
-              if banner:
-                xml_part = '%s\n%s' % (banner,
-                                       self.__PrettyPrintXml('\n'.join(doc), 1))
-            self.__dump[tag] = (xml_part + '\n' + '*' * 72)
-            break
+            doc = []
+            banner = ''
+            for line in xml_part.split('\n'):
+              if line.rfind('SOAP %s' % ('*' * 46)) > -1:
+                banner = line
+                continue
+              doc.append(line)
+            if banner:
+              xml_part = '%s\n%s' % (banner,
+                                     self.__PrettyPrintXml('\n'.join(doc), 1))
+          self.__dump[tag] = (xml_part + '\n' + '*' * 72)
+          break
     return self.__dump
 
   def __GetDumpValue(self, dump_type):

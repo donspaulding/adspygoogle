@@ -18,7 +18,6 @@
 MutateJobService.
 
 Tags: MutateJobService.mutate, MutateJobService.get, MutateJobService.getResult
-Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -37,7 +36,7 @@ from adspygoogle.common import Utils
 
 RETRY_INTERVAL = 30
 RETRIES_COUNT = 30
-KEYWORD_NUMBER = 100
+PLACEMENT_NUMBER = 100
 INDEX_REGEX = r'operations\[(\d+)\].operand'
 
 ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
@@ -52,11 +51,13 @@ mutate_job_service = client.GetMutateJobService(
 # Create list of all operations for the job.
 operations = []
 
-  # Create AdGroupCriterionOperations to add keywords.
-for i in range(KEYWORD_NUMBER):
-  keyword = 'mars%d' % i
+  # Create AdGroupCriterionOperations to add placements.
+for i in range(PLACEMENT_NUMBER):
   if random.randint(1,10) == 1:
-    keyword += '!!!'
+    url = 'invalid-url/%d' % i
+  else:
+    url = 'http://mars.google.com/%d' % i
+
   operations.append({
       'xsi_type': 'AdGroupCriterionOperation',
       'operator': 'ADD',
@@ -64,9 +65,8 @@ for i in range(KEYWORD_NUMBER):
           'xsi_type': 'BiddableAdGroupCriterion',
           'adGroupId': ad_group_id,
           'criterion': {
-              'xsi_type': 'Keyword',
-              'matchType': 'BROAD',
-              'text': keyword
+              'xsi_type': 'Placement',
+              'url': url
           }
       }
   })
@@ -127,9 +127,9 @@ for result in result_response['SimpleMutateResult']['results']:
 for error in result_response['SimpleMutateResult']['errors']:
   index = int(re.search(INDEX_REGEX, error['fieldPath']).group(1))
   reason = error['reason']
-  keyword = operations[index]['operand']['criterion']['text']
-  print ('ERROR - keyword \'%s\' failed due to \'%s\'' %
-         (keyword, reason))
+  placement = operations[index]['operand']['criterion']['url']
+  print ('ERROR - placement \'%s\' failed due to \'%s\'' %
+         (placement, reason))
 
 print
 print ('Usage: %s units, %s operations' % (client.GetUnits(),

@@ -1,3 +1,8 @@
+1.0.1:
+- Client [502-505]: Added a __str__ function to the __Method class. A SOAP call
+                    was being made every time something called str() on an
+                    object of this class.
+
 1.0.0:
 - Namespaces [124-126]: Added JAXB namespace
 - XMLSchema [19, 678]: Added JAXB namespace as a recognized value.

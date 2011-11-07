@@ -24,111 +24,16 @@ sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
 from tests.adspygoogle.adwords import HTTP_PROXY
-from tests.adspygoogle.adwords import SERVER_V13
 from tests.adspygoogle.adwords import SERVER_V201008
 from tests.adspygoogle.adwords import SERVER_V201101
 from tests.adspygoogle.adwords import SERVER_V201109
-from tests.adspygoogle.adwords import TEST_VERSION_V13
 from tests.adspygoogle.adwords import TEST_VERSION_V201008
 from tests.adspygoogle.adwords import TEST_VERSION_V201101
 from tests.adspygoogle.adwords import TEST_VERSION_V201109
-from tests.adspygoogle.adwords import VERSION_V13
 from tests.adspygoogle.adwords import VERSION_V201008
 from tests.adspygoogle.adwords import VERSION_V201101
 from tests.adspygoogle.adwords import VERSION_V201109
 from tests.adspygoogle.adwords import client
-
-
-class TrafficEstimatorServiceTestV13(unittest.TestCase):
-
-  """Unittest suite for TrafficEstimatorService using v13."""
-
-  SERVER = SERVER_V13
-  VERSION = VERSION_V13
-  client.debug = False
-  service = None
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetTrafficEstimatorService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testCheckKeywordTraffic(self):
-    """Test whether we can check keyword traffic."""
-    requests = [{
-        'keywordText': 'Flowers',
-        'keywordType': 'Broad',
-        'language': 'en'
-    }]
-    self.assert_(isinstance(
-        self.__class__.service.CheckKeywordTraffic(requests), tuple))
-
-  def testEstimateAdGroupList(self):
-    """Test whether we can estimate ad group list."""
-    requests = [{
-        'keywordRequests': [{
-            'maxCpc': '1000000',
-            'negative': 'False',
-            'text': 'Flowers',
-            'type': 'Broad'
-          }],
-        'maxCpc': '1000000'
-    }]
-    self.assert_(isinstance(
-        self.__class__.service.EstimateAdGroupList(requests), tuple))
-
-  def testEstimateCampaignList(self):
-    """Test wheter we can estimate campaign list."""
-    requests = [{
-        'adGroupRequests': [{
-            'keywordRequests': [{
-                'maxCpc': '1000000',
-                'negative': 'False',
-                'text': 'Flowers',
-                'type': 'Broad'
-              }],
-            'maxCpc': '1000000'
-        }],
-        'geoTargeting': {
-            'cityTargets': {
-                'cities': ['New York, NY US'],
-            }
-        },
-        'languageTargeting': ['en'],
-        'networkTargeting': ['GoogleSearch', 'SearchNetwork']
-    }]
-    self.assert_(isinstance(
-        self.__class__.service.EstimateCampaignList(requests), tuple))
-
-  def testEstimateKeywordList(self):
-    """Test whether we can estimate keyword list."""
-    requests = [{
-        'maxCpc': '1000000',
-        'negative': 'False',
-        'text': 'Flowers',
-        'type': 'Broad'
-    },
-    {
-        'maxCpc': '2000000',
-        'negative': 'False',
-        'text': 'House',
-        'type': 'Broad'
-    }]
-    self.assert_(isinstance(
-        self.__class__.service.EstimateKeywordList(requests), tuple))
-
-  def testEstimateKeywordListOneItem(self):
-    """Test whether we can estimate keyword list, with only one keyword."""
-    requests = [{
-        'maxCpc': '1000000',
-        'negative': 'False',
-        'text': 'Flowers',
-        'type': 'Broad'
-    }]
-    self.assert_(isinstance(
-        self.__class__.service.EstimateKeywordList(requests), tuple))
 
 
 class TrafficEstimatorServiceTestV201008(unittest.TestCase):
@@ -405,8 +310,6 @@ def makeTestSuiteV201109():
 
 if __name__ == '__main__':
   suites = []
-  if TEST_VERSION_V13:
-    suites.append(makeTestSuiteV13())
   if TEST_VERSION_V201008:
     suites.append(makeTestSuiteV201008())
   if TEST_VERSION_V201101:
