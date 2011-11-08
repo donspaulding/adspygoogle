@@ -1,3 +1,8 @@
+15.0.5:
+- Version 3.0.3 of the common lib addresses issue #9.
+- Removed instance of trinary operator from GenericV13AdWordsService to support
+  Python 2.4.
+
 15.0.4:
 - Updated ReportDownloader to provide a developerToken with report downloads.
 - Version 3.0.2 of common lib addresses issue # 6.

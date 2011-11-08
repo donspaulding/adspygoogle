@@ -91,7 +91,7 @@ class GenericV13AdWordsService(GenericApiService):
     soap_headers = SOAPpy.Types.headerType(attrs=header_attrs)
     for key in GenericV13AdWordsService._POSSIBLE_ADWORDS_REQUEST_HEADERS:
       if key in self._headers and self._headers[key]:
-        header_key = key if not key == 'userAgent' else 'useragent'
+        header_key = {True: 'useragent', False: key}[key == 'userAgent']
         soap_headers._addItem(header_key, SOAPpy.Types.untypedType(
             self._headers[key]))
     self._soappyservice.soapproxy.header = soap_headers

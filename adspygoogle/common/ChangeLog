@@ -1,3 +1,9 @@
+3.0.3:
+- Modified GenericApiService to treat SOAP parameter element names as string
+  types rather than unicode types. These element names are used as keyword
+  argument keys and the ability to use unicode keys in keyword arguments only
+  exists in Python 2.6.5+. This fixes issue 9.
+
 3.0.2:
 - Updated the SOAPpy.patch file to version 1.0.1. Added an explicit __str__
   function to SOAPpy.Client.__Method to prevent odd behavior when the str()

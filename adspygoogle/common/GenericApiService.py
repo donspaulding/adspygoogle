@@ -269,8 +269,8 @@ class GenericApiService(object):
                 method_info[MethodInfoKeys.INPUTS][i][
                     MethodInfoKeys.MAX_OCCURS])
 
-          element_name = method_info[MethodInfoKeys.INPUTS][i][
-              MethodInfoKeys.ELEMENT_NAME]
+          element_name = str(method_info[MethodInfoKeys.INPUTS][i][
+              MethodInfoKeys.ELEMENT_NAME])
 
           ksoap_args[element_name] = MessageHandler.PackForSoappy(
               args[i],
