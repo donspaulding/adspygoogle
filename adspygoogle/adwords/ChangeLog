@@ -1,3 +1,8 @@
+15.0.6:
+- Fixing get_account_hierarchy.py v201109 code example.
+- Altering ReportDownloader to better handle 400/500 errors. They will now be
+  wrapped in an AdWordsError and include the HTTP Response body.
+
 15.0.5:
 - Version 3.0.3 of the common lib addresses issue #9.
 - Removed instance of trinary operator from GenericV13AdWordsService to support

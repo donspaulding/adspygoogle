@@ -37,7 +37,7 @@ SERVICE_NAME = 'ReportDefinitionService'
 DOWNLOAD_URL_BASE = '/api/adwords/reportdownload'
 REPORT_ID='?__rd=%s'
 VERSIONED='/%s'
-OLD_ERROR_REGEX = r'^!!!(\d+)\|\|\|(\d+)\|\|\|(.*)\?\?\?'
+OLD_ERROR_REGEX = r'^!!!([-\d]+)\|\|\|([-\d]+)\|\|\|(.*)\?\?\?'
 ATTRIBUTES_REGEX = r'( )?[\w:-]+="[\w:\[\]-]+"'
 CLIENT_EMAIL_MAX_VER = 'v201101'
 BUF_SIZE = 4096
@@ -250,12 +250,19 @@ class ReportDownloader(object):
     headers = headers or {}
     request_url = self._op_config['server'] + url
     request = urllib2.Request(request_url, payload, headers)
-    response = urllib2.urlopen(request)
-    if file_path:
-      self.__DumpToFile(response, file_path)
-      return file_path
-    else:
-      return response.read()
+    try:
+      response = urllib2.urlopen(request)
+      if file_path:
+        self.__DumpToFile(response, file_path)
+        return file_path
+      else:
+        return response.read()
+    except urllib2.HTTPError, e:
+      error = e.fp.read()
+      match = re.search(OLD_ERROR_REGEX, error)
+      if match:
+        error = match.group(3)
+      raise AdWordsError('%s %s' % (str(e), error))
 
   def __ReloadAuthToken(self):
     """Ensures we have a valid auth_token in our headers."""

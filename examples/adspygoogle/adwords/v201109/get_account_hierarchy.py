@@ -43,7 +43,7 @@ def DisplayAccountTree(account, link, accounts, links, depth=0):
   prefix = '-' * depth * 2
   link_text = ''
   if link:
-    link_text = ' (%s, %s)' % (link['serviceType'], link['typeOfLink'])
+    link_text = ' (%s)' % link['typeOfLink']
   print '%s%s, %s%s' % (prefix, account['login'], account['customerId'],
                         link_text)
   if account['customerId'] in links:
@@ -54,6 +54,7 @@ def DisplayAccountTree(account, link, accounts, links, depth=0):
 
 # Initialize client object.
 client = AdWordsClient(path=os.path.join('..', '..', '..', '..'))
+client.use_mcc = True
 
 # Initialize appropriate service.
 serviced_account_service = client.GetServicedAccountService(
@@ -86,7 +87,7 @@ if 'accounts' in graph and len(graph['accounts']):
       root_account = account
   # Display account tree.
   if root_account:
-    print 'Login, CustomerId (Link Type, Status)'
+    print 'Login, CustomerId (Status)'
     DisplayAccountTree(root_account, None, accounts, child_links, 0)
   else:
     print 'Unable to determine a root account'
