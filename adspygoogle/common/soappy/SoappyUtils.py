@@ -237,6 +237,45 @@ def GetComplexFieldTypeByFieldName(key, type_name, ns, soappy_service):
                   % (key, type_name))
 
 
+def GetComplexFieldNamespaceByFieldName(field, type_name, ns, soappy_service):
+  """Returns the namespace of the type which defines a field in a hierarchy.
+
+  Args:
+    field: string The name of the field within the given complex type whose
+           namespace is being looked up.
+    type_name: string The name of the encapsulating complex type.
+    ns: string The namespace the encapsulating compelx type belongs to.
+    soappy_service: SOAPpy.WSDL.Proxy The SOAPpy service object containing the
+                    descriptions of these types.
+
+  Returns:
+    string The URL of the namespace this field was defined within.
+
+  Raises:
+    TypeError: if the given field is not within the given complex type.
+  """
+  type_obj = soappy_service.wsdl.types[ns].types[type_name]
+
+  if IsASubType(type_name, ns, soappy_service):
+    if hasattr(type_obj.content.derivation.content, 'content'):
+      for element in type_obj.content.derivation.content.content:
+        if element.attributes['name'] == field: return ns
+    try:
+      return GetComplexFieldNamespaceByFieldName(
+          field,
+          type_obj.content.derivation.attributes['base'].getName(),
+          type_obj.content.derivation.attributes['base'].getTargetNamespace(),
+          soappy_service)
+    except TypeError:
+      raise TypeError('There is no field with the name %s in complex type %s.'
+                      % (key, type_name))
+  else:
+    for element in type_obj.content.content:
+      if element.attributes['name'] == field: return ns
+    raise TypeError('There is no field with the name %s in complex type %s.'
+                    % (key, type_name))
+
+
 def GetExplicitType(obj, type_name, ns, soappy_service):
   """Returns the WSDL-defined type set within the given object, if one exists.
 

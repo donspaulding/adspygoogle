@@ -31,8 +31,18 @@ SERVER_V201103 = 'https://sandbox.google.com'
 SERVER_V201104 = 'https://sandbox.google.com'
 SERVER_V201107 = 'https://sandbox.google.com'
 SERVER_V201108 = 'https://sandbox.google.com'
+SERVER_V201111 = 'https://sandbox.google.com'
+
+TEST_VERSION_V201103 = True
+TEST_VERSION_V201104 = True
+TEST_VERSION_V201107 = True
+TEST_VERSION_V201108 = True
+TEST_VERSION_V201111 = True
+
 VERSION_V201103 = 'v201103'
 VERSION_V201104 = 'v201104'
 VERSION_V201107 = 'v201107'
 VERSION_V201108 = 'v201108'
+VERSION_V201111 = 'v201111'
+
 client = DfpClient(path=os.path.join('..', '..', '..'))

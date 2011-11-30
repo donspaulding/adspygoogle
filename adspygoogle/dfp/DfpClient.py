@@ -263,6 +263,36 @@ class DfpClient(Client):
     return GenericDfpService(self._headers, self._config, op_config,
                              self.__lock, self.__logger, 'CompanyService')
 
+  def GetContentService(self, server='https://sandbox.google.com', version=None,
+                        http_proxy=None):
+    """Call API method in ContentService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. Possible values
+              are: 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox. The default behavior is
+              to access sandbox site.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericDfpService New instance of ContentService object.
+    """
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      DfpSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
+    }
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, 'ContentService')
+
   def GetCreativeService(self, server='https://sandbox.google.com',
                          version=None, http_proxy=None):
     """Call API method in CreativeService.
@@ -292,6 +322,37 @@ class DfpClient(Client):
     }
     return GenericDfpService(self._headers, self._config, op_config,
                              self.__lock, self.__logger, 'CreativeService')
+
+  def GetCreativeTemplateService(self, server='https://sandbox.google.com',
+                                 version=None, http_proxy=None):
+    """Call API method in CreativeTemplateService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. Possible values
+              are: 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox. The default behavior is
+              to access sandbox site.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericDfpService New instance of CreativeTemplateService object.
+    """
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      DfpSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
+    }
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger,
+                             'CreativeTemplateService')
 
   def GetCustomTargetingService(self, server='https://sandbox.google.com',
                                 version=None, http_proxy=None):
@@ -628,6 +689,37 @@ class DfpClient(Client):
     }
     return GenericDfpService(self._headers, self._config, op_config,
                              self.__lock, self.__logger, 'ReportService')
+
+  def GetSuggestedAdUnitService(self, server='https://sandbox.google.com',
+                                version=None, http_proxy=None):
+    """Call API method in SuggestedAdUnitService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. Possible values
+              are: 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox. The default behavior is
+              to access sandbox site.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericDfpService New instance of SuggestedAdUnitService object.
+    """
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      DfpSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'http_proxy': http_proxy
+    }
+    return GenericDfpService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger,
+                             'SuggestedAdUnitService')
 
   def GetUserService(self, server='https://sandbox.google.com', version=None,
                      http_proxy=None):

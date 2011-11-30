@@ -22,6 +22,7 @@ __author__ = 'api.shamjeff@gmail.com (Jeff Sham)'
 
 # Locate the client library. If module was installed via "setup.py" script, then
 # the following two lines are not needed.
+import base64
 import os
 import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
@@ -45,8 +46,9 @@ advertiser_id = 'INSERT_ADVERTISER_COMPANY_ID_HERE'
 # Create creative objects.
 creatives = []
 image_data = open(
-    os.path.join('..', '..', 'tests', 'data',
-                 'medium_rectangle.jpg').replace('\\', '/'), 'r').read()
+    os.path.join('..', '..', '..', '..', 'tests', 'adspygoogle', 'dfp', 'data',
+                 'medium_rectangle.jpg'), 'r').read()
+image_data = base64.encodestring(image_data)
 for i in xrange(5):
   creative = {
       'type': 'ImageCreative',
@@ -60,9 +62,6 @@ for i in xrange(5):
   creatives.append(creative)
 
 # Add creatives.
-# The initialization of the service and addition of creatives could've been
-# combined into a single statement. Ex:
-# creatives = client.GetCreativeService().CreateCreatives(creatives)
 creatives = creative_service.CreateCreatives(creatives)
 
 # Display results.

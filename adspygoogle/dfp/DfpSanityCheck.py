@@ -35,11 +35,13 @@ def ValidateServer(server, version):
   prod = {'v201103': 'https://www.google.com',
           'v201104': 'https://www.google.com',
           'v201107': 'https://www.google.com',
-          'v201108': 'https://www.google.com'}
+          'v201108': 'https://www.google.com',
+          'v201111': 'https://www.google.com'}
   sandbox = {'v201103': 'https://sandbox.google.com',
              'v201104': 'https://sandbox.google.com',
              'v201107': 'https://sandbox.google.com',
-             'v201108': 'https://sandbox.google.com'}
+             'v201108': 'https://sandbox.google.com',
+             'v201111': 'https://sandbox.google.com'}
 
   if server not in prod.values() and server not in sandbox.values():
     msg = ('Given API server, \'%s\', is not valid. Expecting one of %s.'

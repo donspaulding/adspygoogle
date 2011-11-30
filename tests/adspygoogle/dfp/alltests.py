@@ -27,6 +27,11 @@ import unittest
 
 from adspygoogle.common.Logger import Logger
 from adspygoogle.dfp import LIB_SIG
+from tests.adspygoogle.dfp import TEST_VERSION_V201103
+from tests.adspygoogle.dfp import TEST_VERSION_V201104
+from tests.adspygoogle.dfp import TEST_VERSION_V201107
+from tests.adspygoogle.dfp import TEST_VERSION_V201108
+from tests.adspygoogle.dfp import TEST_VERSION_V201111
 
 
 LOG_NAME = 'dfp_api_lib'
@@ -39,7 +44,12 @@ for test in tests:
   module = __import__(test)
   for name, obj in inspect.getmembers(module):
     if inspect.isclass(obj):
-      suite.addTest(unittest.makeSuite(obj))
+      if ((name.endswith('201103') and TEST_VERSION_V201103) or
+          (name.endswith('201104') and TEST_VERSION_V201104) or
+          (name.endswith('201107') and TEST_VERSION_V201107) or
+          (name.endswith('201108') and TEST_VERSION_V201108) or
+          (name.endswith('201111') and TEST_VERSION_V201111)):
+        suite.addTest(unittest.makeSuite(obj))
 
 
 if __name__ == '__main__':

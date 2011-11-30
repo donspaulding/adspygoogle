@@ -70,15 +70,16 @@ if 'results' in response:
 
 # Separate the ad units by size.
 for ad_unit in ad_units:
-  for ad_unit_size in ad_unit['adUnitSizes']:
-    size = ad_unit_size['size']
-    if size['width'] == '300' and size['height'] == '250':
-      medium_rectangle_ad_unit_placement['targetedAdUnitIds'].append(
-          ad_unit['id'])
-    elif size['width'] == '120' and size['height'] == '600':
-      skyscraper_ad_unit_placement['targetedAdUnitIds'].append(ad_unit['id'])
-    elif size['width'] == '468' and size['height'] == '60':
-      banner_ad_unit_placement['targetedAdUnitIds'].append(ad_unit['id'])
+  if 'adUnitSizes' in ad_unit:
+    for ad_unit_size in ad_unit['adUnitSizes']:
+      size = ad_unit_size['size']
+      if size['width'] == '300' and size['height'] == '250':
+        medium_rectangle_ad_unit_placement['targetedAdUnitIds'].append(
+            ad_unit['id'])
+      elif size['width'] == '120' and size['height'] == '600':
+        skyscraper_ad_unit_placement['targetedAdUnitIds'].append(ad_unit['id'])
+      elif size['width'] == '468' and size['height'] == '60':
+        banner_ad_unit_placement['targetedAdUnitIds'].append(ad_unit['id'])
 
 # Add placements.
 # The initialization of the service and addition of users could've been

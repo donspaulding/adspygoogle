@@ -38,7 +38,7 @@ pql_service = client.GetPublisherQueryLanguageService(
 
 select_statement = {'query': 'SELECT * FROM Browser'}
 
-# Get browser language by statement.
+# Get browser by statement.
 result_set = pql_service.Select(select_statement)[0]
 
 # Display results.

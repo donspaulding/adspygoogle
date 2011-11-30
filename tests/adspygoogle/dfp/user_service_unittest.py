@@ -30,10 +30,17 @@ from tests.adspygoogle.dfp import SERVER_V201103
 from tests.adspygoogle.dfp import SERVER_V201104
 from tests.adspygoogle.dfp import SERVER_V201107
 from tests.adspygoogle.dfp import SERVER_V201108
+from tests.adspygoogle.dfp import SERVER_V201111
+from tests.adspygoogle.dfp import TEST_VERSION_V201103
+from tests.adspygoogle.dfp import TEST_VERSION_V201104
+from tests.adspygoogle.dfp import TEST_VERSION_V201107
+from tests.adspygoogle.dfp import TEST_VERSION_V201108
+from tests.adspygoogle.dfp import TEST_VERSION_V201111
 from tests.adspygoogle.dfp import VERSION_V201103
 from tests.adspygoogle.dfp import VERSION_V201104
 from tests.adspygoogle.dfp import VERSION_V201107
 from tests.adspygoogle.dfp import VERSION_V201108
+from tests.adspygoogle.dfp import VERSION_V201111
 
 
 class UserServiceTestV201103(unittest.TestCase):
@@ -42,6 +49,7 @@ class UserServiceTestV201103(unittest.TestCase):
 
   SERVER = SERVER_V201103
   VERSION = VERSION_V201103
+  client.debug = False
   service = None
   user1 = None
   user2 = None
@@ -372,6 +380,92 @@ class UserServiceTestV201108(unittest.TestCase):
       self.assertEqual(user['preferredLocale'], locale)
 
 
+class UserServiceTestV201111(unittest.TestCase):
+
+  """Unittest suite for UserService using v201111."""
+
+  SERVER = SERVER_V201111
+  VERSION = VERSION_V201111
+  service = None
+  user1 = None
+  user2 = None
+
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
+    if not self.__class__.service:
+      self.__class__.service = client.GetUserService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+
+  def testGetAllRoles(self):
+    """Test whether we can fetch all roles."""
+    self.assert_(isinstance(self.__class__.service.GetAllRoles(), tuple))
+
+  def testGetCurrentUser(self):
+    """Test whether we can get current user."""
+    self.assert_(isinstance(self.__class__.service.GetCurrentUser(), tuple))
+
+  def testGetUser(self):
+    """Test whether we can fetch an existing user."""
+    if not self.__class__.user1:
+      self.testGetUsersByStatement()
+    self.assert_(isinstance(self.__class__.service.GetUser(
+        self.__class__.user1['id']), tuple))
+
+  def testGetUsersByStatement(self):
+    """Test whether we can fetch a list of existing users that match given
+    statement."""
+    filter_statement = {'query': 'ORDER BY name LIMIT 500'}
+    users = self.__class__.service.GetUsersByStatement(filter_statement)
+    sales = []
+    traffickers = []
+    admins = []
+    for user in users[0]['results']:
+      if user['roleName'] in ('Salesperson',):
+        sales.append(user)
+      elif user['roleName'] in ('Trafficker',):
+        traffickers.append(user)
+      elif user['roleName'] in ('Administrator',):
+        admins.append(user)
+    self.__class__.user1 = sales[0]
+    self.__class__.user2 = traffickers[0]
+    self.assert_(isinstance(users, tuple))
+
+  def testPerformUserAction(self):
+    """Test whether we can deactivate a user."""
+    if not self.__class__.user1:
+      self.testGetUsersByFilter()
+    action = {'type': 'DeactivateUsers'}
+    filter_statement = {'query': 'WHERE id = \'%s\''
+                        % self.__class__.user1['id']}
+    self.assert_(isinstance(
+        self.__class__.service.PerformUserAction(action, filter_statement),
+        tuple))
+
+  def testUpdateUser(self):
+    """Test whether we can update a user."""
+    if not self.__class__.user1:
+      self.testGetUsersByFilter()
+    locale = 'fr_FR'
+    self.__class__.user1['preferredLocale'] = locale
+    user = self.__class__.service.UpdateUser(self.__class__.user1)
+    self.assert_(isinstance(user, tuple))
+    self.assertEqual(user[0]['preferredLocale'], locale)
+
+  def testUpdateUsers(self):
+    """Test whether we can update a list of users."""
+    if not self.__class__.user1 or not self.__class__.user2:
+      self.testGetUsersByFilter()
+    locale = 'fr_FR'
+    self.__class__.user1['preferredLocale'] = locale
+    self.__class__.user2['preferredLocale'] = locale
+    users = self.__class__.service.UpdateUsers([self.__class__.user1,
+                                                self.__class__.user2])
+    self.assert_(isinstance(users, tuple))
+    for user in users:
+      self.assertEqual(user['preferredLocale'], locale)
+
+
 def makeTestSuiteV201103():
   """Set up test suite using v201103.
 
@@ -416,11 +510,29 @@ def makeTestSuiteV201108():
   return suite
 
 
+def makeTestSuiteV201111():
+  """Set up test suite using v201111.
+
+  Returns:
+    TestSuite test suite using v201111.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(UserServiceTestV201111))
+  return suite
+
+
 if __name__ == '__main__':
-  suite_v201103 = makeTestSuiteV201103()
-  suite_v201104 = makeTestSuiteV201104()
-  suite_v201107 = makeTestSuiteV201107()
-  suite_v201108 = makeTestSuiteV201108()
-  alltests = unittest.TestSuite([suite_v201103, suite_v201104, suite_v201107,
-                                 suite_v201108])
-  unittest.main(defaultTest='alltests')
+  suites = []
+  if TEST_VERSION_V201103:
+    suites.append(makeTestSuiteV201103())
+  if TEST_VERSION_V201104:
+    suites.append(makeTestSuiteV201104())
+  if TEST_VERSION_V201107:
+    suites.append(makeTestSuiteV201107())
+  if TEST_VERSION_V201108:
+    suites.append(makeTestSuiteV201108())
+  if TEST_VERSION_V201111:
+    suites.append(makeTestSuiteV201111())
+  if suites:
+    alltests = unittest.TestSuite(suites)
+    unittest.main(defaultTest='alltests')

@@ -31,10 +31,17 @@ from tests.adspygoogle.dfp import SERVER_V201103
 from tests.adspygoogle.dfp import SERVER_V201104
 from tests.adspygoogle.dfp import SERVER_V201107
 from tests.adspygoogle.dfp import SERVER_V201108
+from tests.adspygoogle.dfp import SERVER_V201111
+from tests.adspygoogle.dfp import TEST_VERSION_V201103
+from tests.adspygoogle.dfp import TEST_VERSION_V201104
+from tests.adspygoogle.dfp import TEST_VERSION_V201107
+from tests.adspygoogle.dfp import TEST_VERSION_V201108
+from tests.adspygoogle.dfp import TEST_VERSION_V201111
 from tests.adspygoogle.dfp import VERSION_V201103
 from tests.adspygoogle.dfp import VERSION_V201104
 from tests.adspygoogle.dfp import VERSION_V201107
 from tests.adspygoogle.dfp import VERSION_V201108
+from tests.adspygoogle.dfp import VERSION_V201111
 
 
 class ReportServiceTestV201103(unittest.TestCase):
@@ -389,6 +396,94 @@ class ReportServiceTestV201108(unittest.TestCase):
         self.__class__.report_job_id, 'TSV', self.__class__.service), str))
 
 
+class ReportServiceTestV201111(unittest.TestCase):
+
+  """Unittest suite for ReportService using v201111."""
+
+  SERVER = SERVER_V201111
+  VERSION = VERSION_V201111
+  client.debug = False
+  service = None
+  report_job_id = '0'
+
+  def setUp(self):
+    """Prepare unittest."""
+    print self.id()
+    if not self.__class__.service:
+      self.__class__.service = client.GetReportService(
+          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
+
+  def testRunDeliveryReport(self):
+    """Test whether we can run a delivery report."""
+    report_job = {
+        'reportQuery': {
+            'dimensions': ['ORDER'],
+            'columns': ['AD_SERVER_IMPRESSIONS', 'AD_SERVER_CLICKS',
+                        'AD_SERVER_CTR', 'AD_SERVER_REVENUE',
+                        'AD_SERVER_AVERAGE_ECPM'],
+            'dateRangeType': 'LAST_MONTH'
+        }
+    }
+    report_job = self.__class__.service.RunReportJob(report_job)
+    self.__class__.report_job_id = report_job[0]['id']
+    self.assert_(isinstance(report_job, tuple))
+
+  def testRunInventoryReport(self):
+    """Test whether we can run an inventory report."""
+    report_job = {
+        'reportQuery': {
+            'dimensions': ['DATE'],
+            'columns': ['AD_SERVER_IMPRESSIONS', 'AD_SERVER_CLICKS',
+                        'ADSENSE_IMPRESSIONS', 'ADSENSE_CLICKS',
+                        'TOTAL_IMPRESSIONS', 'TOTAL_REVENUE'],
+            'dateRangeType': 'LAST_WEEK'
+        }
+    }
+    self.assert_(isinstance(self.__class__.service.RunReportJob(
+        report_job), tuple))
+
+  def testRunSalesReport(self):
+    """Test whether we can run a sales report."""
+    report_job = {
+        'reportQuery': {
+            'dimensions': ['SALESPERSON'],
+            'columns': ['AD_SERVER_IMPRESSIONS', 'AD_SERVER_REVENUE',
+                        'AD_SERVER_AVERAGE_ECPM'],
+            'dateRangeType': 'LAST_MONTH'
+        }
+    }
+    self.assert_(isinstance(self.__class__.service.RunReportJob(
+        report_job), tuple))
+
+  def testGetReportJob(self):
+    """Test whether we can retrieve existing report job."""
+    if self.__class__.report_job_id == '0':
+      self.testRunDeliveryReport()
+    self.assert_(isinstance(self.__class__.service.GetReportJob(
+        self.__class__.report_job_id), tuple))
+
+  def testGetReportDownloadUrl(self):
+    """Test whether we can retrieve report download URL."""
+    if self.__class__.report_job_id == '0':
+      self.testRunDeliveryReport()
+    self.assert_(isinstance(self.__class__.service.GetReportDownloadURL(
+        self.__class__.report_job_id, 'CSV'), tuple))
+
+  def testDownloadCsvReport(self):
+    """Test whether we can download a CSV report."""
+    if self.__class__.report_job_id == '0':
+      self.testRunDeliveryReport()
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'CSV', self.__class__.service), str))
+
+  def testDownloadTsvReport(self):
+    """Test whether we can download a TSV report."""
+    if self.__class__.report_job_id == '0':
+      self.testRunDeliveryReport()
+    self.assert_(isinstance(DfpUtils.DownloadReport(
+        self.__class__.report_job_id, 'TSV', self.__class__.service), str))
+
+
 def makeTestSuiteV201103():
   """Set up test suite using v201103.
 
@@ -433,11 +528,29 @@ def makeTestSuiteV201108():
   return suite
 
 
+def makeTestSuiteV201111():
+  """Set up test suite using v201111.
+
+  Returns:
+    TestSuite test suite using v201111.
+  """
+  suite = unittest.TestSuite()
+  suite.addTests(unittest.makeSuite(ReportServiceTestV201111))
+  return suite
+
+
 if __name__ == '__main__':
-  suite_v201103 = makeTestSuiteV201103()
-  suite_v201104 = makeTestSuiteV201104()
-  suite_v201107 = makeTestSuiteV201107()
-  suite_v201108 = makeTestSuiteV201108()
-  alltests = unittest.TestSuite([suite_v201103, suite_v201104, suite_v201107,
-                                 suite_v201108])
-  unittest.main(defaultTest='alltests')
+  suites = []
+  if TEST_VERSION_V201103:
+    suites.append(makeTestSuiteV201103())
+  if TEST_VERSION_V201104:
+    suites.append(makeTestSuiteV201104())
+  if TEST_VERSION_V201107:
+    suites.append(makeTestSuiteV201107())
+  if TEST_VERSION_V201108:
+    suites.append(makeTestSuiteV201108())
+  if TEST_VERSION_V201111:
+    suites.append(makeTestSuiteV201111())
+  if suites:
+    alltests = unittest.TestSuite(suites)
+    unittest.main(defaultTest='alltests')

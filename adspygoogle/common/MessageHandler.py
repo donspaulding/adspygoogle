@@ -134,7 +134,6 @@ def _PackDictForSoappy(obj, xmlns, type_name, soappy_service, wrap_lists,
     SOAPpy.Types.structType The given dictionary ready for SOAPpy transport.
   """
   packed_data = {}
-  ns_prefix = prefix_function(xmlns)
   obj_contained_type, type_key = SoappyUtils.GetExplicitType(
       obj, type_name, xmlns, soappy_service)
   if obj_contained_type:
@@ -143,13 +142,15 @@ def _PackDictForSoappy(obj, xmlns, type_name, soappy_service, wrap_lists,
   for key in obj:
     if key == type_key or not obj[key]:
       continue
+    ns_prefix = prefix_function(SoappyUtils.GetComplexFieldNamespaceByFieldName(
+        key, type_name, xmlns, soappy_service))
     key_type = SoappyUtils.GetComplexFieldTypeByFieldName(
         key, type_name, xmlns, soappy_service)
     packed_data[ns_prefix + key] = PackForSoappy(
         obj[key], key_type.getTargetNamespace(), key_type.getName(),
         soappy_service, wrap_lists, prefix_function)
 
-  attrs = {(SOAPpy.NS.XSI3, 'type'): ns_prefix + type_name}
+  attrs = {(SOAPpy.NS.XSI3, 'type'): prefix_function(xmlns) + type_name}
   packed_object = SOAPpy.Types.structType(packed_data, typed=0, attrs=attrs)
   packed_object._typename = type_name
   packed_object._keyord = SoappyUtils.PruneKeyOrder(

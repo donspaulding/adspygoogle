@@ -1,3 +1,11 @@
+9.0.0:
+- Added support for v201111 and set it as default version.
+- Added support for ContentService, CreativeTemplateService, and
+  SuggestedAdUnitService.
+- Updated adspygoogle.common module to v3.0.3.
+- Remove support for ZSI.
+- Fix issue 11.
+
 8.0.0:
 - Updated adspygoogle.common module to v3.0.0.
 - Removed individual service classes in favor of single GenericDfpService class.
