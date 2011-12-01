@@ -39,11 +39,18 @@ size_service = client.GetSizeService(
 width = 'INSERT_WIDTH_HERE'
 height = 'INSERT_HEIGHT_HERE'
 
+# Create size search criteria.
+size_search_criteria = {
+    'width': width,
+    'height': height
+}
+
 # Get size.
-size = size_service.GetSizeByWidthHeight(width, height)[0]
+size_record_set = size_service.GetSizes(size_search_criteria)[0]
 
 # Display size ID.
-if size:
-  print 'Size id for \'%sx%s\' is \'%s\'.' % (width, height, size['id'])
+if len(size_record_set['records']):
+  for size in size_record_set['records']:
+    print 'Size id for \'%sx%s\' is \'%s\'.' % (width, height, size['id'])
 else:
-  print 'No size found for your criteria.'
+  print 'No sizes found for your criteria.'

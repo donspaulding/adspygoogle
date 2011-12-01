@@ -82,9 +82,23 @@ diff -Naurb wstools/XMLSchema.py wstools/XMLSchema.py
 diff -Naurb Client.py Client.py
 --- Client.py	2008-12-22 14:42:14.000000000 -0500
 +++ Client.py	2011-10-24 13:55:43.705887000 -0400
+@@ -40,11 +40,11 @@
+ ################################################################################
+ """
+ 
++from __future__ import nested_scopes
++
+ ident = '$Id: Client.py,v 1.27 2005/02/21 20:27:09 warnes Exp $'
+ from version import __version__
+ 
+-from __future__ import nested_scopes
+-
+ #import xml.sax
+ import urllib
+ from types import *
 @@ -112,6 +112,9 @@
-
-
+ 
+ 
  class HTTPTransport:
 +    def __init__(self, additional_headers = None):
 +        self.additional_headers = additional_headers or {}
@@ -93,9 +107,9 @@ diff -Naurb Client.py Client.py
          """Extract the (possibly extended) namespace from the returned
          SOAP message."""
 @@ -153,37 +156,40 @@
-
+ 
          r.putrequest("POST", real_path)
-
+ 
 -        r.putheader("Host", addr.host)
 -        r.putheader("User-agent", SOAPUserAgent())
 +        headers = []
@@ -109,16 +123,16 @@ diff -Naurb Client.py Client.py
 -        r.putheader("Content-length", str(len(data)))
 +        headers.append(("Content-type", t))
 +        headers.append(("Content-length", str(len(data))))
-
+ 
          # if user is not a user:passwd format
          #    we'll receive a failure from the server. . .I guess (??)
          if addr.user != None:
-             val = base64.encodestring(addr.user)
+             val = base64.encodestring(addr.user) 
 -            r.putheader('Authorization','Basic ' + val.replace('\012',''))
 +            headers.append(('Authorization','Basic ' + val.replace('\012','')))
 +
 +        headers.extend(self.additional_headers.items())
-
+ 
          # This fixes sending either "" or "None"
          if soapaction == None or len(soapaction) == 0:
 -            r.putheader("SOAPAction", "")
@@ -126,7 +140,7 @@ diff -Naurb Client.py Client.py
          else:
 -            r.putheader("SOAPAction", '"%s"' % soapaction)
 +            headers.append(("SOAPAction", '"%s"' % soapaction))
-
+ 
          if config.dumpHeadersOut:
              s = 'Outgoing HTTP headers'
              debugHeader(s)
@@ -139,16 +153,50 @@ diff -Naurb Client.py Client.py
 +            for header in headers:
 +                print '%s:%s' % header
              debugFooter(s)
-
+ 
 +        for header in headers:
 +            r.putheader(header[0], header[1])
          r.endheaders()
-
+ 
          if config.dumpSOAPOut:
 @@ -493,3 +499,6 @@
-
+ 
          def __repr__(self):
              return "<%s at %d>" % (self.__class__, id(self))
 +
 +        def __str__(self):
 +            return repr(self)
+diff -Naurb Types.py Types.py
+--- Types.py	2009-05-13 18:20:55.000000000 -0400
++++ Types.py	2011-11-29 10:33:00.134756000 -0500
+@@ -33,11 +33,11 @@
+ ################################################################################
+ """
+ 
++from __future__ import nested_scopes
++
+ ident = '$Id: Types.py,v 1.19 2005/02/22 04:29:43 warnes Exp $'
+ from version import __version__
+ 
+-from __future__ import nested_scopes
+-
+ import UserList
+ import base64
+ import cgi
+diff -Naurb Server.py Server.py
+--- Server.py	2009-05-13 18:20:55.000000000 -0400
++++ Server.py	2011-11-29 10:33:00.134756000 -0500
+@@ -40,11 +40,11 @@
+ ################################################################################
+ """
+ 
++from __future__ import nested_scopes
++
+ ident = '$Id: Server.py,v 1.21 2005/02/15 16:32:22 warnes Exp $'
+ from version import __version__
+ 
+-from __future__ import nested_scopes
+-
+ #import xml.sax
+ import re
+ import socket

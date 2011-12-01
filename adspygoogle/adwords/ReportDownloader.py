@@ -107,7 +107,7 @@ class ReportDownloader(object):
     self.__ReloadAuthToken()
     headers = self.__GenerateHeaders(return_micros, url)
     headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    headers['Content-Length'] = len(payload)
+    headers['Content-Length'] = str(len(payload))
     return self.__MakeRequest(url, headers, file_path, payload=payload)
 
   def __GetReportXml(self, report):

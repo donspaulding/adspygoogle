@@ -1,3 +1,8 @@
+1.0.2:
+- Client [43]: Moved __future__ import above other imports.
+- Types [36]: Moved __future__ import above other imports.
+- Server [43]: Moved __future__ import above other imports.
+
 1.0.1:
 - Client [502-505]: Added a __str__ function to the __Method class. A SOAP call
                     was being made every time something called str() on an

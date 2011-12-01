@@ -42,10 +42,13 @@ def DisplayAccountTree(account, link, accounts, links, depth=0):
   """
   prefix = '-' * depth * 2
   link_text = ''
+  descriptive_name = ''
   if link:
     link_text = ' (%s)' % link['typeOfLink']
-  print '%s%s, %s%s' % (prefix, account['login'], account['customerId'],
-                        link_text)
+    if len(link['descriptiveName']) > 0:
+      descriptive_name = ' (%s)' % link['descriptiveName']
+  print '%s%s%s, %s%s' % (prefix, account['login'], descriptive_name,
+                          account['customerId'], link_text)
   if account['customerId'] in links:
     for child_link in links[account['customerId']]:
       child_account = accounts[child_link['clientId']['id']]
@@ -86,6 +89,9 @@ if 'accounts' in graph and len(graph['accounts']):
     if account['customerId'] not in parent_links:
       root_account = account
   # Display account tree.
+  if not root_account and len(child_links) > 0:
+    # Sandbox doesn't handle parent links properly, so use a fake account.
+    root_account = {'customerId': child_links.items()[0][0], 'login': 'Root'}
   if root_account:
     print 'Login, CustomerId (Status)'
     DisplayAccountTree(root_account, None, accounts, child_links, 0)
