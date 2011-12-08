@@ -1,3 +1,6 @@
+3.0.4:
+- Updated SOAPpy patch to version 1.0.3. This fixes issue 13.
+
 3.0.3:
 - Modified GenericApiService to treat SOAP parameter element names as string
   types rather than unicode types. These element names are used as keyword
