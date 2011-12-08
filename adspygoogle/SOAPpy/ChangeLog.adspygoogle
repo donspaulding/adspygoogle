@@ -1,3 +1,8 @@
+1.0.3:
+- Types [102]: Only cast type data to a string if it is not already a
+               basestring. Prevents encoding errors when casting unicode strings
+               to regular strings.
+
 1.0.2:
 - Client [43]: Moved __future__ import above other imports.
 - Types [36]: Moved __future__ import above other imports.

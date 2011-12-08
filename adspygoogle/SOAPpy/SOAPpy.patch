@@ -200,3 +200,14 @@ diff -Naurb Server.py Server.py
  #import xml.sax
  import re
  import socket
+--- Types.py	2011-11-28 14:54:29.000000000 -0500
++++ Types.py	2011-11-28 14:58:31.000000000 -0500
+@@ -99,6 +99,7 @@
+         return data
+ 
+     def _marshalData(self):
++        if isinstance(self._data, basestring): return self._data
+         return str(self._data)
+ 
+     def _marshalAttrs(self, ns_map, builder):
+
