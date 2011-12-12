@@ -33,7 +33,7 @@ LIB_URL = 'http://code.google.com/p/google-api-ads-python/'
 LIB_AUTHOR = 'Joseph DiLallo'
 LIB_AUTHOR_EMAIL = 'api.jdilallo@gmail.com'
 LIB_VERSION = '2.0.0'
-LIB_MIN_COMMON_VERSION = '3.0.2'
+LIB_MIN_COMMON_VERSION = '3.0.4'
 LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:
@@ -42,7 +42,7 @@ if VERSION < LIB_MIN_COMMON_VERSION:
   raise MissingPackageError(msg)
 
 # Tuple of strings representing API versions.
-API_VERSIONS = ('v1.14', 'v1.15')
+API_VERSIONS = ('v1.14', 'v1.15', 'v1.16')
 DEFAULT_API_VERSION = API_VERSIONS[len(API_VERSIONS) - 1]
 
 # Accepted combinations of headers which user has to provide. Either one of

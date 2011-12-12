@@ -28,13 +28,13 @@ import unittest
 from adspygoogle.common import Utils
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_13
+from tests.adspygoogle.dfa import SERVER_V1_16
 from tests.adspygoogle.dfa import SERVER_V1_14
 from tests.adspygoogle.dfa import SERVER_V1_15
-from tests.adspygoogle.dfa import TEST_VERSION_V1_13
+from tests.adspygoogle.dfa import TEST_VERSION_V1_16
 from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import TEST_VERSION_V1_15
-from tests.adspygoogle.dfa import VERSION_V1_13
+from tests.adspygoogle.dfa import VERSION_V1_16
 from tests.adspygoogle.dfa import VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_15
 
@@ -142,12 +142,12 @@ class NetworkServiceTestV1_14(unittest.TestCase):
             widget_image_upload_request), tuple))
 
 
-class NetworkServiceTestV1_13(unittest.TestCase):
+class NetworkServiceTestV1_16(unittest.TestCase):
 
-  """Unittest suite for NetworkService using v1_13."""
+  """Unittest suite for NetworkService using v1_16."""
 
-  SERVER = SERVER_V1_13
-  VERSION = VERSION_V1_13
+  SERVER = SERVER_V1_16
+  VERSION = VERSION_V1_16
   client.debug = False
   test_super_user = False
   service = None
@@ -359,14 +359,14 @@ def makeTestSuiteV1_14():
   return suite
 
 
-def makeTestSuiteV1_13():
-  """Set up test suite using v1_13.
+def makeTestSuiteV1_16():
+  """Set up test suite using v1_16.
 
   Returns:
-    TestSuite test suite using v1_13.
+    TestSuite test suite using v1_16.
   """
   suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(NetworkServiceTestV1_13))
+  suite.addTests(unittest.makeSuite(NetworkServiceTestV1_16))
   return suite
 
 
@@ -385,8 +385,8 @@ if __name__ == '__main__':
   suites = []
   if TEST_VERSION_V1_14:
     suites.append(makeTestSuiteV1_14())
-  if TEST_VERSION_V1_13:
-    suites.append(makeTestSuiteV1_13())
+  if TEST_VERSION_V1_16:
+    suites.append(makeTestSuiteV1_16())
   if TEST_VERSION_V1_15:
     suites.append(makeTestSuiteV1_15())
   if suites:

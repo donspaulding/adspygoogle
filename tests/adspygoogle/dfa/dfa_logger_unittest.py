@@ -27,13 +27,13 @@ import unittest
 from adspygoogle.common import Utils
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
-from tests.adspygoogle.dfa import SERVER_V1_13
+from tests.adspygoogle.dfa import SERVER_V1_16
 from tests.adspygoogle.dfa import SERVER_V1_14
 from tests.adspygoogle.dfa import SERVER_V1_15
-from tests.adspygoogle.dfa import TEST_VERSION_V1_13
+from tests.adspygoogle.dfa import TEST_VERSION_V1_16
 from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import TEST_VERSION_V1_15
-from tests.adspygoogle.dfa import VERSION_V1_13
+from tests.adspygoogle.dfa import VERSION_V1_16
 from tests.adspygoogle.dfa import VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_15
 
@@ -82,12 +82,12 @@ class DfaLoggerTestV1_14(unittest.TestCase):
     os.remove(self.__class__.TMP_LOG)
 
 
-class DfaLoggerTestV1_13(unittest.TestCase):
+class DfaLoggerTestV1_16(unittest.TestCase):
 
-  """Unittest suite for Logger using v1_13."""
+  """Unittest suite for Logger using v1_16."""
 
-  SERVER = SERVER_V1_13
-  VERSION = VERSION_V1_13
+  SERVER = SERVER_V1_16
+  VERSION = VERSION_V1_16
   TMP_LOG = os.path.join('..', '..', '..', 'logs', 'logger_unittest.log')
   DEBUG_MSG1 = 'Message before call to an API method.'
   DEBUG_MSG2 = 'Message after call to an API method.'
@@ -181,14 +181,14 @@ def makeTestSuiteV1_14():
   return suite
 
 
-def makeTestSuiteV1_13():
-  """Set up test suite using v1_13.
+def makeTestSuiteV1_16():
+  """Set up test suite using v1_16.
 
   Returns:
-    TestSuite test suite using v1_13.
+    TestSuite test suite using v1_16.
   """
   suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(DfaLoggerTestV1_13))
+  suite.addTests(unittest.makeSuite(DfaLoggerTestV1_16))
   return suite
 
 
@@ -207,8 +207,8 @@ if __name__ == '__main__':
   suites = []
   if TEST_VERSION_V1_14:
     suites.append(makeTestSuiteV1_14())
-  if TEST_VERSION_V1_13:
-    suites.append(makeTestSuiteV1_13())
+  if TEST_VERSION_V1_16:
+    suites.append(makeTestSuiteV1_16())
   if TEST_VERSION_V1_15:
     suites.append(makeTestSuiteV1_15())
   if suites:

@@ -27,13 +27,13 @@ from adspygoogle.dfa.DfaClient import DfaClient
 
 
 HTTP_PROXY = None
-TEST_VERSION_V1_13 = False
-SERVER_V1_13 = 'http://advertisersapitest.doubleclick.net'
-VERSION_V1_13 = 'v1.13'
-TEST_VERSION_V1_14 = True
+TEST_VERSION_V1_14 = False
 SERVER_V1_14 = 'http://advertisersapitest.doubleclick.net'
 VERSION_V1_14 = 'v1.14'
 TEST_VERSION_V1_15 = True
 SERVER_V1_15 = 'http://advertisersapitest.doubleclick.net'
 VERSION_V1_15 = 'v1.15'
+TEST_VERSION_V1_16 = True
+SERVER_V1_16 = 'http://advertisersapitest.doubleclick.net'
+VERSION_V1_16 = 'v1.16'
 client = DfaClient(path=os.path.join('..', '..', '..'))
