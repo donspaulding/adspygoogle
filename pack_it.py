@@ -167,6 +167,8 @@ def Main(argv):
                   os.path.join(target_dir, 'COPYING'))
   shutil.move(os.path.join(target_lib_dir, 'README'),
               os.path.join(target_dir, 'README'))
+  shutil.move(os.path.join(target_pkg_dir, 'common', 'README.Common'),
+              os.path.join(target_dir, 'README.Common'))
 
   # Perform clean up, generate docs, and adjust permissions.
   os.chdir(target_dir)

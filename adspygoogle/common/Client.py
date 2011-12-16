@@ -20,6 +20,7 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
 import os
 import pickle
+import warnings
 
 from adspygoogle.common import PYXML
 from adspygoogle.common import SanityCheck
@@ -351,3 +352,53 @@ class Client(object):
     return self._config['oauth_enabled']
 
   use_oauth = property(__GetUsingOAuth, __SetUsingOAuth)
+
+  def __SetCaCertsFile(self, ca_certs_file):
+    """Sets the certificates file to use for validating SSL certificates.
+
+    WARNING: Using this feature will monkey-patch a new HTTPS class into
+    httplib. Be aware that any other part of your application that uses httplib,
+    directly or indirectly, will be affected by its use.
+
+    Args:
+      ca_certs_file: string Path to a file storing trusted certificates. If this
+                     variable cleared (as in, set to None or something that
+                     evaluates to False), the original httplib.HTTPS class will
+                     be put back in place and certificate validation will cease.
+    """
+    try:
+      from https import Https
+      if not ca_certs_file: ca_certs_file = None
+      Https.MonkeyPatchHttplib(ca_certs_file)
+    except ImportError:
+      warnings.warn('Your Python installation does not support SSL certificate'
+                    ' validation!')
+
+  def __GetCaCertsFile(self):
+    """Retrieves the current trusted certificates source file path."""
+    try:
+      from https import Https
+      return Https.GetCurrentCertsFile()
+    except ImportError:
+      warnings.warn('Your Python installation does not support SSL certificate'
+                    ' validation!')
+
+  ca_certs = property(__GetCaCertsFile, __SetCaCertsFile)
+
+  def __SetUsingCompression(self, is_using):
+    """Sets the config to use HTTP message compression.
+
+    Args:
+      is_using: boolean Whether the client is using HTTP compression or not.
+    """
+    self._config['compress'] = is_using
+
+  def __GetUsingCompression(self):
+    """Returns if the client is currently set to use HTTP compression.
+
+    Returns:
+      boolean Whether this client is using HTTP comrpession or not
+    """
+    return self._config['compress']
+
+  compress = property(__GetUsingCompression, __SetUsingCompression)

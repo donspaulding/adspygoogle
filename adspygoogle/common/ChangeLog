@@ -1,3 +1,10 @@
+3.0.5:
+- Added support for SSL certificate verification through the Client's "ca_certs"
+  property. Please see our README.Common file for instructions.
+- Added support for HTTP message compression with SOAPpy.
+- Added "compress" property to the Client which can set HTTP compression on/off.
+- Updated SOAPpy patch to version 1.0.4. This fixes issue 8.
+
 3.0.4:
 - Updated SOAPpy patch to version 1.0.3. This fixes issue 13.
 

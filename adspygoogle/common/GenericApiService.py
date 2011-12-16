@@ -45,8 +45,8 @@ class GenericApiService(object):
   _GetMethodInfo
   _HandleLogsAndErrors
 
-  Optionally, the following methods are intended to be overridden if necessary,
-  but provide functioning default implementations:
+  The following methods are intended to be overridden as necessary, but provide
+  functioning default implementations:
 
   _TakeActionOnSoapCall
   _TakeActionOnPackedArgs
@@ -227,6 +227,12 @@ class GenericApiService(object):
         del self._soappyservice.soapproxy.transport.additional_headers[
             'Authorization']
 
+  def _ReadyCompression(self):
+    """Sets whether the HTTP transport layer should use compression."""
+    compress = Utils.BoolTypeConvert(self._config['compress'])
+    self._soappyservice.soapproxy.config.send_compressed = compress
+    self._soappyservice.soapproxy.config.accept_compressed = compress
+
   def _CreateMethod(self, method_name):
     """Create a method wrapping an invocation to the SOAP service."""
     try:
@@ -241,6 +247,7 @@ class GenericApiService(object):
         self._lock.acquire()
         self._SetHeaders()
         self._ReadyOAuth()
+        self._ReadyCompression()
 
         args = self._TakeActionOnSoapCall(method_name, args)
         method_info = self._GetMethodInfo(method_name)

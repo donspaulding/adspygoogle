@@ -14,16 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Settings and configurations for the client library."""
+"""Module that can be used to enforce SSL certificate verification.
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+Using this module will monkey-patch a new HTTPS class into httplib. Be aware
+that any other part of your application that uses httplib, directly or
+indirectly, will be affected by its use.
+"""
 
-VERSION = '3.0.5'
-
-MIN_PY_VERSION = '2.4.4'
-PYXML_NAME = 'PyXML'
-ETREE_NAME = 'ElementTree'
-MIN_PYXML_VERSION = '0.8.3'
-MIN_ETREE_VERSION = '1.2.6'
-PYXML = '1'
-ETREE = '2'
+__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'

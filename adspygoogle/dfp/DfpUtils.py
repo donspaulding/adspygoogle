@@ -108,10 +108,10 @@ def GetAllEntitiesByStatementWithService(service, query='', page_size=500):
     service_name = 'AdUnit'
   if service_name[-1] == 'y':
     method_name = service_name[:-1] + 'ies'
-  if service_name == 'Content':
-    method_name = service_name
   else:
     method_name = service_name + 's'
+  if service_name == 'Content':
+    method_name = service_name
   method_name = 'Get%sByStatement' % method_name
 
   if page_size <= 0 or page_size > 500:

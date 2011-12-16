@@ -1,3 +1,7 @@
+9.0.1
+- Added support for third party slots in v201111.
+- Fixed bug in DfpUtils.GetAllEntitiesByStatementWithService.
+
 9.0.0:
 - Added support for v201111 and set it as default version.
 - Added support for ContentService, CreativeTemplateService, and
