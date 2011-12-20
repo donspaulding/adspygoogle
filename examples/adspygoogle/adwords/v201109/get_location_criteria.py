@@ -62,8 +62,12 @@ location_criteria = location_criterion_service.Get(selector)
 
 # Display the resulting location criteria.
 for location_criterion in location_criteria:
-  parent_string = ', '.join([GetLocationString(parent) for parent in
-                             location_criterion['location']['parentLocations']])
+  parent_string = ''
+  if ('parentLocations' in location_criterion['location']
+      and location_criterion['location']['parentLocations']):
+    parent_string = ', '.join([GetLocationString(parent)for parent in
+                               location_criterion['location']
+                               ['parentLocations']])
   print ('The search term \'%s\' returned the location \'%s\' of type \'%s\''
          ' with parent locations \'%s\' and reach \'%s\''
          % (location_criterion['searchTerm'],

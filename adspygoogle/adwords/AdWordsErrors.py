@@ -62,16 +62,16 @@ class AdWordsApiError(AdWordsError):
     if 'faultstring' in fault: self.fault_string = fault['faultstring']
 
     (self.code, error_msg, self.trigger, self.errors) = (-1, '', '', [])
-    if 'detail' in fault:
+    if 'detail' in fault and fault['detail']:
       if 'code' in fault['detail']: self.code = int(fault['detail']['code'])
       if 'trigger' in fault['detail']: self.trigger = fault['detail']['trigger']
       if 'message' in fault['detail']: error_msg = fault['detail']['message']
     if not error_msg: error_msg = self.fault_string
 
     errors = [None]
-    if 'detail' in fault and 'errors' in fault['detail']:
+    if 'detail' in fault and fault['detail'] and 'errors' in fault['detail']:
       errors = fault['detail']['errors']
-    elif 'detail' not in fault:
+    elif 'detail' not in fault or not fault['detail']:
       errors[0] = {}
     else:
       errors[0] = fault['detail']

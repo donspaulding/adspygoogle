@@ -1,3 +1,6 @@
+2.0.1:
+- Added support for receiving compressed HTTP messages from the DFA servers.
+
 2.0.0:
 - Added support for v1.16, removed support for v1.13.
 - Updated adspygoogle.common module to v3.0.3.

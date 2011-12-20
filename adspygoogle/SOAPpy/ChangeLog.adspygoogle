@@ -1,3 +1,10 @@
+1.0.4:
+- Client: Altered HTTPTransport.call to support gzip compression.
+- Config: Removed all references to M2Crypto.
+          Added send_compressed and accept_compressed config values.
+- Parser: Removed all references to M2Crypto.
+- Server: Removed all references to M2Crypto.
+
 1.0.3:
 - Types [102]: Only cast type data to a string if it is not already a
                basestring. Prevents encoding errors when casting unicode strings

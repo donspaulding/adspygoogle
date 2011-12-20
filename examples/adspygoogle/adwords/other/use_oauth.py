@@ -47,7 +47,7 @@ client.use_oauth = True
 
 # Request a new OAuth token. Web applications should pass in a callback URL to
 # redirect the user to after authorizing the token.
-client.RequestOAuthToken('https://adwords.google.com',
+client.RequestOAuthToken('https://adwords-sandbox.google.com',
                          applicationname='OAuth Example')
 
 # Get the authorization URL for the OAuth token.
@@ -61,7 +61,7 @@ authorizationurl = client.GetOAuthAuthorizationUrl()
 print ('Log in to your AdWords account and open the following URL: %s\n' %
        authorizationurl)
 print 'After approving the token enter the verification code (if specified).'
-verifier = raw_input('Verifier: ')
+verifier = raw_input('Verifier: ').strip()
 
 # Upgrade the authorized token.
 client.UpgradeOAuthToken(verifier)
@@ -76,7 +76,7 @@ print ('OAuth authorization successful.  Store these credentials to reuse' +
 # previous steps once access has been granted.
 
 campaign_service = client.GetCampaignService(
-    'https://adwords.google.com', 'v201101')
+    'https://adwords-sandbox.google.com', 'v201109')
 
 # Get all campaigns.
 # Construct selector and get all campaigns.

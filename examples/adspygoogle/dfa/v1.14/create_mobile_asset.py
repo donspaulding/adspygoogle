@@ -29,7 +29,6 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
-from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
 from adspygoogle.dfa.DfaClient import DfaClient
 
@@ -47,8 +46,7 @@ path_to_file = 'INSERT_PATH_TO_FILE_HERE'
 
 # Convert file into format that can be sent in SOAP messages.
 content = Utils.ReadFile(path_to_file)
-if client._config['soap_lib'] == SOAPPY:
-  content = base64.encodestring(content)
+content = base64.encodestring(content)
 
 # Construct and save mobile asset.
 image_asset = {

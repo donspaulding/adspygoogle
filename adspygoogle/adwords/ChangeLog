@@ -1,3 +1,14 @@
+15.1.2:
+- HTTP compression is now supported for both SOAP messages and AdHoc report
+  downloads.
+- Updated to version 3.0.5 of the common library. This addresses issue # 8.
+- Added ability to supply OAuth credentials when AdWordsClient is constructed.
+- Misc minor fixes for AppEngine support.
+- Enhanced report download to accept an open file-like object that supports
+  .write() instead of a file_path.
+- Fixed setup.py to include OAuth package when installed library, addresses
+  issue # 14.
+
 15.1.1:
 - Version 3.0.4 of the common lib addresses issue # 13.
 

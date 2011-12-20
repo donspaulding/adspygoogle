@@ -305,7 +305,7 @@ class Client(object):
     Args:
       credentials: dict OAuth credentials.
     """
-    self._config['oauth_credentials'] = credentials
+    self._headers['oauth_credentials'] = credentials
 
   def __GetOAuthCredentials(self):
     """Retrieves the OAuth credentials from the config.
@@ -313,7 +313,7 @@ class Client(object):
     Returns:
       dict The OAuth credentials.
     """
-    return self._config['oauth_credentials']
+    return self._headers['oauth_credentials']
 
   oauth_credentials = property(__GetOAuthCredentials, __SetOAuthCredentials)
 

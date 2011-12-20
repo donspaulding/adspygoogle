@@ -18,7 +18,9 @@
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
+import gzip
 import re
+import StringIO
 import time
 import urllib
 import urllib2
@@ -70,45 +72,57 @@ class ReportDownloader(object):
         wsdl_url, noroot=1)
 
   def DownloadReport(self, report_definition_or_id, return_micros=False,
-                     file_path=None):
+                     file_path=None, fileobj=None):
     """Downloads a report by object or id.
 
     Args:
       report_definition_or_id: dict or str Report or reportDefinitionId.
       return_micros: bool Whether to return currency in micros (optional).
       file_path: str File path to download to (optional).
+      fileobj: file An already-open file-like object that supports write()
+               (optional).
 
     Returns:
-      str Report data if file_path=None, otherwise the file_path written to.
+      str Report data if file_path and fileobj are None, None if fileobj is
+          not None and file_path otherwise.
     """
+    if not fileobj and file_path:
+      fileobj = open(file_path, 'w+')
+
     if isinstance(report_definition_or_id, dict):
       return self.__DownloadAdHocReport(report_definition_or_id, return_micros,
-                                        file_path)
+                                        fileobj) or file_path
     else:
       return self.__DownloadReportById(report_definition_or_id, return_micros,
-                                       file_path)
+                                       fileobj) or file_path
 
-  def __DownloadAdHocReport(self, report, return_micros=False, file_path=None):
+  def __DownloadAdHocReport(self, report, return_micros=False, fileobj=None):
     """Downloads an AdHoc report.
 
     Args:
       report: dict Report to download.
       return_micros: bool Whether to return currency in micros (optional).
-      file_path: str Path to download report to.
+      fileobj: file File to write to (optional).
 
     Returns:
-      str Report data if no file_path, otherwise path written to.
+      str Report data if no fileobj, otherwise None.
     """
     report_xml = self.__GetReportXml(report)
 
     payload = urllib.urlencode({'__rdxml': report_xml})
+    if Utils.BoolTypeConvert(self._config['compress']):
+      buffer = StringIO.StringIO()
+      gzip_file = gzip.GzipFile(mode='wb', fileobj=buffer)
+      gzip_file.write(payload)
+      gzip_file.close()
+      payload = buffer.getvalue()
 
     url = self.__GenerateUrl()
     self.__ReloadAuthToken()
     headers = self.__GenerateHeaders(return_micros, url)
     headers['Content-Type'] = 'application/x-www-form-urlencoded'
     headers['Content-Length'] = str(len(payload))
-    return self.__MakeRequest(url, headers, file_path, payload=payload)
+    return self.__MakeRequest(url, headers, fileobj, payload=payload)
 
   def __GetReportXml(self, report):
     """Transforms the report object into xml.
@@ -158,21 +172,21 @@ class ReportDownloader(object):
     return re.sub(ATTRIBUTES_REGEX, '', report_xml).strip()
 
   def __DownloadReportById(self, report_definition_id, return_micros=False,
-                           file_path=None):
+                           fileobj=None):
     """Download report and return raw data.
 
     Args:
       report_definition_id: str Id of the report definition to download.
       return_micros: bool Whether to return currency in micros.
-      file_path: str Path to download file to.
+      fileobj: str Path to download file to.
 
     Returns:
-      str Report data if no file_path, otherwise file path written to.
+      str Report data if no fileobj, otherwise None.
     """
     self.__ReloadAuthToken()
     url = self.__GenerateUrl(report_definition_id)
     headers = self.__GenerateHeaders(return_micros, url)
-    return self.__MakeRequest(url, headers, file_path)
+    return self.__MakeRequest(url, headers, fileobj)
 
   def __GenerateUrl(self, report_definition_id=None):
     """Generates the URL to get a report from.
@@ -217,7 +231,7 @@ class ReportDownloader(object):
     if ('oauth_enabled' in self._config and
         Utils.BoolTypeConvert(self._config['oauth_enabled'])):
       signedrequestparams = (self._config['oauth_handler']
-          .GetSignedRequestParameters(self._config['oauth_credentials'],
+          .GetSignedRequestParameters(self._headers['oauth_credentials'],
                                       self._op_config['server'] + url))
       headers['Authorization'] = ('OAuth ' +
           self._config['oauth_handler']
@@ -229,36 +243,47 @@ class ReportDownloader(object):
 
     headers['returnMoneyInMicros'] = str(return_micros).lower()
     headers['developerToken'] = self._headers['developerToken']
+    headers['User-Agent'] = 'Python-urllib,' + self._headers['userAgent']
+    if Utils.BoolTypeConvert(self._config['compress']):
+      headers['Accept-Encoding'] = 'gzip'
+      headers['User-Agent'] += ',gzip'
+      headers['Content-Encoding'] = 'gzip'
     return headers
 
-  def __MakeRequest(self, url, headers=None, file_path=None, payload=None):
+  def __MakeRequest(self, url, headers=None, fileobj=None, payload=None):
     """Performs an HTTPS request and slightly processes the response.
 
-    If file_path is provided, saves the body to file instead of including it
+    If fileobj is provided, saves the body to file instead of including it
     in the return value.
 
     Args:
       url: str Resource for the request line.
       headers: dict Headers to send along with the request.
-      file_path: str File to save to (optional).
+      fileobj: file File to save to (optional).
       payload: str Xml to POST (optional).
 
     Returns:
-      str Report data as a string if file_path=None, otherwise the file path
-      written to.
+      str Report data as a string if fileobj=None, otherwise None
     """
     headers = headers or {}
     request_url = self._op_config['server'] + url
     request = urllib2.Request(request_url, payload, headers)
     try:
       response = urllib2.urlopen(request)
-      if file_path:
-        self.__DumpToFile(response, file_path)
-        return file_path
+      if response.info().get('Content-Encoding') == 'gzip':
+        response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
+                                 mode='rb')
+      if fileobj:
+        self.__DumpToFile(response, fileobj)
+        return None
       else:
         return response.read()
     except urllib2.HTTPError, e:
-      error = e.fp.read()
+      response = e
+      if response.info().get('Content-Encoding') == 'gzip':
+        response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
+                                 mode='rb')
+      error = response.read()
       match = re.search(OLD_ERROR_REGEX, error)
       if match:
         error = match.group(3)
@@ -287,23 +312,22 @@ class ReportDownloader(object):
           AUTH_TOKEN_SERVICE, LIB_SIG, self._config['proxy'])
       self._config['auth_token_epoch'] = time.time()
 
-  def __DumpToFile(self, response, file_path):
-    """Reads from response.read() and writes to file_path.
+  def __DumpToFile(self, response, fileobj):
+    """Reads from response.read() and writes to fileobj.
 
      Args:
       response: file Some object that supports read().
-      file_path: str File name to write to.
+      fileobj: file Some object that supports write()
 
      Returns:
-      tuple Filename and number of bytes written.
+      number Number of bytes written.
     """
     byteswritten = 0
-    f = open(file_path, 'w+')
     while True:
       buf = response.read(BUF_SIZE)
       if buf:
-        f.write(buf)
+        fileobj.write(buf)
         byteswritten += len(buf)
       else:
         break
-    return (file_path, byteswritten)
+    return byteswritten

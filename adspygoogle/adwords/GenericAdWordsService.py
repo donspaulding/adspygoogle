@@ -230,12 +230,11 @@ class GenericAdWordsService(GenericApiService):
         self._config['last_operations'][0] = int(buf.GetCallOperations())
 
       handlers = self.__GetLogHandlers(buf)
-
       fault = super(GenericAdWordsService, self)._ManageSoap(
           buf, handlers, LIB_URL, start_time, stop_time, error)
       if fault:
         # Raise a specific error, subclass of AdWordsApiError.
-        if 'detail' in fault:
+        if 'detail' in fault and fault['detail']:
           if 'code' in fault['detail']:
             code = int(fault['detail']['code'])
             if code in ERRORS: raise ERRORS[code](fault)

@@ -28,7 +28,6 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
-from adspygoogle.common import SOAPPY
 from adspygoogle.common import Utils
 
 
@@ -40,8 +39,7 @@ media_service = client.GetMediaService(
     'https://adwords-sandbox.google.com', 'v201109')
 
 image_data = Utils.ReadFile('INSERT_IMAGE_PATH_HERE')
-if client.soap_lib == SOAPPY:
-  image_data = base64.encodestring(image_data)
+image_data = base64.encodestring(image_data)
 
 # Construct media and upload image.
 media = [{

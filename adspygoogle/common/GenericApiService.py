@@ -214,7 +214,7 @@ class GenericApiService(object):
     if Utils.BoolTypeConvert(self._config['oauth_enabled']):
       signedrequestparams = self._config[
           'oauth_handler'].GetSignedRequestParameters(
-              self._config['oauth_credentials'], str(self._service_url))
+              self._headers['oauth_credentials'], str(self._service_url))
       self._soappyservice.soapproxy.transport.additional_headers[
           'Authorization'] = (
               'OAuth ' +
@@ -494,7 +494,7 @@ class GenericApiService(object):
       if Utils.BoolTypeConvert(self._config['oauth_enabled']):
         signedrequestparams = self._config[
             'oauth_handler'].GetSignedRequestParameters(
-                self._config['oauth_credentials'], self._service_url)
+                self._headers['oauth_credentials'], self._service_url)
         http_header['authorization'] = (
             'OAuth ' + self._config['oauth_handler'].FormatParametersForHeader(
                 signedrequestparams))

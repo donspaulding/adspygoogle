@@ -74,7 +74,13 @@ class AdWordsClient(Client):
         'userAgent': 'GoogleTest',
         'developerToken': 'johndoe@example.com++USD',
         'validateOnly': 'n',
-        'partialFailure': 'n'
+        'partialFailure': 'n',
+        'oauth_credentials': {
+          'oauth_consumer_key': ...,
+          'oauth_consumer_secret': ...,
+          'oauth_token': ...,
+          'oauth_token_secret': ...
+        }
       }
       config = {
         'home': '/path/to/home',
@@ -168,14 +174,20 @@ class AdWordsClient(Client):
 
     # Load/set authentication token.
     try:
-      if headers and 'authToken' in headers and headers['authToken']:
-        self._headers['authToken'] = headers['authToken']
-      elif 'email' in self._headers and 'password' in self._headers:
+      if ('email' in self._headers and 'password' in self._headers
+          and 'authToken' not in self._headers):
+        # Since authToken is not present, generate it
         self._headers['authToken'] = Utils.GetAuthToken(
             self._headers['email'], self._headers['password'],
             AUTH_TOKEN_SERVICE, LIB_SIG, self._config['proxy'])
-      else:
-        msg = 'Authentication data, email or/and password, is missing.'
+      elif (('oauth_credentials' not in self._headers
+             or not self._headers['oauth_credentials'])
+            and
+            ('authToken' not in self._headers
+             or not self._headers['authToken'])):
+        # We need either oauth_credentials OR authToken.
+        msg = ('Authentication data, email and/or password or oauth_credentials'
+               ' is missing.')
         raise ValidationError(msg)
       self._config['auth_token_epoch'] = time.time()
     except AuthTokenError:

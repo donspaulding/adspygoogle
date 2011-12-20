@@ -157,6 +157,16 @@ class GenericDfaService(GenericApiService):
       DfaUtils.AssignAdXsi(args[0])
     return args
 
+  def _ReadyCompression(self):
+    """Sets whether the HTTP transport layer should use compression.
+
+    Overloaded for DFA because the DFA servers do not accept compressed
+    messages. They do support returning compressed messages.
+    """
+    compress = Utils.BoolTypeConvert(self._config['compress'])
+    self._soappyservice.soapproxy.config.send_compressed = False
+    self._soappyservice.soapproxy.config.accept_compressed = compress
+
   def _HandleLogsAndErrors(self, buf, start_time, stop_time, error=None):
     """Manage SOAP XML message.
 
