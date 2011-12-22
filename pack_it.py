@@ -26,6 +26,7 @@ import os
 import platform
 import re
 import shutil
+import subprocess
 import sys
 sys.path.insert(0, os.path.join('..', '..', '..'))
 
@@ -54,6 +55,14 @@ def FileMatches(filename, regex=ADWORDS_ONLY_REGEX):
     f.close()
 
 
+def UpdateSOAPpy():
+  """Runs download_and_patch_soappy.py to make sure SOAPpy is up to date."""
+  cur_dir = os.curdir
+  os.chdir(os.path.join(cur_dir, 'adspygoogle', 'SOAPpy'))
+  _ = subprocess.call(['python', 'download_and_patch_soappy.py'])
+  os.chdir(cur_dir)
+
+
 def Main(argv):
   """Builds a gzipped tarball containing the api library you specified.
 
@@ -75,6 +84,7 @@ def Main(argv):
 
   lib_tag = '%s_api_python_%s' % (actual_target, LIB_VERSION)
   source_dir = os.path.abspath('.')
+  UpdateSOAPpy()
   target_dir = '%s/%s' % (TARGET_DIR_BASE, lib_tag)
   # If temp base dir exists, remove it so we start fresh
   if os.path.exists(target_dir):

@@ -1,3 +1,10 @@
+15.1.3:
+- Fixing a broken edge-case introduced in 15.1.2 where providing a non-empty
+  email and password but an empty authToken as a headers arg to AdWordsClient
+  failed to validate.
+- Including up-to-date copy of SOAPpy; 15.1.2 was missing some changes that
+  addressed issue #8.
+
 15.1.2:
 - HTTP compression is now supported for both SOAP messages and AdHoc report
   downloads.

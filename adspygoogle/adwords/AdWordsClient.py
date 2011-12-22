@@ -173,28 +173,28 @@ class AdWordsClient(Client):
           self._headers['partialFailure']))
 
     # Load/set authentication token.
-    try:
-      if ('email' in self._headers and 'password' in self._headers
-          and 'authToken' not in self._headers):
-        # Since authToken is not present, generate it
+    if self._headers.get('authToken'):
+      # If they have a non-empty authToken, skip the rest.
+      pass
+    elif self._headers.get('oauth_credentials'):
+      # If they have oauth_credentials, that's also fine.
+      pass
+    elif (self._headers.get('email') and self._headers.get('password')
+          and not self._headers.get('authToken')):
+      # If they have a non-empty email and password but no or empty authToken,
+      # generate an authToken.
+      try:
         self._headers['authToken'] = Utils.GetAuthToken(
             self._headers['email'], self._headers['password'],
             AUTH_TOKEN_SERVICE, LIB_SIG, self._config['proxy'])
-      elif (('oauth_credentials' not in self._headers
-             or not self._headers['oauth_credentials'])
-            and
-            ('authToken' not in self._headers
-             or not self._headers['authToken'])):
-        # We need either oauth_credentials OR authToken.
-        msg = ('Authentication data, email and/or password or oauth_credentials'
-               ' is missing.')
-        raise ValidationError(msg)
-      self._config['auth_token_epoch'] = time.time()
-    except AuthTokenError:
-      # We would end up here if non-valid Google Account's credentials were
-      # specified.
-      self._headers['authToken'] = None
-      self._config['auth_token_epoch'] = 0
+        self._config['auth_token_epoch'] = time.time()
+      except AuthTokenError:
+        # We would end up here if non-valid Google Account's credentials were
+        # specified.
+        raise ValidationError('Provided email and password were not valid.')
+    else:
+      # We need either oauth_credentials OR authToken.
+      raise ValidationError('Authentication data is missing.')
 
     # Insert library's signature into user agent.
     if self._headers['userAgent'].rfind(LIB_SIG) == -1:

@@ -43,6 +43,9 @@ def main():
     abs_filename = os.path.join(tar_out_dir, 'SOAPpy-0.12.0', 'SOAPpy',
                                 filename)
     if os.path.isdir(abs_filename):
+      # If the destination exists (i.e. wstools), first remove it.
+      if os.path.exists(os.path.join(os.curdir, filename)):
+        shutil.rmtree(os.path.join(os.curdir, filename))
       shutil.copytree(abs_filename, os.path.join(os.curdir, filename))
     else:
       shutil.copy(abs_filename, os.curdir)

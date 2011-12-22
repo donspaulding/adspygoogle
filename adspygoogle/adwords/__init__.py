@@ -29,10 +29,10 @@ from adspygoogle.common.Errors import MissingPackageError
 LIB_HOME = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 LIB_NAME = 'AdWords API Python Client Library'
 LIB_SHORT_NAME = 'AwApi-Python'
-LIB_URL = 'http://code.google.com/p/google-api-adwords-python-lib'
+LIB_URL = 'http://code.google.com/p/google-api-ads-python'
 LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '15.1.2'
+LIB_VERSION = '15.1.3'
 LIB_MIN_COMMON_VERSION = '3.0.5'
 LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
 
@@ -47,9 +47,10 @@ DEFAULT_API_VERSION = API_VERSIONS[len(API_VERSIONS) - 1]
 
 # Accepted combinations of headers which user has to provide. Either one of
 # these is required in order to make a succesful API request.
-REQUIRED_SOAP_HEADERS = (('email', 'password', 'useragent', 'developerToken'),
+REQUIRED_SOAP_HEADERS = (('email', 'password', 'userAgent', 'developerToken'),
                          ('email', 'password', 'userAgent', 'developerToken'),
                          ('authToken', 'userAgent', 'developerToken'),
+                         ('oauth_credentials', 'userAgent', 'developerToken'),
                          ('userAgent', 'developerToken'))
 
 AUTH_TOKEN_SERVICE = 'adwords'
