@@ -1,3 +1,8 @@
+3.0.6:
+- Added a patch to MessageHandler's _RestoreListTypesForResponse function. It
+  will now check any returned object for a field ending with ".Type" and use
+  this field as the class name when restoring list types.
+
 3.0.5:
 - Added support for SSL certificate verification through the Client's "ca_certs"
   property. Please see our README.Common file for instructions.

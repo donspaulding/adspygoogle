@@ -1,3 +1,7 @@
+15.1.4:
+- Re-organizing code examples to better group similar functionality.
+- Code examples are now tested.
+
 15.1.3:
 - Fixing a broken edge-case introduced in 15.1.2 where providing a non-empty
   email and password but an empty authToken as a headers arg to AdWordsClient

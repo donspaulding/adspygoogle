@@ -18,7 +18,7 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
-VERSION = '3.0.5'
+VERSION = '3.0.6'
 
 MIN_PY_VERSION = '2.4.4'
 PYXML_NAME = 'PyXML'

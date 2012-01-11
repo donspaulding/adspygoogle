@@ -170,7 +170,7 @@ class AdWordsClient(Client):
     # Load partialFailure header, if one was set.
     if 'partialFailure' in self._headers:
       self._headers['partialFailure'] = str(Utils.BoolTypeConvert(
-          self._headers['partialFailure']))
+          self._headers['partialFailure'])).lower()
 
     # Load/set authentication token.
     if self._headers.get('authToken'):
@@ -377,7 +377,7 @@ class AdWordsClient(Client):
     Args:
       new_state: bool New state of the partial failure mode.
     """
-    self._headers['partialFailure'] = str(new_state)
+    self._headers['partialFailure'] = str(new_state).lower()
 
   partial_failure = property(__GetPartialFailure, __SetPartialFailure)
 

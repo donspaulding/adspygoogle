@@ -258,6 +258,8 @@ def _RestoreListTypesForResponse(response, type_name, ns, service):
   """
   if isinstance(response, dict):
     if not response: return response
+    for key in response:
+      if key.endswith("_Type"): type_name = response[key]
     parameters = SoappyUtils.GenKeyOrderAttrs(service, ns, type_name)
     for param, param_type, param_max_occurs in [
         (param['name'], param['type'], param['maxOccurs'])
