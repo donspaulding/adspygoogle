@@ -54,7 +54,8 @@ class AdWordsClient(Client):
   auth_pkl_name = 'adwords_api_auth.pkl'
   config_pkl_name = 'adwords_api_config.pkl'
 
-  def __init__(self, headers=None, config=None, path=None):
+  def __init__(self, headers=None, config=None, path=None,
+               login_token=None, login_captcha=None):
     """Inits AdWordsClient.
 
     Args:
@@ -63,6 +64,9 @@ class AdWordsClient(Client):
       config: dict Object with client configuration values.
       path: str Relative or absolute path to home directory (i.e. location of
             pickles and logs/).
+      login_token: str Token representing the specific CAPTCHA challenge.
+      login_captcha: str String entered by the user as an answer to a CAPTCHA
+                     challenge.
 
     Example:
       headers = {
@@ -165,7 +169,7 @@ class AdWordsClient(Client):
     # Load validateOnly header, if one was set.
     if 'validateOnly' in self._headers:
       self._headers['validateOnly'] = str(Utils.BoolTypeConvert(
-          self._headers['validateOnly']))
+          self._headers['validateOnly'])).lower()
 
     # Load partialFailure header, if one was set.
     if 'partialFailure' in self._headers:
@@ -174,8 +178,8 @@ class AdWordsClient(Client):
 
     # Load/set authentication token.
     if self._headers.get('authToken'):
-      # If they have a non-empty authToken, skip the rest.
-      pass
+      # If they have a non-empty authToken, set the epoch and skip the rest.
+      self._config['auth_token_epoch'] = time.time()
     elif self._headers.get('oauth_credentials'):
       # If they have oauth_credentials, that's also fine.
       pass
@@ -186,12 +190,14 @@ class AdWordsClient(Client):
       try:
         self._headers['authToken'] = Utils.GetAuthToken(
             self._headers['email'], self._headers['password'],
-            AUTH_TOKEN_SERVICE, LIB_SIG, self._config['proxy'])
+            AUTH_TOKEN_SERVICE, LIB_SIG, self._config['proxy'], login_token,
+            login_captcha)
         self._config['auth_token_epoch'] = time.time()
-      except AuthTokenError:
+      except AuthTokenError, e:
         # We would end up here if non-valid Google Account's credentials were
         # specified.
-        raise ValidationError('Provided email and password were not valid.')
+        raise ValidationError('Was not able to obtain an AuthToken for '
+                              'provided email and password, see root_cause.', e)
     else:
       # We need either oauth_credentials OR authToken.
       raise ValidationError('Authentication data is missing.')
@@ -352,13 +358,13 @@ class AdWordsClient(Client):
     """
     return self._headers['validateOnly']
 
-  def __SetValidateOnly(self, new_state):
+  def __SetValidateOnly(self, value):
     """Temporarily change validation mode for a given AdWordsClient instance.
 
     Args:
-      new_state: bool New state of the validation mode.
+      value: mixed New state of the validation mode using BoolTypeConvert.
     """
-    self._headers['validateOnly'] = str(new_state)
+    self._headers['validateOnly'] = str(Utils.BoolTypeConvert(value)).lower()
 
   validate_only = property(__GetValidateOnly, __SetValidateOnly)
 
@@ -370,14 +376,14 @@ class AdWordsClient(Client):
     """
     return self._headers['partialFailure']
 
-  def __SetPartialFailure(self, new_state):
+  def __SetPartialFailure(self, value):
     """Temporarily change partial failure mode for a given AdWordsClient
     instance.
 
     Args:
-      new_state: bool New state of the partial failure mode.
+      value: mixed New state of the partial failure mode using BoolTypeConvert.
     """
-    self._headers['partialFailure'] = str(new_state).lower()
+    self._headers['partialFailure'] = str(Utils.BoolTypeConvert(value)).lower()
 
   partial_failure = property(__GetPartialFailure, __SetPartialFailure)
 

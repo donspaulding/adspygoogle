@@ -36,7 +36,7 @@ class Buffer(object):
     Args:
       str_in: str String to append to a buffer.
     """
-    self._buffer += str_in
+    self._buffer += str(str_in)
 
   def flush(self):
     pass

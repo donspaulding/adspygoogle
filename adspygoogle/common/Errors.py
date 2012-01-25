@@ -83,7 +83,9 @@ class ValidationError(Error):
   client library.
   """
 
-  pass
+  def __init__(self, msg, root_cause=None):
+    Error.__init__(self, msg)
+    self.root_cause = root_cause
 
 
 class ApiVersionNotSupportedError(Error):
@@ -124,3 +126,14 @@ class AuthTokenError(Error):
   """
 
   pass
+
+
+class CaptchaError(AuthTokenError):
+
+  """Implements CaptchaError which encapsulates a CAPTCHA challenge."""
+
+  def __init__(self, captcha_token, captcha_url):
+    AuthTokenError.__init__(self, 'Captcha challenge, token \'%s\', url \'%s\'.'
+                            % (captcha_token, captcha_url))
+    self.captcha_token = captcha_token
+    self.captcha_url = captcha_url

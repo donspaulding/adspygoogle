@@ -30,7 +30,7 @@ from adspygoogle.adwords.AdWordsClient import AdWordsClient
 client = AdWordsClient(path=os.path.join('..', '..', '..', '..', '..'))
 
 # Initialize appropriate service.
-report_definition_service = client.GetReportDefinitionService(
+report_downloader = client.GetReportDownloader(
     'https://adwords-sandbox.google.com', 'v201109')
 
 report_definition_id = 'INSERT_REPORT_DEFINITION_ID'
@@ -39,7 +39,7 @@ file_name = 'INSERT_OUTPUT_FILE_NAME_HERE'
 path = os.path.join(os.path.abspath('.'), file_name)
 
 # Download report.
-data = report_definition_service.DownloadReport(report_definition_id)
+data = report_downloader.DownloadReport(report_definition_id)
 
 # Save report to a data file.
 fh = open(path, 'w')

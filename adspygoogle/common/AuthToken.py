@@ -20,8 +20,10 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
 import os
 import urllib
+import urllib2
 
 from adspygoogle.common.Errors import AuthTokenError
+from adspygoogle.common.Errors import CaptchaError
 
 
 class AuthToken(object):
@@ -33,7 +35,8 @@ class AuthToken(object):
   ClientLogin API, http://code.google.com/apis/accounts/.
   """
 
-  def __init__(self, email, password, service, lib_sig, proxy):
+  def __init__(self, email, password, service, lib_sig, proxy, login_token=None,
+               login_captcha=None):
     """Inits AuthToken.
 
     Args:
@@ -52,6 +55,8 @@ class AuthToken(object):
     self.__sid = ''
     self.__lsid = ''
     self.__auth = ''
+    self.__login_token = login_token
+    self.__login_captcha = login_captcha
 
     self.__Login()
 
@@ -64,22 +69,26 @@ class AuthToken(object):
             ('accountType', self.__account_type),
             ('service', self.__service),
             ('source', self.__source)]
+    if self.__login_token and self.__login_captcha:
+      data.append(('logintoken', self.__login_token))
+      data.append(('logincaptcha', self.__login_captcha))
     try:
-      fh = urllib.urlopen(url, urllib.urlencode(data))
+      fh = urllib2.urlopen(url, urllib.urlencode(data))
       data = self.__ParseResponse(fh)
       try:
         if 'SID' in data or 'LSID' in data or 'Auth' in data:
           self.__sid = data.get('SID', '')
           self.__lsid = data.get('LSID', '')
           self.__auth = data.get('Auth', '')
-        elif 'Error' in data:
+        elif 'Error' in data and data['Error'] != 'CaptchaRequired':
           msg = data['Error'].strip()
           if 'Info' in data:
             msg = msg + ' Additional Info: ' + data['Info'].strip()
           raise AuthTokenError(msg)
         elif 'CaptchaToken' in data:
-          raise AuthTokenError('Captcha token is %s'
-                               % data['CaptchaToken'].strip())
+          raise CaptchaError(data['CaptchaToken'].strip(),
+                             'http://www.google.com/accounts/'
+                             + data['CaptchaUrl'].strip())
         else:
           raise AuthTokenError('Unexpected response: ' + str(data))
       finally:

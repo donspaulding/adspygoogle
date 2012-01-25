@@ -1,3 +1,15 @@
+15.1.5:
+- Fixing misc bugs:
+-- Issue #21, validateOnly header now properly lower-cased.  Also fixed setters
+   to accept same range of values as constructor.
+-- Issue #18, adding reference to fpconst as a dependency in README.
+-- Issue #22, properly regenerating token with report downloads.
+-- Issue #20, applying portions of supplied patch file.
+-- Issue #16, adding unit test to send/receive cyrillic characters with fix.
+- Adding Python version to LIG_SIG so we can better track which versions of
+  Python are in use with the client libraries.
+- Adding better support for captcha challenges.
+
 15.1.4:
 - Re-organizing code examples to better group similar functionality.
 - Code examples are now tested.

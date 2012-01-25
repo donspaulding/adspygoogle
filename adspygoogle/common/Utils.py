@@ -71,9 +71,8 @@ def GetDataFromCsvFile(loc):
   try:
     data = urllib.urlopen(loc).read()
   except IOError, e:
-    if str(e).find('[Errno url error] unknown url type: \'c\'') > -1:
-      loc = 'file:///%s' % loc.replace('\\', '/').replace(':', '|')
-      data = urllib.urlopen(loc).read()
+    if str(e).find('[Errno url error] unknown url type: \'') > -1:
+      data = ReadFile(loc)
     else:
       raise e
   for row in csv.reader(data.split('\n')):
@@ -313,7 +312,8 @@ def GetServerFromUrl(url):
                      ''))
 
 
-def GetAuthToken(email, password, service, lib_sig, proxy):
+def GetAuthToken(email, password, service, lib_sig, proxy, login_token=None,
+                 login_captcha=None):
   """Return an authentication token for Google Account.
 
   If an error occurs, AuthTokenError is raised.
@@ -328,7 +328,8 @@ def GetAuthToken(email, password, service, lib_sig, proxy):
   Returns:
     str Authentication token for Google Account.
   """
-  return AuthToken(email, password, service, lib_sig, proxy).GetAuthToken()
+  return AuthToken(email, password, service, lib_sig, proxy, login_token,
+                   login_captcha).GetAuthToken()
 
 
 def GetCurrentFuncName():

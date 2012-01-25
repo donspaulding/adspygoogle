@@ -136,6 +136,7 @@ External Dependencies:
       lxml v2.2+           -- http://codespeak.net/lxml/index.html
     - Epydoc               -- http://epydoc.sourceforge.net/
                            (only if you will be generating docs)
+    - fpconst              -- http://pypi.python.org/pypi/fpconst/#downloads
     - Google Account       -- https://www.google.com/accounts/NewAccount
 
 

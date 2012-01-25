@@ -21,6 +21,7 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 import httplib
 import sys
 import time
+import threading
 
 from adspygoogle import SOAPpy
 from adspygoogle.common import MessageHandler
@@ -32,6 +33,7 @@ from adspygoogle.common.Errors import ValidationError
 from adspygoogle.common.Logger import Logger
 from adspygoogle.SOAPpy.wstools.WSDLTools import WSDLError
 
+sys_stdout_monkey_lock = threading.Lock()
 
 class GenericApiService(object):
 
@@ -292,20 +294,24 @@ class GenericApiService(object):
         buf = self._buffer_class(
             xml_parser=self._config['xml_parser'],
             pretty_xml=Utils.BoolTypeConvert(self._config['pretty_xml']))
-        old_stdout = sys.stdout
-        sys.stdout = buf
-
-        error = {}
-        response = None
-        start_time = time.strftime('%Y-%m-%d %H:%M:%S')
+        sys_stdout_monkey_lock.acquire()
         try:
-          response = MessageHandler.UnpackResponseAsDict(
-              soap_service_method(**ksoap_args))
-        except Exception, e:
-          error['data'] = e
-        stop_time = time.strftime('%Y-%m-%d %H:%M:%S')
-        # Restore stdout
-        sys.stdout = old_stdout
+            old_stdout = sys.stdout
+            sys.stdout = buf
+
+            error = {}
+            response = None
+            start_time = time.strftime('%Y-%m-%d %H:%M:%S')
+            try:
+              response = MessageHandler.UnpackResponseAsDict(
+                  soap_service_method(**ksoap_args))
+            except Exception, e:
+              error['data'] = e
+            stop_time = time.strftime('%Y-%m-%d %H:%M:%S')
+            # Restore stdout
+            sys.stdout = old_stdout
+        finally:
+            sys_stdout_monkey_lock.release()
 
         if isinstance(response, Error):
           error = response
@@ -448,6 +454,8 @@ class GenericApiService(object):
     if is_fault:
       try:
         fault = buf.GetFaultAsDict()
+        if 'detail' in fault and fault['detail'] is None:
+           fault = buf.GetFaultAsDictWhenOtherFails()
         if not fault: msg = error['data']
       except Exception:
         fault = None

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 #
 # Copyright 2011 Google Inc. All Rights Reserved.
 #
@@ -73,7 +74,7 @@ def main(client, ad_group_id, criterion_id):
           'operand': {
               'adGroupId': ad_group_id,
               'criterionId': criterion_id,
-              'insertionText': '$100',
+              'insertionText': '£100',
               'paramIndex': '1'
           }
       },

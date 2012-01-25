@@ -64,10 +64,12 @@ class ReportDownloader(object):
     self._config = config
     self._op_config = op_config
     self._message_handler = MessageHandler
+    namespace_suffix = '/'.join(('/api/adwords', op_config['group'],
+                                 self._op_config['version']))
+    self._namespace = 'https://adwords.google.com' + namespace_suffix
 
-    self._namespace = '/'.join(['https://adwords.google.com/api/adwords',
-                                op_config['group'], self._op_config['version']])
-    wsdl_url = self._namespace + '/ReportDefinitionService?wsdl'
+    wsdl_url = '%s%s/ReportDefinitionService?wsdl' % (op_config['server'],
+                                                      namespace_suffix)
     self._soappyservice = SOAPpy.WSDL.Proxy(
         wsdl_url, noroot=1)
 
@@ -301,7 +303,7 @@ class ReportDownloader(object):
          'auth_token_epoch' not in self._config) or
         int(now - self._config['auth_token_epoch']) >= AUTH_TOKEN_EXPIRE):
       if ('email' not in self._headers or
-          not self.__service._headers['email'] or
+          not self._headers['email'] or
           'password' not in self._headers or
           not self._headers['password']):
         msg = ('Required authentication headers, \'email\' and \'password\', '

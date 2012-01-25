@@ -109,7 +109,7 @@ def PackForSoappy(obj, xmlns, type_name, soappy_service, wrap_lists,
     return _PackListForSoappy(obj, xmlns, type_name, soappy_service, wrap_lists,
                               prefix_function)
   elif isinstance(obj, (str, unicode)):
-    return SOAPpy.Types.untypedType(Utils.HtmlEscape(obj))
+    return SOAPpy.Types.untypedType(Utils.HtmlEscape(obj).decode('utf-8'))
   elif isinstance(obj, SOAPpy.Types.anyType) or obj is None:
     return obj
   else:

@@ -19,8 +19,10 @@
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
 import os
+import StringIO
 import sys
 import unittest
+import urllib2
 sys.path.insert(0, os.path.join('..', '..', '..'))
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
 from adspygoogle.common import Utils
@@ -40,9 +42,13 @@ class AdWordsClientValidationTest(unittest.TestCase):
   def setUp(self):
     """Monkey patch AuthToken retrieval."""
 
-    def FakeGetAuthToken(a, b, c, d, e):
+    def FakeGetAuthToken(a, b, c, d, e, f, g):
       return 'FooBar'
+    self.__old_GetAuthToken = Utils.GetAuthToken
     Utils.GetAuthToken = FakeGetAuthToken
+
+  def tearDown(self):
+    Utils.GetAuthToken = self.__old_GetAuthToken
 
   def testEmailPassOnly(self):
     """Tests that specifying solely email & password works."""
@@ -113,6 +119,47 @@ class AdWordsClientValidationTest(unittest.TestCase):
     self.assertRaises(ValidationError, Run)
 
 
+class AdWordsClientCaptchaHandlingTest(unittest.TestCase):
+
+  """Tests the captcha handling logic."""
+  CAPTCHA_CHALLENGE = '''Url=http://www.google.com/login/captcha
+Error=CaptchaRequired
+CaptchaToken=DQAAAGgA...dkI1LK9
+CaptchaUrl=Captcha?ctoken=HiteT4b0Bk5Xg18_AcVoP6-yFkHPibe7O9EqxeiI7lUSN'''
+  SUCCESS = '''SID=DQAAAGgA...7Zg8CTN
+LSID=DQAAAGsA...lk8BBbG
+Auth=DQAAAGgA...dk3fA5N'''
+
+
+  def setUp(self):
+    """Monkey patch AuthToken retrieval."""
+
+    def FakeUrlOpen(a, b):
+      # If we don't see a captcha response, initiate challenge
+      if b.find('logincaptcha') == -1:
+        return StringIO.StringIO(self.__class__.CAPTCHA_CHALLENGE)
+      else:
+        return StringIO.StringIO(self.__class__.SUCCESS)
+    self.__old_urlopen = urllib2.urlopen
+    urllib2.urlopen = FakeUrlOpen
+
+  def tearDown(self):
+    urllib2.urlopen = self.__old_urlopen
+
+  def testCaptchaHandling(self):
+    headers = DEFAULT_HEADERS.copy()
+    headers['email'] = 'email@example.com'
+    headers['password'] = 'password'
+    client = None
+    try:
+      client = AdWordsClient(headers=headers)
+      self.fail('Expected a CaptchaError to be thrown')
+    except ValidationError, e:
+      client = AdWordsClient(headers=headers,
+                             login_token=e.root_cause.captcha_token,
+                             login_captcha='foo bar')
+      self.assertEquals(client._headers['authToken'], 'DQAAAGgA...dk3fA5N')
+
 def MakeTestSuite():
   """Set up test suite.
 
@@ -121,6 +168,7 @@ def MakeTestSuite():
   """
   suite = unittest.TestSuite()
   suite.addTests(unittest.makeSuite(AdWordsClientValidationTest))
+  suite.addTests(unittest.makeSuite(AdWordsClientCaptchaHandlingTest))
   return suite
 
 
