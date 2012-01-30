@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2010 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 """Script to run all existing unit tests."""
 
-__author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
+__author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
 import glob
 import inspect
 import os
 import sys
-sys.path.insert(0, os.path.join('..', '..', '..'))
+sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 import unittest
 
 from adspygoogle.adwords import LIB_SIG
@@ -40,11 +40,10 @@ for test in tests:
   module = __import__(test)
   for name, obj in inspect.getmembers(module):
     if inspect.isclass(obj):
-      if name.endswith('201109') and TEST_VERSION_V201109:
-        suite.addTest(unittest.makeSuite(obj))
+      suite.addTest(unittest.makeSuite(obj))
 
 
 if __name__ == '__main__':
   LOGGER.Log(LOG_NAME, 'Start all unit tests.', log_level=Logger.DEBUG)
-  unittest.TextTestRunner().run(suite)
+  unittest.TextTestRunner(verbosity=1).run(suite)
   LOGGER.Log(LOG_NAME, 'End all unit tests.', log_level=Logger.DEBUG)

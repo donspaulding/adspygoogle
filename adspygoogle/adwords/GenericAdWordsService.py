@@ -46,15 +46,10 @@ class GenericAdWordsService(GenericApiService):
   # header.
   _POSSIBLE_ADWORDS_REQUEST_HEADERS = (
       'authToken', 'developerToken', 'userAgent', 'clientCustomerId',
-      'clientEmail', 'validateOnly', 'partialFailure')
+      'validateOnly', 'partialFailure')
   # The _OAUTH_IGNORE_HEADERS are the header elements that should not be
   # included when the client is using OAuth.
   _OAUTH_IGNORE_HEADERS = ('authToken')
-  # Used to decide if we should throw an error message because an old header is
-  # no longer allowed for a newer version.
-  _HEADER_DEPRECATED_WITH = {
-      'clientEmail': 'v201109'
-  }
   # The _WRAP_LISTS constant indicates that AdWords services do not need to wrap
   # lists in an extra layer of XML element tags.
   _WRAP_LISTS = False
@@ -128,12 +123,6 @@ class GenericAdWordsService(GenericApiService):
       if (key in GenericAdWordsService._OAUTH_IGNORE_HEADERS
           and Utils.BoolTypeConvert(self._config['oauth_enabled'])):
         continue
-      if (key in self._headers and self._headers[key] and
-          key in GenericAdWordsService._HEADER_DEPRECATED_WITH and
-          self._op_config['version'] >=
-          GenericAdWordsService._HEADER_DEPRECATED_WITH[key]):
-        raise AdWordsError('Header \'%s\' is not valid with version %s' %
-                           (key, self._op_config['version']))
       if key in self._headers and self._headers[key]:
         request_header_data['cm:' + key] = SOAPpy.Types.stringType(
             self._headers[key])

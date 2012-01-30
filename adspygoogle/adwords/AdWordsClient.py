@@ -31,7 +31,6 @@ from adspygoogle.adwords import LIB_SIG
 from adspygoogle.adwords import REQUIRED_SOAP_HEADERS
 from adspygoogle.adwords.AdWordsErrors import AdWordsError
 from adspygoogle.adwords.GenericAdWordsService import GenericAdWordsService
-from adspygoogle.adwords.GenericV13AdWordsService import GenericV13AdWordsService
 from adspygoogle.adwords.ReportDownloader import ReportDownloader
 from adspygoogle.common import SanityCheck
 from adspygoogle.common import Utils
@@ -40,9 +39,6 @@ from adspygoogle.common.Errors import AuthTokenError
 from adspygoogle.common.Errors import ValidationError
 from adspygoogle.common.Logger import Logger
 
-
-# Minimum version to support TrafficEstimatorService for.
-TES_MIN_VER = 'v201008'
 
 class AdWordsClient(Client):
 
@@ -73,7 +69,6 @@ class AdWordsClient(Client):
         'email': 'johndoe@example.com',
         'password': 'secret',
         'authToken': '...',
-        'clientEmail': 'client_1+johndoe@example.com',
         'clientCustomerId': '1234567890',
         'userAgent': 'GoogleTest',
         'developerToken': 'johndoe@example.com++USD',
@@ -328,17 +323,6 @@ class AdWordsClient(Client):
 
   use_mcc = property(__GetUseMcc, __SetUseMcc)
 
-  def SetClientEmail(self, client_email):
-    """Temporarily change client email for a given AdWordsClient instance.
-
-    Args:
-      client_email: str New client email to use.
-    """
-    if ('clientEmail' not in self._headers or
-        self._headers['clientEmail'] != client_email):
-      self._headers['clientEmail'] = client_email
-      self._headers['clientCustomerId'] = ''
-
   def SetClientCustomerId(self, client_customer_id):
     """Temporarily change client customer id for a given AdWordsClient instance.
 
@@ -348,7 +332,6 @@ class AdWordsClient(Client):
     if ('clientCustomerId' not in self._headers or
         self._headers['clientCustomerId'] != client_customer_id):
       self._headers['clientCustomerId'] = client_customer_id
-      self._headers['clientEmail'] = ''
 
   def __GetValidateOnly(self):
     """Return current state of the validation mode.
@@ -401,13 +384,10 @@ class AdWordsClient(Client):
 
     for key, value in old_headers.iteritems():
       new_headers[key] = value
-      if key == 'clientEmail' or key == 'clientCustomerId':
+      if key == 'clientCustomerId':
         if is_mcc and 'email' in old_headers:
           new_headers[key] = None
 
-    if (('clientEmail' in new_headers and 'clientCustomerId' in new_headers) and
-        new_headers['clientEmail'] == new_headers['clientCustomerId']):
-      new_headers['clientCustomerId'] = None
     return new_headers
 
   def CallRawMethod(self, soap_message, url, server, http_proxy):
@@ -429,39 +409,6 @@ class AdWordsClient(Client):
     service = getattr(self, 'Get' + service_name)(server=server,
                                                   http_proxy=http_proxy)
     return service.CallRawMethod(soap_message)
-
-  def GetAccountService(self, server='https://adwords.google.com', version=None,
-                        http_proxy=None):
-    """Call API method in AccountService.
-
-    Args:
-      [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
-      version: str API version to use.
-      http_proxy: str HTTP proxy to use.
-
-    Returns:
-      GenericAdWordsService New instance of AccountService object.
-    """
-    headers = self.__GetAuthCredentialsForAccessLevel()
-
-    if version is None:
-      version = 'v13'
-    if Utils.BoolTypeConvert(self._config['strict']):
-      AdWordsSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericV13AdWordsService(headers, self._config, op_config,
-                                    self.__lock, self.__logger,
-                                    'AccountService')
 
   def GetAdExtensionOverrideService(self, server='https://adwords.google.com',
                                     version=None, http_proxy=None):
@@ -1250,38 +1197,6 @@ class AdWordsClient(Client):
     }
     return ReportDownloader(headers, self._config, op_config)
 
-  def GetReportService(self, server='https://adwords.google.com', version=None,
-                       http_proxy=None):
-    """Call API method in ReportService.
-
-    Args:
-      [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
-      version: str API version to use.
-      http_proxy: str HTTP proxy to use.
-
-    Returns:
-      GenericAdWordsService New instance of ReportService object.
-    """
-    headers = self.__GetAuthCredentialsForAccessLevel()
-
-    if version is None:
-      version = 'v13'
-    if Utils.BoolTypeConvert(self._config['strict']):
-      AdWordsSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericV13AdWordsService(headers, self._config, op_config,
-                                    self.__lock, self.__logger, 'ReportService')
-
   def GetServicedAccountService(self, server='https://adwords.google.com',
                                 version=None, http_proxy=None):
     """Call API method in ServicedAccountService.
@@ -1367,10 +1282,6 @@ class AdWordsClient(Client):
       GenericAdWordsService New instance of TrafficEstimatorService object.
     """
     headers = self.__GetAuthCredentialsForAccessLevel()
-
-    if version < TES_MIN_VER:
-      raise AdWordsError('TrafficEstimatorService is not available for %s.'
-                         % version)
 
     if version is None:
       version = DEFAULT_API_VERSION

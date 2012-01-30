@@ -1,3 +1,7 @@
+15.2.0:
+- Removing support for all versions except v201109 (they sunset 2012/02/29).
+- Removing support for clientEmail.  Will now be ignored everywhere.
+
 15.1.5:
 - Fixing misc bugs:
 -- Issue #21, validateOnly header now properly lower-cased.  Also fixed setters

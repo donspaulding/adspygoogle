@@ -41,9 +41,7 @@ REPORT_ID='?__rd=%s'
 VERSIONED='/%s'
 OLD_ERROR_REGEX = r'^!!!([-\d]+)\|\|\|([-\d]+)\|\|\|(.*)\?\?\?'
 ATTRIBUTES_REGEX = r'( )?[\w:-]+="[\w:\[\]-]+"'
-CLIENT_EMAIL_MAX_VER = 'v201101'
 BUF_SIZE = 4096
-ALWAYS_VERSION = 'v201109'
 
 
 class ReportDownloader(object):
@@ -200,10 +198,7 @@ class ReportDownloader(object):
       str url to request
     """
     url = [DOWNLOAD_URL_BASE]
-    # If no report_definition_id, must be Ad Hoc, which always uses versioned
-    # endpoint.  Everything including and after v201109 also uses it.
-    if not report_definition_id or self._op_config['version'] >= ALWAYS_VERSION:
-      url.append(VERSIONED % self._op_config['version'])
+    url.append(VERSIONED % self._op_config['version'])
     if report_definition_id:
       url.append(REPORT_ID % report_definition_id)
     return ''.join(url)
@@ -220,13 +215,7 @@ class ReportDownloader(object):
       dict Dictionary containing all the headers for the request
     """
     headers = {}
-    if ('clientEmail' in self._headers and
-        self._headers['clientEmail']):
-      if self._op_config['version'] > CLIENT_EMAIL_MAX_VER:
-        raise AdWordsError('clientEmail header not supported in %s'
-                           % self._op_config['version'])
-      headers['clientEmail'] = self._headers['clientEmail']
-    elif 'clientCustomerId' in self._headers:
+    if 'clientCustomerId' in self._headers:
       headers['clientCustomerId'] = self._headers['clientCustomerId']
 
     # Handle OAuth (if enabled) and ClientLogin

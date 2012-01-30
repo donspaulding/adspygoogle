@@ -66,6 +66,9 @@ class CampaignManagement(unittest.TestCase):
           client, self.__class__.campaign_id)
       self.__class__.loaded = True
 
+  def tearDown(self):
+    client.validate_only = False
+
   def testAddExperiment(self):
     """Test whether we can add an experiment."""
     add_experiment.main(client, self.__class__.campaign_id,

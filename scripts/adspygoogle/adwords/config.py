@@ -56,12 +56,7 @@ print """
 All requests that are sent to the AdWords API web
 services must include SOAP header elements. Currently
 accepted header elements are email, password,
-clientEmail, clientCustomerId, userAgent, and
-developerToken.
-
-The clientEmail and clientCustomerId headers are
-optional. Supply either clientEmail or clientCustomerId,
-but not both.
+clientCustomerId, userAgent, and developerToken.
 
 For the userAgent header, the client library name
 and its version is automatically prefixed. Supply
@@ -74,7 +69,6 @@ The default behavior is to keep old values.
 -~----------~----~----~----~------~----~------~--~---\n"""
 prompts = (('Your AdWords account\'s login email', 'email', 'auth'),
            ('Login password', 'password', 'auth'),
-           ('Login client email', 'clientEmail', 'auth'),
            ('Login client customer id', 'clientCustomerId', 'auth'),
            ('User agent', 'userAgent', 'auth'),
            ('Developer token', 'developerToken', 'auth'),
@@ -124,13 +118,6 @@ for prompt_msg, header, source in prompts:
         msg = 'Possible values are \'y\' or \'n\'.'
         raise InvalidInputError(msg)
     config[header] = res
-
-# Raise an exception, if required headers are missing.
-SanityCheck.ValidateRequiredHeaders(auth, REQUIRED_SOAP_HEADERS)
-if not AdWordsSanityCheck.IsClientIdSet(auth['clientEmail'],
-                                        auth['clientCustomerId']):
-  msg = 'Set either clientEmail or clientCustomerId, but not both.'
-  raise InvalidInputError(msg)
 
 # Load new authentication credentials into adwords_api_auth.pkl.
 try:

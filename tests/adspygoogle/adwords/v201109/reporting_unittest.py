@@ -38,7 +38,7 @@ class Reporting(unittest.TestCase):
 
   SERVER = SERVER_V201109
   VERSION = VERSION_V201109
-  client.debug = True
+  client.debug = False
 
   def setUp(self):
     """Prepare unittest."""

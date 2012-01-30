@@ -73,7 +73,7 @@ class AuthToken(object):
       data.append(('logintoken', self.__login_token))
       data.append(('logincaptcha', self.__login_captcha))
     try:
-      fh = urllib2.urlopen(url, urllib.urlencode(data))
+      fh = urllib.urlopen(url, urllib.urlencode(data))
       data = self.__ParseResponse(fh)
       try:
         if 'SID' in data or 'LSID' in data or 'Auth' in data:

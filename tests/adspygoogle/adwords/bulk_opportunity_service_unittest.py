@@ -25,43 +25,10 @@ sys.path.insert(0, os.path.join('..', '..', '..'))
 import unittest
 
 from tests.adspygoogle.adwords import HTTP_PROXY
-from tests.adspygoogle.adwords import SERVER_V201101
 from tests.adspygoogle.adwords import SERVER_V201109
-from tests.adspygoogle.adwords import TEST_VERSION_V201101
 from tests.adspygoogle.adwords import TEST_VERSION_V201109
-from tests.adspygoogle.adwords import VERSION_V201101
 from tests.adspygoogle.adwords import VERSION_V201109
 from tests.adspygoogle.adwords import client
-
-
-class BulkOpportunityServiceTestV201101(unittest.TestCase):
-
-  """Unittest suite for BulkOpportunityService using v201101."""
-
-  SERVER = SERVER_V201101
-  VERSION = VERSION_V201101
-  client.debug = False
-  service = None
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetBulkOpportunityService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testGetKeywordOpportunities(self):
-    """Test whether we can get keyword opportunities."""
-    selector = {
-        'ideaTypes': ['KEYWORD'],
-        'requestedAttributeTypes': ['ADGROUP_ID', 'AVERAGE_MONTHLY_SEARCHES',
-                                    'CAMPAIGN_ID', 'IDEA_TYPE', 'KEYWORD'],
-        'paging': {
-            'startIndex': '0',
-            'numberResults': '10'
-        }
-    }
-    self.assert_(isinstance(self.__class__.service.Get(selector), tuple))
 
 
 class BulkOpportunityServiceTestV201109(unittest.TestCase):
@@ -94,17 +61,6 @@ class BulkOpportunityServiceTestV201109(unittest.TestCase):
     self.assert_(isinstance(self.__class__.service.Get(selector), tuple))
 
 
-def makeTestSuiteV201101():
-  """Set up test suite using v201101.
-
-  Returns:
-    TestSuite test suite using v201101.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(BulkOpportunityServiceTestV201101))
-  return suite
-
-
 def makeTestSuiteV201109():
   """Set up test suite using v201109.
 
@@ -118,8 +74,6 @@ def makeTestSuiteV201109():
 
 if __name__ == '__main__':
   suites = []
-  if TEST_VERSION_V201101:
-    suites.append(makeTestSuiteV201101())
   if TEST_VERSION_V201109:
     suites.append(makeTestSuiteV201109())
   if suites:

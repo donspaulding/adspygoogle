@@ -27,22 +27,7 @@ from adspygoogle.adwords.AdWordsClient import AdWordsClient
 
 
 HTTP_PROXY = None
-SERVER_V13 = 'https://sandbox.google.com'
-SERVER_V200909 = 'https://adwords-sandbox.google.com'
-SERVER_V201003 = 'https://adwords-sandbox.google.com'
-SERVER_V201008 = 'https://adwords-sandbox.google.com'
-SERVER_V201101 = 'https://adwords-sandbox.google.com'
 SERVER_V201109 = 'https://adwords-sandbox.google.com'
-TEST_VERSION_V13 = True
-TEST_VERSION_V200909 = True
-TEST_VERSION_V201003 = True
-TEST_VERSION_V201008 = True
-TEST_VERSION_V201101 = True
 TEST_VERSION_V201109 = True
-VERSION_V13 = 'v13'
-VERSION_V200909 = 'v200909'
-VERSION_V201003 = 'v201003'
-VERSION_V201008 = 'v201008'
-VERSION_V201101 = 'v201101'
 VERSION_V201109 = 'v201109'
 client = AdWordsClient(path=os.path.join('..', '..', '..'))

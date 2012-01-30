@@ -32,18 +32,8 @@ def ValidateServer(server, version):
     ValidationError: if the given API server or version is not valid.
   """
   # Map of supported API servers and versions.
-  prod = {'v13': 'https://adwords.google.com',
-          'v200909': 'https://adwords.google.com',
-          'v201003': 'https://adwords.google.com',
-          'v201008': 'https://adwords.google.com',
-          'v201101': 'https://adwords.google.com',
-          'v201109': 'https://adwords.google.com'}
-  sandbox = {'v13': 'https://sandbox.google.com',
-             'v200909': 'https://adwords-sandbox.google.com',
-             'v201003': 'https://adwords-sandbox.google.com',
-             'v201008': 'https://adwords-sandbox.google.com',
-             'v201101': 'https://adwords-sandbox.google.com',
-             'v201109': 'https://adwords-sandbox.google.com'}
+  prod = {'v201109': 'https://adwords.google.com'}
+  sandbox = {'v201109': 'https://adwords-sandbox.google.com'}
 
   if server not in prod.values() and server not in sandbox.values():
     msg = ('Given API server, \'%s\', is not valid. Expecting one of %s.'
@@ -68,12 +58,6 @@ def ValidateHeadersForServer(headers, server):
   http://code.google.com/apis/adwords/docs/developer/adwords_api_sandbox.html.
   """
   fits_sandbox = False
-
-  # The clientEmail SOAP header in Sandbox has to be of specific format, with
-  # "client_" prepended (e.g., client_1+joe.shmoe@gmail.com).
-  if ('clientEmail' in headers and headers['clientEmail'] and
-      headers['clientEmail'].find('client_', 0, 7) > -1):
-    fits_sandbox = True
 
   # The developerToken SOAP header in Sandbox has to be same as email SOAP
   # header with appended "++" and the currency code.
@@ -102,19 +86,3 @@ def ValidateHeadersForServer(headers, server):
              'adwords/docs/developer/index.html#adwords_api_intro_request.'
              % server)
       raise ValidationError(msg)
-
-
-def IsClientIdSet(client_email, client_customer_id):
-  """Sanity check for clientEmail/clientCustomerId elements.
-
-  Args:
-    client_email: str clientEmail authentication header.
-    client_customer_id: str clientCustomerId authentication header.
-
-  Returns:
-    bool True if either client_email or client_customer_id is set, False
-         otherwise.
-  """
-  if client_email and client_customer_id:
-    return False
-  return True
