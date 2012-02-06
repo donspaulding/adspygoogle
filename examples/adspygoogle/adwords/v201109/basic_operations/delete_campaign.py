@@ -54,12 +54,9 @@ def main(client, campaign_id):
   result = campaign_service.Mutate(operations)[0]
 
   # Display results.
-  if 'value' in result:
-    for campaign in result['value']:
-      print ('Campaign with name \'%s\' and id \'%s\' was deleted.'
-             % (campaign['name'], campaign['id']))
-  else:
-    print 'No campaigns were deleted.'
+  for campaign in result['value']:
+    print ('Campaign with name \'%s\' and id \'%s\' was deleted.'
+           % (campaign['name'], campaign['id']))
 
   print
   print ('Usage: %s units, %s operations' % (client.GetUnits(),

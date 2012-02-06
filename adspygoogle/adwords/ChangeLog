@@ -1,3 +1,7 @@
+15.2.1:
+- Re-addressing issue #16 and #25.
+- Misc example fixes.
+
 15.2.0:
 - Removing support for all versions except v201109 (they sunset 2012/02/29).
 - Removing support for clientEmail.  Will now be ignored everywhere.

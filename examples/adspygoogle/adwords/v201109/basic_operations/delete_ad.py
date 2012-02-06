@@ -53,12 +53,9 @@ def main(client, ad_group_id, ad_id):
   result = ad_group_ad_service.Mutate(operations)[0]
 
   # Display results.
-  if 'value' in result:
-    for ad in result['value']:
-      print ('Ad with id \'%s\' and type \'%s\' was deleted.'
-             % (ad['ad']['id'], ad['ad']['Ad_Type']))
-  else:
-    print 'No ads were deleted.'
+  for ad in result['value']:
+    print ('Ad with id \'%s\' and type \'%s\' was deleted.'
+           % (ad['ad']['id'], ad['ad']['Ad_Type']))
 
   print
   print ('Usage: %s units, %s operations' % (client.GetUnits(),

@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for issue #16.
+"""Unit tests for issues #16 and #25.
 
 Unicode characters don't serialize/deserialize properly.
 """
@@ -32,12 +32,12 @@ from adspygoogle.common import Utils
 from datetime import date
 
 
-class Issue22(unittest.TestCase):
+class Issue16(unittest.TestCase):
 
   """Unittests for Issue #16."""
 
-  def testRegenerateTokenInReportDownload(self):
-    """Tests if the report download token regeneration logic works.."""
+  def testSendReceiveUnicode(self):
+    """Tests if we can send/receive unicode characters."""
     client = AdWordsClient(path=os.path.join('..', '..', '..'))
     campaign_service = client.GetCampaignService(
       'https://adwords-sandbox.google.com', 'v201109')
@@ -47,6 +47,30 @@ class Issue22(unittest.TestCase):
         'operator': 'ADD',
         'operand': {
             'name': 'межпланетных круиз #%s' % Utils.GetUniqueName(),
+            'status': 'PAUSED',
+            'biddingStrategy': {
+                'xsi_type': 'ManualCPC'
+            },
+            'endDate': date(date.today().year + 1, 12, 31).strftime('%Y%m%d'),
+            'budget': {
+                'period': 'DAILY',
+                'amount': {
+                    'microAmount': '50000000'
+                },
+                'deliveryMethod': 'STANDARD'
+            },
+            'networkSetting': {
+                'targetGoogleSearch': 'true',
+                'targetSearchNetwork': 'true',
+                'targetContentNetwork': 'false',
+                'targetContentContextual': 'false',
+                'targetPartnerSearchNetwork': 'false'
+            }
+        }
+    }, {
+        'operator': 'ADD',
+        'operand': {
+            'name': u'межпланетных круиз #%s' % Utils.GetUniqueName(),
             'status': 'PAUSED',
             'biddingStrategy': {
                 'xsi_type': 'ManualCPC'

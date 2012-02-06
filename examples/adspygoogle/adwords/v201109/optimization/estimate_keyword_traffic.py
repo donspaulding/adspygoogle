@@ -97,7 +97,7 @@ def main(client):
       continue
 
     # Find the mean of the min and max values.
-    mean_avg_cpc = (long(estimate['max']['averageCpc']['microAmount']) +
+    mean_avg_cpc = (long(estimate['min']['averageCpc']['microAmount']) +
                     long(estimate['max']['averageCpc']['microAmount'])) / 2
     mean_avg_pos = (float(estimate['min']['averagePosition']) +
                     float(estimate['max']['averagePosition'])) / 2

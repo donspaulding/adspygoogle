@@ -55,14 +55,11 @@ def main(client, ad_group_id, criterion_id):
   result = ad_group_criterion_service.Mutate(operations)[0]
 
   # Display results.
-  if 'value' in result:
-    for criterion in result['value']:
-      print ('Ad group criterion with ad group id \'%s\', criterion id \'%s\', '
-             'and type \'%s\' was deleted.'
-             % (criterion['adGroupId'], criterion['criterion']['id'],
-                criterion['criterion']['Criterion_Type']))
-  else:
-    print 'No ad group criteria were deleted.'
+  for criterion in result['value']:
+    print ('Ad group criterion with ad group id \'%s\', criterion id \'%s\', '
+           'and type \'%s\' was deleted.'
+           % (criterion['adGroupId'], criterion['criterion']['id'],
+              criterion['criterion']['Criterion_Type']))
 
   print
   print ('Usage: %s units, %s operations' % (client.GetUnits(),

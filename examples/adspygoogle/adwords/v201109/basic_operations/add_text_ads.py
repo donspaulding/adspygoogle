@@ -15,8 +15,7 @@
 # limitations under the License.
 
 """This example adds several text ads to a given ad group. To get ad_group_id,
-run get_ad_groups.py. To get all videos, run get_all_videos.py. To upload video,
-see http://adwords.google.com/support/aw/bin/answer.py?hl=en&answer=39454.
+run get_ad_groups.py.
 
 Tags: AdGroupAdService.mutate
 """

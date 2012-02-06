@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example gets all ad group criteria in an account. To add ad group
-criteria, run add_ad_group_criteria.py.
+"""This example gets all ad group criteria in an account. To add keywords, run
+add_keywords.py.
 
 Tags: AdGroupCriterionService.get
 """
