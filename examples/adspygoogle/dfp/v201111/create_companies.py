@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-company_service = client.GetCompanyService(
-    'https://sandbox.google.com', 'v201111')
+company_service = client.GetService(
+    'CompanyService', 'https://sandbox.google.com', 'v201111')
 
 # Create company objects.
 companies = []
@@ -48,9 +48,6 @@ for i in xrange(5):
   companies.append(company)
 
 # Add companies.
-# The initialization of the service and addition of companies could've been
-# combined into a single statement. Ex:
-# companies = client.GetCompanyService().CreateCompanies(companies)
 companies = company_service.CreateCompanies(companies)
 
 # Display results.

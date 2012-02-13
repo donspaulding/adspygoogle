@@ -36,8 +36,9 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-lica_service = client.GetLineItemCreativeAssociationService(
-    'https://sandbox.google.com', 'v201111')
+lica_service = client.GetService(
+    'LineItemCreativeAssociationService', 'https://sandbox.google.com',
+    'v201111')
 
 # Set line item and creative id to use to retrieve the LICA.
 line_item_id = 'INSERT_LINE_ITEM_ID_HERE'

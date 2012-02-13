@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-content_service = client.GetContentService(
-    'https://sandbox.google.com', 'v201111')
+content_service = client.GetService(
+    'ContentService', 'https://sandbox.google.com', 'v201111')
 
 # Get content by statement.
 content = DfpUtils.GetAllEntitiesByStatementWithService(content_service)

@@ -39,8 +39,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-line_item_service = client.GetLineItemService(
-    'https://sandbox.google.com', 'v201111')
+line_item_service = client.GetService(
+    'LineItemService', 'https://sandbox.google.com', 'v201111')
 
 # Set order that the created line item will belong to and add the id of a
 # placement containing ad units with a mobile target platform.

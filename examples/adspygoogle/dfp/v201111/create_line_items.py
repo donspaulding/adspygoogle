@@ -38,8 +38,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-line_item_service = client.GetLineItemService(
-    'https://sandbox.google.com', 'v201111')
+line_item_service = client.GetService(
+    'LineItemService', 'https://sandbox.google.com', 'v201111')
 
 # Set order that all created line items will belong to and the placement id to
 # target.
@@ -165,9 +165,6 @@ for i in xrange(5):
   line_items.append(line_item)
 
 # Add line items.
-# The initialization of the service and addition of line items could've been
-# combined into a single statement. Ex:
-# line_items = client.GetLineItemService().CreateLineItems(line_items)
 line_items = line_item_service.CreateLineItems(line_items)
 
 # Display results.

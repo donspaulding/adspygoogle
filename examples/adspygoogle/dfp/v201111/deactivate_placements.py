@@ -35,15 +35,22 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-placement_service = client.GetPlacementService(
-    'https://sandbox.google.com', 'v201111')
+placement_service = client.GetService(
+    'PlacementService', 'https://sandbox.google.com', 'v201111')
 
 # Create query.
-query = 'WHERE status = \'ACTIVE\''
+values = [{
+    'key': 'status',
+    'value': {
+        'xsi_type': 'TextValue',
+        'value': 'ACTIVE'
+    }
+}]
+query = 'WHERE status = :status'
 
 # Get placements by statement.
-placements = DfpUtils.GetAllEntitiesByStatementWithService(placement_service,
-                                                           query)
+placements = DfpUtils.GetAllEntitiesByStatementWithService(
+    placement_service, query=query, bind_vars=values)
 for placement in placements:
   print ('Placement with id \'%s\', name \'%s\', and status \'%s\' will be '
          'deactivated.' % (placement['id'], placement['name'],
@@ -52,7 +59,7 @@ print 'Number of placements to be deactivated: %s' % len(placements)
 
 # Perform action.
 result = placement_service.PerformPlacementAction(
-    {'type': 'DeactivatePlacements'}, {'query': query})[0]
+    {'type': 'DeactivatePlacements'}, {'query': query, 'values': values})[0]
 
 # Display results.
 if result and int(result['numChanges']) > 0:

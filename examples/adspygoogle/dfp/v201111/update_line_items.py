@@ -35,15 +35,29 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-line_item_service = client.GetLineItemService(
-    'https://sandbox.google.com', 'v201111')
+line_item_service = client.GetService(
+    'LineItemService', 'https://sandbox.google.com', 'v201111')
 
 # Set id of the order to get line items from.
 order_id = 'INSERT_ORDER_ID_HERE'
 
 # Create statement object to only select line items with even delivery rates.
-filter_statement = {'query': 'WHERE deliveryRateType = \'EVENLY\' and '
-                    'orderId = \'%s\' LIMIT 500' % order_id}
+values = [{
+    'key': 'deliveryRateType',
+    'value': {
+        'xsi_type': 'TextValue',
+        'value': 'EVENLY'
+    }
+}, {
+    'key': 'orderId',
+    'value': {
+        'xsi_type': 'NumberValue',
+        'value': order_id
+    }
+}]
+filter_statement = {'query': 'WHERE deliveryRateType = :deliveryRateType and '
+                    'orderId = :orderId LIMIT 500',
+                    'values': values}
 
 # Get line items by statement.
 response = line_item_service.GetLineItemsByStatement(filter_statement)[0]

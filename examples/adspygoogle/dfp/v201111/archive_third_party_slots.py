@@ -35,17 +35,30 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-third_party_slot_service = client.GetThirdPartySlotService(
-    'https://sandbox.google.com', 'v201111')
+third_party_slot_service = client.GetService(
+    'ThirdPartySlotService', 'https://sandbox.google.com', 'v201111')
 
 company_id = 'INSERT_COMPANY_ID_HERE'
 
 # Create query.
-query = 'WHERE status = \'ACTIVE\' and companyId = ' + company_id
+values = [{
+    'key': 'status',
+    'value': {
+        'xsi_type': 'TextValue',
+        'value': 'ACTIVE'
+    }
+}, {
+    'key': 'companyId',
+    'value': {
+        'xsi_type': 'NumberValue',
+        'value': company_id
+    }
+}]
+query = 'WHERE status = :status and companyId = :companyId'
 
 # Get third party slots by statement.
 third_party_slots = DfpUtils.GetAllEntitiesByStatementWithService(
-    third_party_slot_service, query)
+    third_party_slot_service, query=query, bind_vars=values)
 
 for third_party_slot in third_party_slots:
   print ('Third party slot with id \'%s\' will be archived.'
@@ -56,7 +69,7 @@ print ('Number of third party slots to be archived: %s'
 
 # Perform action.
 result = third_party_slot_service.PerformThirdPartySlotAction(
-    {'type': 'ArchiveThirdPartySlots'}, {'query': query})[0]
+    {'type': 'ArchiveThirdPartySlots'}, {'query': query, 'values': values})[0]
 
 # Display results.
 if result and int(result['numChanges']) > 0:

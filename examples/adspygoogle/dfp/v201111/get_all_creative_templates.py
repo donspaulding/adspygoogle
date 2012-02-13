@@ -34,8 +34,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-creative_template_service = client.GetCreativeTemplateService(
-    'https://sandbox.google.com', 'v201111')
+creative_template_service = client.GetService(
+    'CreativeTemplateService', 'https://sandbox.google.com', 'v201111')
 
 # Get line items by statement.
 creative_templates = DfpUtils.GetAllEntitiesByStatementWithService(

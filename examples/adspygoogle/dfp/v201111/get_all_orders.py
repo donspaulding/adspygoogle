@@ -34,8 +34,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-order_service = client.GetOrderService(
-    'https://sandbox.google.com', 'v201111')
+order_service = client.GetService(
+    'OrderService', 'https://sandbox.google.com', 'v201111')
 
 # Get orders by statement.
 orders = DfpUtils.GetAllEntitiesByStatementWithService(order_service)

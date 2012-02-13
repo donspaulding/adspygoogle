@@ -1,3 +1,10 @@
+9.1.0
+- Added support for v201201 and set it as default.
+- Change DfpUtils.GetAllEntitiesByStatementWithService to accept bind variables.
+- Changed DfpClient to support generic service creation. Services can be created
+  by calling GetService with the name of the service.
+- Added support for TeamService.
+
 9.0.1
 - Added support for third party slots in v201111.
 - Fixed bug in DfpUtils.GetAllEntitiesByStatementWithService.

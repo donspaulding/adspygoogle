@@ -35,10 +35,10 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-placement_service = client.GetPlacementService(
-    'https://sandbox.google.com', 'v201111')
-inventory_service = client.GetInventoryService(
-    'https://sandbox.google.com', 'v201111')
+placement_service = client.GetService(
+    'PlacementService', 'https://sandbox.google.com', 'v201111')
+inventory_service = client.GetService(
+    'InventoryService', 'https://sandbox.google.com', 'v201111')
 
 # Create placement object to store medium rectangle ad units.
 medium_rectangle_ad_unit_placement = {
@@ -82,11 +82,6 @@ for ad_unit in ad_units:
         banner_ad_unit_placement['targetedAdUnitIds'].append(ad_unit['id'])
 
 # Add placements.
-# The initialization of the service and addition of users could've been
-# combined into a single statement. Ex:
-# placements = client.GetPlacementService().CreatePlacements(
-#     [medium_square_ad_unit_placement, skyscraper_ad_unit_placement,
-#      banner_ad_unit_placement])
 placements = placement_service.CreatePlacements(
     [medium_rectangle_ad_unit_placement, skyscraper_ad_unit_placement,
      banner_ad_unit_placement])

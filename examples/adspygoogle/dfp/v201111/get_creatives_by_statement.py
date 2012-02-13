@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-creative_service = client.GetCreativeService(
-    'https://sandbox.google.com', 'v201111')
+creative_service = client.GetService(
+    'CreativeService', 'https://sandbox.google.com', 'v201111')
 
 # Create statement object to only select image creatives.
 values = [{

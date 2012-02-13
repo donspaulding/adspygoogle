@@ -35,8 +35,9 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-lica_service = client.GetLineItemCreativeAssociationService(
-    'https://sandbox.google.com', 'v201111')
+lica_service = client.GetService(
+    'LineItemCreativeAssociationService', 'https://sandbox.google.com',
+    'v201111')
 
 # Get LICAs by statement.
 licas = DfpUtils.GetAllEntitiesByStatementWithService(lica_service)

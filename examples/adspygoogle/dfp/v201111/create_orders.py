@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-order_service = client.GetOrderService(
-    'https://sandbox.google.com', 'v201111')
+order_service = client.GetService(
+    'OrderService', 'https://sandbox.google.com', 'v201111')
 
 # Set advertiser (company), salesperson, and trafficker to assign to each order.
 advertiser_id = 'INSERT_ADVERTISER_COMPANY_ID_HERE'
@@ -55,9 +55,6 @@ for i in xrange(5):
   orders.append(order)
 
 # Add orders.
-# The initialization of the service and addition of orders could've been
-# combined into a single statement. Ex:
-# orders = client.GetOrderService().CreateOrders(orders)
 orders = order_service.CreateOrders(orders)
 
 # Display results.

@@ -35,14 +35,14 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-content_service = client.GetContentService(
-    'https://sandbox.google.com', 'v201111')
+content_service = client.GetService(
+    'ContentService', 'https://sandbox.google.com', 'v201111')
 
-network_service = client.GetNetworkService(
-    'https://sandbox.google.com', 'v201111')
+network_service = client.GetService(
+    'NetworkService', 'https://sandbox.google.com', 'v201111')
 
-custom_targeting_service = client.GetCustomTargetingService(
-    'https://sandbox.google.com', 'v201111')
+custom_targeting_service = client.GetService(
+    'CustomTargetingService', 'https://sandbox.google.com', 'v201111')
 
 # Get the network's content browse custom targeting key.
 network = network_service.GetCurrentNetwork()[0]

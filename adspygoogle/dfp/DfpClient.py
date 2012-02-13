@@ -233,21 +233,22 @@ class DfpClient(Client):
                                                   http_proxy=http_proxy)
     return service.CallRawMethod(soap_message)
 
-  def GetCompanyService(self, server='https://sandbox.google.com', version=None,
-                        http_proxy=None):
-    """Call API method in CompanyService.
+  def GetService(self, service_name, server='https://sandbox.google.com',
+                 version=None, http_proxy=None, op_config=None):
+    """Generic method to create a service.
 
     Args:
+      service_name: str Name of the service to create.
       [optional]
       server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
+              are 'https://www.google.com' for live site and
               'https://sandbox.google.com' for sandbox. The default behavior is
               to access sandbox site.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of CompanyService object.
+      GenericDfpService New object representing the SOAP service.
     """
     if version is None:
       version = DEFAULT_API_VERSION
@@ -255,529 +256,331 @@ class DfpClient(Client):
       DfpSanityCheck.ValidateServer(server, version)
 
     # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
+    if op_config is None:
+      op_config = {
+          'server': server,
+          'version': version,
+          'http_proxy': http_proxy
+      }
     return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'CompanyService')
+                             self.__lock, self.__logger, service_name)
+
+  def GetCompanyService(self, server='https://sandbox.google.com', version=None,
+                        http_proxy=None):
+    """Create a CompanyService.
+
+    Args:
+      [optional]
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericDfpService New object representing the CompanyService object.
+    """
+    return self.GetService('CompanyService', server, version, http_proxy)
 
   def GetContentService(self, server='https://sandbox.google.com', version=None,
                         http_proxy=None):
-    """Call API method in ContentService.
+    """Create a ContentService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of ContentService object.
+      GenericDfpService New object representing the ContentService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'ContentService')
+    return self.GetService('ContentService', server, version, http_proxy)
 
   def GetCreativeService(self, server='https://sandbox.google.com',
                          version=None, http_proxy=None):
-    """Call API method in CreativeService.
+    """Create a CreativeService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of CreativeService object.
+      GenericDfpService New object representing the CreativeService
+      object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'CreativeService')
+    return self.GetService('CreativeService', server, version, http_proxy)
 
   def GetCreativeTemplateService(self, server='https://sandbox.google.com',
                                  version=None, http_proxy=None):
-    """Call API method in CreativeTemplateService.
+    """Create a CreativeTemplateService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of CreativeTemplateService object.
+      GenericDfpService New object representing the CreativeTemplateService
+      object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger,
-                             'CreativeTemplateService')
+    return self.GetService('CreativeTemplateService', server, version,
+                           http_proxy)
 
   def GetCustomTargetingService(self, server='https://sandbox.google.com',
                                 version=None, http_proxy=None):
-    """Call API method in CustomTargetingService.
+    """Create a CustomTargetingService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of CustomTargetingService object.
+      GenericDfpService New object representing the CustomTargetingService
+      object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger,
-                             'CustomTargetingService')
+    return self.GetService('CustomTargetingService', server, version,
+                           http_proxy)
 
   def GetForecastService(self, server='https://sandbox.google.com',
                          version=None, http_proxy=None):
-    """Call API method in ForecastService.
+    """Create a ForecastService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of ForecastService object.
+      GenericDfpService New object representing the ForecastService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'ForecastService')
+    return self.GetService('ForecastService', server, version, http_proxy)
 
   def GetInventoryService(self, server='https://sandbox.google.com',
                           version=None, http_proxy=None):
-    """Call API method in InventoryService.
+    """Create a InventoryService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of InventoryService object.
+      GenericDfpService New object representing the InventoryService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'InventoryService')
+    return self.GetService('InventoryService', server, version, http_proxy)
 
   def GetLabelService(self, server='https://sandbox.google.com',
                       version=None, http_proxy=None):
-    """Call API method in LineItemCreativeAssociationService.
+    """Create a LabelService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of LabelService object.
+      GenericDfpService New object representing the LabelService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'LabelService')
+    return self.GetService('LabelService', server, version, http_proxy)
 
   def GetLineItemCreativeAssociationService(self,
                                             server='https://sandbox.google.com',
                                             version=None, http_proxy=None):
-    """Call API method in LineItemCreativeAssociationService.
+    """Create a LineItemCreativeAssociationService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of LineItemCreativeAssociationService
-                        object.
+      GenericDfpService New object representing the
+      LineItemCreativeAssociationService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger,
-                             'LineItemCreativeAssociationService')
+    return self.GetService('LineItemCreativeAssociationService', server,
+                           version, http_proxy)
 
   def GetLineItemService(self, server='https://sandbox.google.com',
                          version=None, http_proxy=None):
-    """Call API method in LineItemService.
+    """Create a LineItemService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of LineItemService object.
+      GenericDfpService New object representing the LineItemService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'LineItemService')
+    return self.GetService('LineItemService', server, version, http_proxy)
 
   def GetNetworkService(self, server='https://sandbox.google.com', version=None,
                         http_proxy=None):
-    """Call API method in NetworkService.
+    """Create a NetworkService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of NetworkService object.
+      GenericDfpService New object representing the NetworkService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'NetworkService')
+    return self.GetService('NetworkService', server, version, http_proxy)
 
   def GetOrderService(self, server='https://sandbox.google.com', version=None,
                       http_proxy=None):
-    """Call API method in OrderService.
+    """Create a OrderService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of OrderService object.
+      GenericDfpService New object representing the OrderService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'OrderService')
+    return self.GetService('OrderService', server, version, http_proxy)
 
   def GetPlacementService(self, server='https://sandbox.google.com',
                           version=None, http_proxy=None):
-    """Call API method in PlacementService.
+    """Create a PlacementService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of PlacementService object.
+      GenericDfpService New object representing the PlacementService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'PlacementService')
+    return self.GetService('PlacementService', server, version, http_proxy)
 
   def GetPublisherQueryLanguageService(self,
                                        server='https://sandbox.google.com',
                                        version=None, http_proxy=None):
-    """Call API method in PublisherQueryLanguageService.
+    """Create a PublisherQueryLanguageService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of PublisherQueryLanguageService object.
+      GenericDfpService New object representing the
+      PublisherQueryLanguageService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger,
-                             'PublisherQueryLanguageService')
+    return self.GetService('PublisherQueryLanguageService', server, version,
+                           http_proxy)
 
   def GetReportService(self, server='https://sandbox.google.com',
                        version=None, http_proxy=None):
-    """Call API method in ReportService.
+    """Create a ReportService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of ReportService object.
+      GenericDfpService New object representing the ReportService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'ReportService')
+    return self.GetService('ReportService', server, version, http_proxy)
 
   def GetSuggestedAdUnitService(self, server='https://sandbox.google.com',
                                 version=None, http_proxy=None):
-    """Call API method in SuggestedAdUnitService.
+    """Create a SuggestedAdUnitService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of SuggestedAdUnitService object.
+      GenericDfpService New object representing the SuggestedAdUnitService
+      object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger,
-                             'SuggestedAdUnitService')
+    return self.GetService('SuggestedAdUnitService', server, version,
+                           http_proxy)
 
   def GetThirdPartySlotService(self, server='https://sandbox.google.com',
                                version=None, http_proxy=None):
-    """Call API method in ThirdPartySlotService.
+    """Create a ThirdPartySlotService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of ThirdPartySlotService object.
+      GenericDfpService New object representing the ThirdPartySlotService
+      object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger,
-                             'ThirdPartySlotService')
+    return self.GetService('ThirdPartySlotService', server, version, http_proxy)
 
   def GetUserService(self, server='https://sandbox.google.com', version=None,
                      http_proxy=None):
-    """Call API method in UserService.
+    """Create a UserService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible values
-              are: 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. Possible values
+              are 'https://www.google.com' for live site and
+              'https://sandbox.google.com' for sandbox.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfpService New instance of UserService object.
+      GenericDfpService New object representing the UserService object.
     """
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfpSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfpService(self._headers, self._config, op_config,
-                             self.__lock, self.__logger, 'UserService')
+    return self.GetService('UserService', server, version, http_proxy)

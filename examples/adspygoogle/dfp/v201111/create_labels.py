@@ -35,7 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-label_service = client.GetLabelService('https://sandbox.google.com', 'v201111')
+label_service = client.GetService(
+    'LabelService', 'https://sandbox.google.com', 'v201111')
 
 # Create label objects.
 labels = []
@@ -48,9 +49,6 @@ for i in xrange(5):
   labels.append(label)
 
 # Add Labels.
-# The initialization of the service and addition of labels could've been
-# combined into a single statement. Ex:
-# labels = client.GetLabelService().CreateLabels(labels)
 labels = label_service.CreateLabels(labels)
 
 # Display results.

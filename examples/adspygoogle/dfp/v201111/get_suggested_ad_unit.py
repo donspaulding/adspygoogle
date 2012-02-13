@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-suggested_ad_unit_service = client.GetSuggestedAdUnitService(
-    'https://sandbox.google.com', 'v201111')
+suggested_ad_unit_service = client.GetService(
+    'SuggestedAdUnitService', 'https://sandbox.google.com', 'v201111')
 
 # Set the id of the suggested ad unit to get.
 suggested_ad_unit_id = 'INSERT_SUGGESTED_AD_UNIT_ID_HERE'

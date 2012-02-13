@@ -35,17 +35,32 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-lica_service = client.GetLineItemCreativeAssociationService(
-    'https://sandbox.google.com', 'v201111')
+lica_service = client.GetService(
+    'LineItemCreativeAssociationService', 'https://sandbox.google.com',
+    'v201111')
 
 # Set the id of the line item in which to deactivate LICAs.
 line_item_id = 'INSERT_LINE_ITEM_ID_HERE'
 
 # Create query.
-query = 'WHERE lineItemId = \'%s\' AND status = \'ACTIVE\'' % line_item_id
+values = [{
+    'key': 'lineItemId',
+    'value': {
+        'xsi_type': 'NumberValue',
+        'value': line_item_id
+    }
+}, {
+    'key': 'status',
+    'value': {
+        'xsi_type': 'TextValue',
+        'value': 'ACTIVE'
+    }
+}]
+query = 'WHERE lineItemId = :lineItemId AND status = :status'
 
 # Get LICAs by statement.
-licas = DfpUtils.GetAllEntitiesByStatementWithService(lica_service, query)
+licas = DfpUtils.GetAllEntitiesByStatementWithService(
+    lica_service, query=query, bind_vars=values)
 for lica in licas:
   print ('LICA with line item id \'%s\', creative id \'%s\', and status \'%s\''
          'will be deactivated.' % (lica['lineItemId'], lica['creativeId'],
@@ -54,7 +69,8 @@ print 'Number of LICAs to be deactivated: %s' % len(licas)
 
 # Perform action.
 result = lica_service.PerformLineItemCreativeAssociationAction(
-    {'type': 'DeactivateLineItemCreativeAssociations'}, {'query': query})[0]
+    {'type': 'DeactivateLineItemCreativeAssociations'},
+    {'query': query, 'values': values})[0]
 
 # Display results.
 if result and int(result['numChanges']) > 0:

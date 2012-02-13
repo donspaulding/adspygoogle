@@ -37,8 +37,8 @@ client.strict = False
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-forecast_service = client.GetForecastService(
-    'https://sandbox.google.com', 'v201111')
+forecast_service = client.GetService(
+    'ForecastService', 'https://sandbox.google.com', 'v201111')
 
 # Set the placement that the prospective line item will target.
 target_placement_ids = ['INSERT_PLACEMENT_ID_HERE']

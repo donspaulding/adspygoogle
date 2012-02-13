@@ -83,7 +83,8 @@ def GetAllEntitiesByStatement(client, service_name, query='', page_size=500,
   return GetAllEntitiesByStatementWithService(service, query, page_size)
 
 
-def GetAllEntitiesByStatementWithService(service, query='', page_size=500):
+def GetAllEntitiesByStatementWithService(service, query='', page_size=500,
+                                         bind_vars=None):
   """Get all existing entities by statement.
 
   All existing entities are retrieved for a given statement and page size. The
@@ -97,6 +98,7 @@ def GetAllEntitiesByStatementWithService(service, query='', page_size=500):
     query: str a statement filter to apply, if any. The default is empty string.
     page_size: int size of the page to use. If page size is less than 0 or
                greater than 500, defaults to 500.
+    bind_vars: list Key value pairs of bind variables to use with query.
 
   Returns:
     list a list of existing entities.
@@ -125,8 +127,10 @@ def GetAllEntitiesByStatementWithService(service, query='', page_size=500):
   offset = 0
   all_entities = []
   while True:
-    filter_statement = {'query': '%s LIMIT %s OFFSET %s' % (query, page_size,
-                                                            offset)}
+    filter_statement = {
+        'query': '%s LIMIT %s OFFSET %s' % (query, page_size, offset),
+        'values': bind_vars
+    }
     entities = eval('service.%s(filter_statement)[0].get(\'results\')'
                     % method_name)
 

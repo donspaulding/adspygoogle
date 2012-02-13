@@ -34,8 +34,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-forecast_service = client.GetForecastService(
-    'https://sandbox.google.com', 'v201111')
+forecast_service = client.GetService(
+    'ForecastService', 'https://sandbox.google.com', 'v201111')
 
 # Set the line item to get a forecast for.
 line_item_id = 'INSERT_LINE_ITEM_ID'

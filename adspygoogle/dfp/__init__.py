@@ -20,6 +20,7 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
 import os
 import pickle
+import sys
 
 from adspygoogle.common import Utils
 from adspygoogle.common import VERSION
@@ -32,8 +33,8 @@ LIB_SHORT_NAME = 'DfpApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python'
 LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '9.0.1'
-LIB_MIN_COMMON_VERSION = '3.0.3'
+LIB_VERSION = '9.1.0'
+LIB_MIN_COMMON_VERSION = '3.0.6'
 LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:
@@ -42,7 +43,8 @@ if VERSION < LIB_MIN_COMMON_VERSION:
   raise MissingPackageError(msg)
 
 # Tuple of strings representing API versions.
-API_VERSIONS = ('v201103', 'v201104', 'v201107', 'v201108', 'v201111')
+API_VERSIONS = ('v201103', 'v201104', 'v201107', 'v201108', 'v201111',
+                'v201201')
 DEFAULT_API_VERSION = API_VERSIONS[len(API_VERSIONS) - 1]
 
 # Accepted combinations of headers which user has to provide. Either one of

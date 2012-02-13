@@ -33,8 +33,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-network_service = client.GetNetworkService(
-    'https://sandbox.google.com', 'v201111')
+network_service = client.GetService(
+    'NetworkService', 'https://sandbox.google.com', 'v201111')
 
 # Get the current network.
 network = network_service.GetCurrentNetwork()[0]

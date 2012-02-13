@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-creative_service = client.GetCreativeService(
-    'https://sandbox.google.com', 'v201111')
+creative_service = client.GetService(
+    'CreativeService', 'https://sandbox.google.com', 'v201111')
 
 # Get creatives by statement.
 creatives = DfpUtils.GetAllEntitiesByStatementWithService(creative_service)

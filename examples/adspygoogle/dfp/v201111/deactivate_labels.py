@@ -36,13 +36,22 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-label_service = client.GetLabelService('https://sandbox.google.com', 'v201111')
+label_service = client.GetService(
+    'LabelService', 'https://sandbox.google.com', 'v201111')
 
 # Create query.
-query = 'WHERE isActive = true'
+values = [{
+    'key': 'isActive',
+    'value': {
+        'xsi_type': 'TextValue',
+        'value': 'True'
+    }
+}]
+query = 'WHERE isActive = :isActive'
 
 # Get labels by statement.
-labels = DfpUtils.GetAllEntitiesByStatementWithService(label_service, query)
+labels = DfpUtils.GetAllEntitiesByStatementWithService(
+    label_service, query=query, bind_vars=values)
 for label in labels:
   print ('Label with id \'%s\', name \'%s\', and type \'%s\' will be '
          'deactivated.' % (label['id'], label['name'], label['type']))
@@ -50,7 +59,7 @@ print 'Number of Labels to be deactivated: %s' % len(labels)
 
 # Perform action.
 result = label_service.PerformLabelAction({'type': 'DeactivateLabels'},
-                                          {'query': query})[0]
+                                          {'query': query, 'values': values})[0]
 
 # Display results.
 if result and int(result['numChanges']) > 0:

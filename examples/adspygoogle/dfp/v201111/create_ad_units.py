@@ -36,10 +36,10 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-inventory_service = client.GetInventoryService(
-    'https://sandbox.google.com', 'v201111')
-network_service = client.GetNetworkService(
-    'https://sandbox.google.com', 'v201111')
+inventory_service = client.GetService(
+    'InventoryService', 'https://sandbox.google.com', 'v201111')
+network_service = client.GetService(
+    'NetworkService', 'https://sandbox.google.com', 'v201111')
 
 # Set the parent ad unit's id for all ad units to be created under.
 effective_root_ad_unit_id = \
@@ -66,9 +66,6 @@ for i in xrange(5):
   ad_units.append(ad_unit)
 
 # Add ad units.
-# The initialization of the service and addition of ad units can be
-# combined into a single statement. Ex:
-# ad_units = client.GetInventoryService().CreateAdUnits(ad_units)
 ad_units = inventory_service.CreateAdUnits(ad_units)
 
 # Display results.

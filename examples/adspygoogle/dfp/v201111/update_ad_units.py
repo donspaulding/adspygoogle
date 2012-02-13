@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-inventory_service = client.GetInventoryService(
-    'https://sandbox.google.com', 'v201111')
+inventory_service = client.GetService(
+    'InventoryService', 'https://sandbox.google.com', 'v201111')
 
 # Create statement object to get all ad units.
 filter_statement = {'query': 'LIMIT 500'}

@@ -36,17 +36,26 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-user_service = client.GetUserService(
-    'https://sandbox.google.com', 'v201111')
+user_service = client.GetService(
+    'UserService', 'https://sandbox.google.com', 'v201111')
 
 # Set the id of the user to deactivate.
 user_id = 'INSERT_USER_ID_HERE'
 
 # Create query.
-query = 'WHERE id = \'%s\'' % user_id
+values = [{
+    'key': 'userId',
+    'value': {
+        'xsi_type': 'NumberValue',
+        'value': user_id
+    }
+}]
+query = 'WHERE id = :userId'
 
 # Get users by statement.
-users = DfpUtils.GetAllEntitiesByStatementWithService(user_service, query)
+users = DfpUtils.GetAllEntitiesByStatementWithService(
+    user_service, query=query, bind_vars=values)
+
 for user in users:
   print ('User with id \'%s\', email \'%s\', and status \'%s\' will be '
          'deactivated.'
@@ -56,7 +65,7 @@ print 'Number of users to be deactivated: %s' % len(users)
 
 # Perform action.
 result = user_service.PerformUserAction({'type': 'DeactivateUsers'},
-                                        {'query': query})[0]
+                                        {'query': query, 'values': values})[0]
 
 # Display results.
 if result and int(result['numChanges']) > 0:

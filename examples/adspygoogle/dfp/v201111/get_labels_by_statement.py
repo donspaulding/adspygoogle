@@ -35,7 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-label_service = client.GetLabelService('https://sandbox.google.com', 'v201111')
+label_service = client.GetService(
+    'LabelService', 'https://sandbox.google.com', 'v201111')
 
 # Create a statement to only select labels that are competitive, sorted by name.
 values = [{

@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-third_party_slot_service = client.GetThirdPartySlotService(
-    'https://sandbox.google.com', 'v201111')
+third_party_slot_service = client.GetService(
+    'ThirdPartySlotService', 'https://sandbox.google.com', 'v201111')
 
 company_id = 'INSERT_COMPANY_ID_HERE'
 external_unique_id = 'INSERT_EXTERNAL_UNIQUE_ID_HERE'

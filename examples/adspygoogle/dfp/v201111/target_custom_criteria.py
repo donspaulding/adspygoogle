@@ -37,8 +37,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-line_item_service = client.GetLineItemService(
-    'https://sandbox.google.com', 'v201111')
+line_item_service = client.GetService(
+    'LineItemService', 'https://sandbox.google.com', 'v201111')
 
 line_item_id = 'INSERT_LINE_ITEM_ID_HERE'
 key_id1 = 'INSERT_TARGETING_KEY_ID_HERE'

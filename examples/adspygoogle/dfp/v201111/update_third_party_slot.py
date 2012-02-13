@@ -33,8 +33,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-third_party_slot_service = client.GetThirdPartySlotService(
-    'https://sandbox.google.com', 'v201111')
+third_party_slot_service = client.GetService(
+    'ThirdPartySlotService', 'https://sandbox.google.com', 'v201111')
 
 # Create statement object to only select third party slots that are active.
 values = [{

@@ -34,8 +34,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-user_service = client.GetUserService(
-    'https://sandbox.google.com', 'v201111')
+user_service = client.GetService(
+    'UserService', 'https://sandbox.google.com', 'v201111')
 
 # Set the id of the user to get.
 user_id = 'INSERT_USER_ID_HERE'

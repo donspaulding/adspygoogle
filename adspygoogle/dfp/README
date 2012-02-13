@@ -20,17 +20,18 @@ strings, when passing them as parameters. In fact, all variables are passed as
 either dict, list, or str. The conversion to the right type is handled
 internally by the client library.
 
-The client library provides support for SOAPpy and ZSI, which are two well
-known web services toolkits from http://pywebsvcs.sourceforge.net/. A single
-implementation of the client code can be used with either toolkit. Once you
-decide which SOAP toolkit to use, client library will take care of proper type
-conversions, instantiation of classes, etc.
+Starting with 9.0.0 the client library uses a patched version of the SOAPpy
+web services toolkit from http://pywebsvcs.sourceforge.net/, which is included
+in the tarball download. This change allows us to write more consistent and
+maintainable code, including unit tests and code examples.
 
-The two toolkits are very different and both have their pluses and minuses. The
-SOAPpy toolkit hasn't been updated for some time. The latest version 0.12.0_rc1
-is dated 2005-02-22. However, from the tests, it seem to be faster than ZSI. On
-the other hand, ZSI is the primary and most active web services toolkit from
-the "Python Web Services" project.
+This change also includes fixes to make SOAPpy follow the WSDL when returning
+objects. For example, when an element is defined in the WSDL with maxOccurs > 1,
+this is traditionally represented as a list (SOAPpy would return back a list of
+elements when more than one element is present in the response). However, when
+only a single element is returned in the response, SOAPpy used to return back
+just the element, not the element wrapped in a list. Starting with 9.0.0, it
+will correctly return back a list with a single element.
 
 Two modules are supported for parsing SOAP XML messages. By default, the client
 library uses the PyXML module in order to parse SOAP XML messages. In addition,
@@ -81,23 +82,20 @@ Step-by-step guide for accessing the sandbox:
 1) Make sure you have Python v2.4 or above installed. The latest stable version
    can be fetched from http://www.python.org/.
 
-2) One of the two web services toolkits is needed, either SOAPpy or ZSI. Both
-   of them can be fetched from http://pywebsvcs.sourceforge.net/.
-
-3) Fetch the latest version of the PyXML module from
+2) If using PyXML, fetch the latest version of the PyXML module from
    http://sourceforge.net/projects/pyxml/. This is required by the client
    library.
 
-4) Sign up for a Google Account. In later steps, we'll assume that the new login
+3) Sign up for a Google Account. In later steps, we'll assume that the new login
    is joe.shmoe@gmail.com.
 
-5) Navigate to the directory that contains your downloaded unzipped client
+4) Navigate to the directory that contains your downloaded unzipped client
    library and run the "setup.py" script to install the "adspygoogle.dfp"
    module.
 
    $ python setup.py build install
 
-6) From the same directory, run the "config.py" script to set
+5) From the same directory, run the "config.py" script to set
    authentication headers. More information about the format of each header is
    at http://code.google.com/apis/dfp/docs/developers_guide.html#headers.
    Example,
@@ -107,7 +105,6 @@ Step-by-step guide for accessing the sandbox:
    Network code [optional]:
    Application name: GoogleTest
 
-   Select SOAP library [1=SOAPpy, 2=ZSI]: 2
    Select XML parser [1=PyXML, 2=ElementTree]: 1
    Enable debugging mode [y/n]: n
    Enable SOAP XML logging mode [y/n]: y
@@ -120,7 +117,7 @@ Step-by-step guide for accessing the sandbox:
 Where do I submit bug reports and/or feature requests?
 ---------------------------------------------------
 
-Use the issue tracker at http://code.google.com/p/google-api-dfp-python/issues/list.
+Use the issue tracker at http://code.google.com/p/google-api-ads-python/issues/list.
 
 
 External Dependencies:
@@ -135,14 +132,12 @@ External Dependencies:
                            (part of the Python v2.5+)
                            or
       lxml v2.2+           -- http://codespeak.net/lxml/index.html
-    - SOAPpy v0.12.0       -- http://pywebsvcs.sourceforge.net/
-                           or
-      ZSI v2.0             -- http://pywebsvcs.sourceforge.net/
-                           (requires PyXML v0.8.3+)
     - Epydoc               -- http://epydoc.sourceforge.net/
                            (only if you will be generating docs)
+    - fpconst              -- http://pypi.python.org/pypi/fpconst/#downloads
     - Google Account       -- https://www.google.com/accounts/NewAccount
 
 
 Author:
     api.sgrinberg@gmail.com (Stan Grinberg)
+    api.shamjeff@gmail.com (Jeff Sham)

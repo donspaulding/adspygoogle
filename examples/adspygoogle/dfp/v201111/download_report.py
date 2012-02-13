@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-report_service = client.GetReportService(
-    'https://sandbox.google.com', 'v201111')
+report_service = client.GetService(
+    'ReportService', 'https://sandbox.google.com', 'v201111')
 
 # Set the id of the completed report.
 report_job_id = 'INSERT_REPORT_JOB_ID_HERE'

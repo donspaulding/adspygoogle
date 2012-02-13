@@ -34,8 +34,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-user_service = client.GetUserService(
-    'https://sandbox.google.com', 'v201111')
+user_service = client.GetService(
+    'UserService', 'https://sandbox.google.com', 'v201111')
 
 # Create user objects.
 users = [
@@ -54,9 +54,6 @@ for user in users:
   user['roleId'] = 'INSERT_ROLE_ID_HERE'
 
 # Add users.
-# The initialization of the service and addition of users could've been
-# combined into a single statement. Ex:
-# users = client.GetUserService().CreateUsers(users)
 users = user_service.CreateUsers(users)
 
 # Display results.

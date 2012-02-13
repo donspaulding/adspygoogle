@@ -39,18 +39,31 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-line_item_service = client.GetLineItemService(
-    'https://sandbox.google.com', 'v201111')
+line_item_service = client.GetService(
+    'LineItemService', 'https://sandbox.google.com', 'v201111')
 
 # Set the id of the order to get line items from.
 order_id = 'INSERT_ORDER_ID_HERE'
 
 # Create query.
-query = 'WHERE orderId = \'%s\' AND status = \'NEEDS_CREATIVES\'' % order_id
+values = [{
+    'key': 'orderId',
+    'value': {
+        'xsi_type': 'NumberValue',
+        'value': order_id
+    }
+}, {
+    'key': 'status',
+    'value': {
+        'xsi_type': 'TextValue',
+        'value': 'NEEDS_CREATIVES'
+    }
+}]
+query = 'WHERE orderId = :orderId AND status = :status'
 
 # Get line items by statement.
-line_items = DfpUtils.GetAllEntitiesByStatementWithService(line_item_service,
-                                                           query)
+line_items = DfpUtils.GetAllEntitiesByStatementWithService(
+    line_item_service, query=query, bind_vars=values)
 for line_item in line_items:
   print ('Line item with id \'%s\', belonging to order id \'%s\', and name '
          '\'%s\' will be activated.' % (line_item['id'], line_item['orderId'],
@@ -58,8 +71,8 @@ for line_item in line_items:
 print 'Number of line items to be activated: %s' % len(line_items)
 
 # Perform action.
-result = line_item_service.PerformLineItemAction({'type': 'ActivateLineItems'},
-                                                 {'query': query})[0]
+result = line_item_service.PerformLineItemAction(
+    {'type': 'ActivateLineItems'}, {'query': query, 'values': values})[0]
 
 # Display results.
 if result and int(result['numChanges']) > 0:

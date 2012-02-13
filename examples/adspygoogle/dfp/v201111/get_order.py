@@ -34,8 +34,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-order_service = client.GetOrderService(
-    'https://sandbox.google.com', 'v201111')
+order_service = client.GetService(
+    'OrderService', 'https://sandbox.google.com', 'v201111')
 
 # Set the id of the order to get.
 order_id = 'INSERT_ORDER_ID_HERE'

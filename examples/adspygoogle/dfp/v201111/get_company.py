@@ -34,8 +34,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-company_service = client.GetCompanyService(
-    'https://sandbox.google.com', 'v201111')
+company_service = client.GetService(
+    'CompanyService', 'https://sandbox.google.com', 'v201111')
 
 # Set the id of the company to get.
 company_id = 'INSERT_COMPANY_ID_HERE'

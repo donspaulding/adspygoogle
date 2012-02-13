@@ -34,8 +34,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-inventory_service = client.GetInventoryService(
-    'https://sandbox.google.com', 'v201111')
+inventory_service = client.GetService(
+    'InventoryService', 'https://sandbox.google.com', 'v201111')
 
 # Set the id of the ad unit to get.
 ad_unit_id = 'INSERT_AD_UNIT_ID_HERE'

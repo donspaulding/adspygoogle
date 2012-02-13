@@ -87,8 +87,8 @@ def Main():
 
   # Initialize appropriate service. By default, the request is always made
   # against sandbox environment.
-  inventory_service = client.GetInventoryService(
-      'https://sandbox.google.com', 'v201111')
+  inventory_service = client.GetService(
+      'InventoryService', 'https://sandbox.google.com', 'v201111')
 
   # Get ad units by statement.
   all_ad_units = DfpUtils.GetAllEntitiesByStatementWithService(

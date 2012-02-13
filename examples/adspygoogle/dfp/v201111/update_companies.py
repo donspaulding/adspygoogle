@@ -35,11 +35,18 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-company_service = client.GetCompanyService(
-    'https://sandbox.google.com', 'v201111')
+company_service = client.GetService(
+    'CompanyService', 'https://sandbox.google.com', 'v201111')
 
 # Create statement object to only select companies that are advertises.
-filter_statement = {'query': 'WHERE type = \'ADVERTISER\' LIMIT 500'}
+values = [{
+    'key': 'type',
+    'value': {
+        'xsi_type': 'TextValue',
+        'value': 'ADVERTISER'
+    }
+}]
+filter_statement = {'query': 'WHERE type = :type LIMIT 500', 'values': values}
 
 # Get companies by statement.
 response = company_service.GetCompaniesByStatement(filter_statement)[0]

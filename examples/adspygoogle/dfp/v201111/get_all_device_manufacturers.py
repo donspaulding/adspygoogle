@@ -33,8 +33,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-pql_service = client.GetPublisherQueryLanguageService(
-    'https://sandbox.google.com', 'v201111')
+pql_service = client.GetService(
+    'PublisherQueryLanguageService', 'https://sandbox.google.com', 'v201111')
 
 select_statement = {'query': 'SELECT * FROM Device_Manufacturer'}
 

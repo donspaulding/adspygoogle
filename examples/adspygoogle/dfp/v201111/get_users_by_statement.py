@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # the sandbox environment.
-user_service = client.GetUserService(
-    'https://sandbox.google.com', 'v201111')
+user_service = client.GetService(
+    'UserService', 'https://sandbox.google.com', 'v201111')
 
 # Create statement object to get all users stored by name.
 filter_statement = {'query': 'ORDER BY name LIMIT 500'}

@@ -35,7 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-label_service = client.GetLabelService('https://sandbox.google.com', 'v201111')
+label_service = client.GetService(
+    'LabelService', 'https://sandbox.google.com', 'v201111')
 
 # Set the id of the label to get.
 label_id = 'INSERT_LABEL_ID_HERE'

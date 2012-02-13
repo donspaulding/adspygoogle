@@ -35,8 +35,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-company_service = client.GetCompanyService(
-    'https://sandbox.google.com', 'v201111')
+company_service = client.GetService(
+    'CompanyService', 'https://sandbox.google.com', 'v201111')
 
 # Get companies by statement.
 companies = DfpUtils.GetAllEntitiesByStatementWithService(company_service)

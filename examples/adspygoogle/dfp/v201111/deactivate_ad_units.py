@@ -35,23 +35,30 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-inventory_service = client.GetInventoryService(
-    'https://sandbox.google.com', 'v201111')
+inventory_service = client.GetService(
+    'InventoryService', 'https://sandbox.google.com', 'v201111')
 
 # Create query.
-query = 'WHERE status = \'ACTIVE\''
+values = [{
+    'key': 'status',
+    'value': {
+        'xsi_type': 'TextValue',
+        'value': 'ACTIVE'
+    }
+}]
+query = 'WHERE status = :status'
 
 # Get ad units by statement.
-ad_units = DfpUtils.GetAllEntitiesByStatementWithService(inventory_service,
-                                                         query)
+ad_units = DfpUtils.GetAllEntitiesByStatementWithService(
+    inventory_service, query=query, bind_vars=values)
 for ad_unit in ad_units:
   print ('Ad unit with id \'%s\', name \'%s\', and status \'%s\' will be '
          'deactivated.' % (ad_unit['id'], ad_unit['name'], ad_unit['status']))
 print 'Number of ad units to be deactivated: %s' % len(ad_units)
 
 # Perform action.
-result = inventory_service.PerformAdUnitAction({'type': 'DeactivateAdUnits'},
-                                               {'query': query})[0]
+result = inventory_service.PerformAdUnitAction(
+    {'type': 'DeactivateAdUnits'}, {'query': query, 'values': values})[0]
 
 # Display results.
 if result and int(result['numChanges']) > 0:

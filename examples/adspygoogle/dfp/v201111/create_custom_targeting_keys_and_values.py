@@ -36,8 +36,8 @@ client = DfpClient(path=os.path.join('..', '..', '..', '..'))
 
 # Initialize appropriate service. By default, the request is always made against
 # sandbox environment.
-custom_targeting_service = client.GetCustomTargetingService(
-    'https://sandbox.google.com', 'v201111')
+custom_targeting_service = client.GetService(
+    'CustomTargetingService', 'https://sandbox.google.com', 'v201111')
 
 # Create custom targeting key objects.
 keys = [
