@@ -24,6 +24,7 @@ from adspygoogle.common.Errors import Error
 from adspygoogle.common.GenericApiService import GenericApiService
 from adspygoogle.common.GenericApiService import MethodInfoKeys
 from adspygoogle.dfa import DfaUtils
+from adspygoogle.dfa import LIB_SIG
 from adspygoogle.dfa import LIB_URL
 from adspygoogle.dfa import WSSE_NS
 from adspygoogle.dfa.DfaErrors import DfaApiError
@@ -88,7 +89,7 @@ class GenericDfaService(GenericApiService):
           name='Security', typed=0, attrs={'xmlns': WSSE_NS})
       soap_headers.Security = wsse_header
     request_header = SOAPpy.Types.structType(
-        data={'applicationName': self._config['app_name']},
+        data={'applicationName': '|'.join([LIB_SIG, self._config['app_name']])},
         name='RequestHeader', typed=0)
     soap_headers.RequestHeader = request_header
     self._soappyservice.soapproxy.header = soap_headers
@@ -266,13 +267,15 @@ class GenericDfaService(GenericApiService):
     ]
 
 
-def _DetermineNamespacePrefix(url):
+def _DetermineNamespacePrefix(unused_url):
   """Returns the SOAP prefix to use for definitions within the given namespace.
 
   Args:
-    url: string The URL of the namespace.
+    unused_url: string The URL of the namespace. The DFA library doesn't
+                actually check this value.
 
   Returns:
-    string The SOAP namespace prefix to use for the given namespace.
+    string The SOAP namespace prefix to use for the given namespace. The DFA
+           library always returns 'dfa:'.
   """
   return 'dfa:'

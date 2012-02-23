@@ -27,8 +27,8 @@ import unittest
 
 from adspygoogle.dfa import LIB_SIG
 from adspygoogle.common.Logger import Logger
+from tests.adspygoogle.dfa import TEST_VERSION_V1_17
 from tests.adspygoogle.dfa import TEST_VERSION_V1_16
-from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import TEST_VERSION_V1_15
 
 
@@ -43,10 +43,17 @@ for test in tests:
   for name, obj in inspect.getmembers(module):
     if inspect.isclass(obj):
       if ((name.endswith('1_15') and TEST_VERSION_V1_15) or
-          (name.endswith('1_16') and TEST_VERSION_V1_16) or
-          (name.endswith('1_14') and TEST_VERSION_V1_14)):
+          (name.endswith('1_16') and TEST_VERSION_V1_16)):
         suite.addTest(unittest.makeSuite(obj))
 
+tests = [test[:-3].replace('/', '.') for test in
+         glob.glob(os.path.join('**', '*_unittest.py'))]
+for test in tests:
+  module = __import__(test, fromlist=[True])
+  for name, obj in inspect.getmembers(module):
+    if inspect.isclass(obj):
+      if (name.endswith('1_17') and TEST_VERSION_V1_17):
+        suite.addTest(unittest.makeSuite(obj))
 
 if __name__ == '__main__':
   LOGGER.Log(LOG_NAME, 'Start all unit tests.', log_level=Logger.DEBUG)

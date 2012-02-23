@@ -31,75 +31,11 @@ from adspygoogle.dfa.GenericDfaService import GenericDfaService
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
 from tests.adspygoogle.dfa import SERVER_V1_16
-from tests.adspygoogle.dfa import SERVER_V1_14
 from tests.adspygoogle.dfa import SERVER_V1_15
 from tests.adspygoogle.dfa import TEST_VERSION_V1_16
-from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import TEST_VERSION_V1_15
 from tests.adspygoogle.dfa import VERSION_V1_16
-from tests.adspygoogle.dfa import VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_15
-
-
-class DfaWebServiceTestV1_14(unittest.TestCase):
-
-  """Unittest suite for DfaWebService using v1_14."""
-
-  SERVER = SERVER_V1_14
-  VERSION = VERSION_V1_14
-  client.debug = False
-  res = []
-  MAX_THREADS = 3
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-
-  def testCallMethod(self):
-    """Test whether we can call an API method indirectly."""
-    search_criteria = {'pageSize': '10'}
-    self.assert_(isinstance(client.GetAdvertiserService(
-        self.__class__.SERVER,
-        self.__class__.VERSION, HTTP_PROXY).GetAdvertisers(search_criteria),
-                            tuple))
-
-  def testCallRawMethod(self):
-    """Test whether we can call an API method by posting SOAP XML message."""
-    soap_message = Utils.ReadFile(
-        os.path.join('data', 'request_getadvertisers.xml'))
-    url = '/v1.14/api/dfa-api/advertiser'
-    http_proxy = None
-
-    self.assert_(isinstance(client.CallRawMethod(
-        soap_message, url, self.__class__.SERVER, http_proxy), tuple))
-
-  def testMultiThreads(self):
-    """Test whether we can safely execute multiple threads."""
-    all_threads = []
-    for i in xrange(self.__class__.MAX_THREADS):
-      t = TestThreadV1_14()
-      all_threads.append(t)
-      t.start()
-
-    for t in all_threads:
-      t.join()
-
-    self.assertEqual(len(self.res), self.__class__.MAX_THREADS)
-
-
-class TestThreadV1_14(threading.Thread):
-
-  """Creates TestThread using v1_14.
-
-  Responsible for defining an action for a single thread.
-  """
-
-  def run(self):
-    """Represent thread's activity."""
-    search_criteria = {'pageSize': '10'}
-    DfaWebServiceTestV1_14.res.append(client.GetAdvertiserService(
-        DfaWebServiceTestV1_14.SERVER, DfaWebServiceTestV1_14.VERSION,
-        HTTP_PROXY).GetAdvertisers(search_criteria))
 
 
 class DfaWebServiceTestV1_16(unittest.TestCase):
@@ -224,17 +160,6 @@ class TestThreadV1_15(threading.Thread):
         HTTP_PROXY).GetAdvertisers(search_criteria))
 
 
-def makeTestSuiteV1_14():
-  """Set up test suite using v1_14.
-
-  Returns:
-    TestSuite test suite using v1_14.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(DfaWebServiceTestV1_14))
-  return suite
-
-
 def makeTestSuiteV1_16():
   """Set up test suite using v1_16.
 
@@ -259,8 +184,6 @@ def makeTestSuiteV1_15():
 
 if __name__ == '__main__':
   suites = []
-  if TEST_VERSION_V1_14:
-    suites.append(makeTestSuiteV1_14())
   if TEST_VERSION_V1_16:
     suites.append(makeTestSuiteV1_16())
   if TEST_VERSION_V1_15:

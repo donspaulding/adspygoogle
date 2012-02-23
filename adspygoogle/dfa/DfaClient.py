@@ -193,676 +193,424 @@ class DfaClient(Client):
 
     return service.CallRawMethod(soap_message)
 
-  def GetAdService(self, server='http://advertisersapi.doubleclick.net',
+  def GetService(self, service_name,
+                 server='https://advertisersapi.doubleclick.net', version=None,
+                 http_proxy=None, op_config=None):
+    """Generic method to create a service.
+
+    Args:
+      service_name: str Name of the service to create.
+      [optional]
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+      op_config: dict Dictionary object with additional configuration values for
+                 this operation.
+
+    Returns:
+      GenericDfaService New object representing the SOAP service.
+    """
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      DfaSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    if op_config is None:
+      op_config = {
+          'server': server,
+          'version': version,
+          'http_proxy': http_proxy
+      }
+    return GenericDfaService(self._headers, self._config, op_config,
+                             self.__lock, self.__logger, service_name)
+
+  def GetAdService(self, server='https://advertisersapi.doubleclick.net',
                    version=None, http_proxy=None):
-    """Call API method in AdRemoteService.
+    """Returns an object which can call methods in the ad service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of AdRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('ad', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'ad')
-
-  def GetAdvertiserService(self, server='http://advertisersapi.doubleclick.net',
+  def GetAdvertiserService(self,
+                           server='https://advertisersapi.doubleclick.net',
                            version=None, http_proxy=None):
-    """Call API method in AdvertiserRemoteService.
+    """Returns an object which can call methods in the advertiser service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of AdvertiserRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
-
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'advertiser')
+    return self.GetService('advertiser', server, version, http_proxy)
 
   def GetAdvertiserGroupService(self,
-                                server='http://advertisersapi.doubleclick.net',
+                                server='https://advertisersapi.doubleclick.net',
                                 version=None, http_proxy=None):
-    """Call API method in AdvertiserGroupRemoteService.
+    """Returns an object which can call methods in the advertisergroup service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of AdvertiserGroupRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('advertisergroup', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'advertisergroup')
-
-  def GetCampaignService(self, server='http://advertisersapi.doubleclick.net',
+  def GetCampaignService(self, server='https://advertisersapi.doubleclick.net',
                          version=None, http_proxy=None):
-    """Call API method in CampaignRemoteService.
+    """Returns an object which can call methods in the campaign service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of CampaignRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('campaign', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'campaign')
-
-  def GetChangeLogService(self, server='http://advertisersapi.doubleclick.net',
+  def GetChangeLogService(self, server='https://advertisersapi.doubleclick.net',
                           version=None, http_proxy=None):
-    """Call API method in ChangeLogRemoteService.
+    """Returns an object which can call methods in the changelog service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of ChangeLogRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
-
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'changelog')
+    return self.GetService('changelog', server, version, http_proxy)
 
   def GetContentCategoryService(self,
-                                server='http://advertisersapi.doubleclick.net',
+                                server='https://advertisersapi.doubleclick.net',
                                 version=None, http_proxy=None):
-    """Call API method in ContentCategoryRemoteService.
+    """Returns an object which can call methods in the contentcategory service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of ContentCategoryRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('contentcategory', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'contentcategory')
-
-  def GetCreativeService(self, server='http://advertisersapi.doubleclick.net',
+  def GetCreativeService(self, server='https://advertisersapi.doubleclick.net',
                          version=None, http_proxy=None):
-    """Call API method in CreativeRemoteService.
+    """Returns an object which can call methods in the creative service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of CreativeRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
-
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'creative')
+    return self.GetService('creative', server, version, http_proxy)
 
   def GetCreativeFieldService(self,
-                              server='http://advertisersapi.doubleclick.net',
+                              server='https://advertisersapi.doubleclick.net',
                               version=None, http_proxy=None):
-    """Call API method in CreativeFieldRemoteService.
+    """Returns an object which can call methods in the creativefield service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of CreativeFieldRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
-
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'creativefield')
+    return self.GetService('creativefield', server, version, http_proxy)
 
   def GetCreativeGroupService(self,
-                              server='http://advertisersapi.doubleclick.net',
+                              server='https://advertisersapi.doubleclick.net',
                               version=None, http_proxy=None):
-    """Call API method in CreativeGroupRemoteService.
+    """Returns an object which can call methods in the creativegroup service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of CreativeGroupRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('creativegroup', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'creativegroup')
-
-  def GetLoginService(self, server='http://advertisersapi.doubleclick.net',
+  def GetLoginService(self, server='https://advertisersapi.doubleclick.net',
                       version=None, http_proxy=None):
-    """Call API method in LoginRemoteService.
+    """Returns an object which can call methods in the login service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of LoginRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('login', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'login')
-
-  def GetNetworkService(self, server='http://advertisersapi.doubleclick.net',
+  def GetNetworkService(self, server='https://advertisersapi.doubleclick.net',
                         version=None, http_proxy=None):
-    """Call API method in NetworkRemoteService.
+    """Returns an object which can call methods in the network service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of NetworkRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('network', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'network')
-
-  def GetPlacementService(self, server='http://advertisersapi.doubleclick.net',
+  def GetPlacementService(self, server='https://advertisersapi.doubleclick.net',
                           version=None, http_proxy=None):
-    """Call API method in PlacementRemoteService.
+    """Returns an object which can call methods in the placement service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of PlacementRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('placement', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'placement')
-
-  def GetReportService(self, server='http://advertisersapi.doubleclick.net',
+  def GetReportService(self, server='https://advertisersapi.doubleclick.net',
                        version=None, http_proxy=None):
-    """Call API method in ReportRemoteService.
+    """Returns an object which can call methods in the report service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of ReportRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('report', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'report')
-
-  def GetSiteService(self, server='http://advertisersapi.doubleclick.net',
+  def GetSiteService(self, server='https://advertisersapi.doubleclick.net',
                      version=None, http_proxy=None):
-    """Call API method in SiteRemoteService.
+    """Returns an object which can call methods in the site service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of SiteRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('site', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'site')
-
-  def GetSizeService(self, server='http://advertisersapi.doubleclick.net',
+  def GetSizeService(self, server='https://advertisersapi.doubleclick.net',
                      version=None, http_proxy=None):
-    """Call API method in SizeRemoteService.
+    """Returns an object which can call methods in the size service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of SizeRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('size', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'size')
-
-  def GetSpotlightService(self, server='http://advertisersapi.doubleclick.net',
+  def GetSpotlightService(self, server='https://advertisersapi.doubleclick.net',
                           version=None, http_proxy=None):
-    """Call API method in SpotlightRemoteService.
+    """Returns an object which can call methods in the spotlight service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of SpotlightRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('spotlight', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'spotlight')
-
-  def GetStrategyService(self, server='http://advertisersapi.doubleclick.net',
+  def GetStrategyService(self, server='https://advertisersapi.doubleclick.net',
                          version=None, http_proxy=None):
-    """Call API method in StrategyRemoteService.
+    """Returns an object which can call methods in the strategy service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of StrategyRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('strategy', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'strategy')
-
-  def GetSubnetworkService(self, server='http://advertisersapi.doubleclick.net',
+  def GetSubnetworkService(self,
+                           server='https://advertisersapi.doubleclick.net',
                            version=None, http_proxy=None):
-    """Call API method in SubnetworkRemoteService.
+    """Returns an object which can call methods in the subnetwork service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of SubnetworkRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('subnetwork', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'subnetwork')
-
-  def GetUserService(self, server='http://advertisersapi.doubleclick.net',
+  def GetUserService(self, server='https://advertisersapi.doubleclick.net',
                      version=None, http_proxy=None):
-    """Call API method in UserRemoteService.
+    """Returns an object which can call methods in the user service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of UserRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
+    return self.GetService('user', server, version, http_proxy)
 
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'user')
-
-  def GetUserRoleService(self, server='http://advertisersapi.doubleclick.net',
+  def GetUserRoleService(self, server='https://advertisersapi.doubleclick.net',
                          version=None, http_proxy=None):
-    """Call API method in UserRoleRemoteService.
+    """Returns an object which can call methods in the userrole service.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'http://advertisersapi.doubleclick.net' for production
-              site, 'http://advertisersapitest.doubleclick.net' for test, and
-              'http://betaadvertisersapi.doubleclick.net' for beta. The default
-              behavior is to access production site.
+      server: str API server this object will access. Possible values are:
+              'https://advertisersapi.doubleclick.net' for production,
+              'https://advertisersapitest.doubleclick.net' for test, and
+              'https://betaadvertisersapi.doubleclick.net' for beta.
+              The default behavior is to access the production environment.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericDfaService New instance of UserRoleRemoteService object.
+      GenericDfaService New object representing the SOAP service.
     """
-    headers = self._headers
-
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      DfaSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    self._config['wsse'] = 'y'
-    op_config = {
-        'server': server,
-        'version': version,
-        'http_proxy': http_proxy
-    }
-    return GenericDfaService(headers, self._config, op_config, self.__lock,
-                             self.__logger, 'userrole')
+    return self.GetService('userrole', server, version, http_proxy)

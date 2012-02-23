@@ -28,71 +28,11 @@ from adspygoogle.common import Utils
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
 from tests.adspygoogle.dfa import SERVER_V1_16
-from tests.adspygoogle.dfa import SERVER_V1_14
 from tests.adspygoogle.dfa import SERVER_V1_15
 from tests.adspygoogle.dfa import TEST_VERSION_V1_16
-from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import TEST_VERSION_V1_15
 from tests.adspygoogle.dfa import VERSION_V1_16
-from tests.adspygoogle.dfa import VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_15
-
-
-class ContentCategoryServiceTestV1_14(unittest.TestCase):
-
-  """Unittest suite for ContentCategoryService using v1_14."""
-
-  SERVER = SERVER_V1_14
-  VERSION = VERSION_V1_14
-  client.debug = False
-  service = None
-  content_category_id = '0'
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetContentCategoryService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testGetContentCategory(self):
-    """Test whether we can fetch a content category by id"""
-    if self.__class__.content_category_id == '0':
-      self.testSaveContentCategory()
-    content_category_id = self.__class__.content_category_id
-    self.assert_(isinstance(self.__class__.service.GetContentCategory(
-        content_category_id), tuple))
-
-  def testSaveContentCategory(self):
-    """Test whether we can save a content category"""
-    content_category = {
-        'name': 'Content Category #%s' % Utils.GetUniqueName(),
-        'description': 'Test content category',
-        'id' : '-1'
-    }
-    content_category = self.__class__.service.SaveContentCategory(
-        content_category)
-    self.__class__.content_category_id = content_category[0]['id']
-    self.assert_(isinstance(content_category, tuple))
-
-  def testGetContentCategories(self):
-    """Test whether we can fetch content categories by criteria."""
-    if self.__class__.content_category_id == '0':
-      self.testSaveContentCategory()
-    search_criteria = {
-        'ids': [self.__class__.content_category_id]
-    }
-    self.__class__.content_category_id = \
-        self.__class__.service.GetContentCategories(
-        search_criteria)[0]['records'][0]['id']
-
-  def testDeleteContentCategory(self):
-    """Test whether we can delete a content category"""
-    if self.__class__.content_category_id == '0':
-      self.testSaveContentCategory()
-    self.assertEqual(self.__class__.service.DeleteContentCategory(
-        self.__class__.content_category_id), None)
-    self.__class__.content_category_id = '0'
 
 
 class ContentCategoryServiceTestV1_16(unittest.TestCase):
@@ -209,17 +149,6 @@ class ContentCategoryServiceTestV1_15(unittest.TestCase):
     self.__class__.content_category_id = '0'
 
 
-def makeTestSuiteV1_14():
-  """Set up test suite using v1_14.
-
-  Returns:
-    TestSuite test suite using v1_14.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(ContentCategoryServiceTestV1_14))
-  return suite
-
-
 def makeTestSuiteV1_16():
   """Set up test suite using v1_16.
 
@@ -244,8 +173,6 @@ def makeTestSuiteV1_15():
 
 if __name__ == '__main__':
   suites = []
-  if TEST_VERSION_V1_14:
-    suites.append(makeTestSuiteV1_14())
   if TEST_VERSION_V1_16:
     suites.append(makeTestSuiteV1_16())
   if TEST_VERSION_V1_15:

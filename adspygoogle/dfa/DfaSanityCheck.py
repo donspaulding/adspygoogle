@@ -32,15 +32,15 @@ def ValidateServer(server, version):
     ValidationError: if the given API server or version is not valid.
   """
   # Map of supported API servers and versions.
-  prod = {'v1.14': 'http://advertisersapi.doubleclick.net',
-          'v1.15': 'http://advertisersapi.doubleclick.net',
-          'v1.16': 'http://advertisersapi.doubleclick.net'}
-  beta = {'v1.14': 'http://betaadvertisersapi.doubleclick.net',
-          'v1.15': 'http://betaadvertisersapi.doubleclick.net',
-          'v1.16': 'http://betaadvertisersapi.doubleclick.net'}
-  test = {'v1.14': 'http://advertisersapitest.doubleclick.net',
-          'v1.15': 'http://advertisersapitest.doubleclick.net',
-          'v1.16': 'http://advertisersapitest.doubleclick.net'}
+  prod = {'v1.15': 'https://advertisersapi.doubleclick.net',
+          'v1.16': 'https://advertisersapi.doubleclick.net',
+          'v1.17': 'https://advertisersapi.doubleclick.net'}
+  beta = {'v1.15': 'https://betaadvertisersapi.doubleclick.net',
+          'v1.16': 'https://betaadvertisersapi.doubleclick.net',
+          'v1.17': 'https://betaadvertisersapi.doubleclick.net'}
+  test = {'v1.15': 'https://advertisersapitest.doubleclick.net',
+          'v1.16': 'https://advertisersapitest.doubleclick.net',
+          'v1.17': 'https://advertisersapitest.doubleclick.net'}
 
   if (server not in prod.values() and server not in beta.values() and
       server not in test.values()):

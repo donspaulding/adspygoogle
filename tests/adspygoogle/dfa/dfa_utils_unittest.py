@@ -28,44 +28,11 @@ from adspygoogle.dfa.DfaSoapBuffer import DfaSoapBuffer
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
 from tests.adspygoogle.dfa import SERVER_V1_16
-from tests.adspygoogle.dfa import SERVER_V1_14
 from tests.adspygoogle.dfa import SERVER_V1_15
 from tests.adspygoogle.dfa import TEST_VERSION_V1_16
-from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import TEST_VERSION_V1_15
 from tests.adspygoogle.dfa import VERSION_V1_16
-from tests.adspygoogle.dfa import VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_15
-
-
-class DfaUtilsTestV1_14(unittest.TestCase):
-
-  """Unittest suite for DfaUtils using v1_14."""
-
-  SERVER = SERVER_V1_14
-  VERSION = VERSION_V1_14
-  client.debug = False
-  TRIGGER_MSG = ('502 Server Error. The server encountered a temporary error'
-                 ' and could not complete yourrequest. Please try again in 30 '
-                 'seconds.')
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-
-  def testError502(self):
-    """Test whether we can handle and report 502 errors."""
-    buf = DfaSoapBuffer()
-
-    html_code = Utils.ReadFile(os.path.join('data', 'http_error_502.html'))
-    buf.write(html_code)
-
-    if not buf.IsHandshakeComplete():
-      data = buf.GetBufferAsStr()
-    else:
-      data = ''
-
-    self.assertEqual(Utils.GetErrorFromHtml(data), self.__class__.TRIGGER_MSG)
 
 
 class DfaUtilsTestV1_16(unittest.TestCase):
@@ -128,17 +95,6 @@ class DfaUtilsTestV1_15(unittest.TestCase):
     self.assertEqual(Utils.GetErrorFromHtml(data), self.__class__.TRIGGER_MSG)
 
 
-def makeTestSuiteV1_14():
-  """Set up test suite using v1_14.
-
-  Returns:
-    TestSuite test suite using v1_14.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(DfaUtilsTestV1_14))
-  return suite
-
-
 def makeTestSuiteV1_16():
   """Set up test suite using v1_16.
 
@@ -163,8 +119,6 @@ def makeTestSuiteV1_15():
 
 if __name__ == '__main__':
   suites = []
-  if TEST_VERSION_V1_14:
-    suites.append(makeTestSuiteV1_14())
   if TEST_VERSION_V1_16:
     suites.append(makeTestSuiteV1_16())
   if TEST_VERSION_V1_15:

@@ -28,87 +28,11 @@ from adspygoogle.common import Utils
 from tests.adspygoogle.dfa import client
 from tests.adspygoogle.dfa import HTTP_PROXY
 from tests.adspygoogle.dfa import SERVER_V1_16
-from tests.adspygoogle.dfa import SERVER_V1_14
 from tests.adspygoogle.dfa import SERVER_V1_15
 from tests.adspygoogle.dfa import TEST_VERSION_V1_16
-from tests.adspygoogle.dfa import TEST_VERSION_V1_14
 from tests.adspygoogle.dfa import TEST_VERSION_V1_15
 from tests.adspygoogle.dfa import VERSION_V1_16
-from tests.adspygoogle.dfa import VERSION_V1_14
 from tests.adspygoogle.dfa import VERSION_V1_15
-
-
-class SubnetworkServiceTestV1_14(unittest.TestCase):
-
-  """Unittest suite for SubnetworkService using v1_14."""
-
-  SERVER = SERVER_V1_14
-  VERSION = VERSION_V1_14
-  client.debug = False
-  test_super_user = False
-  service = None
-  user_self = None
-  subnetwork_id = '0'
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetSubnetworkService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-    if self.__class__.user_self is None:
-      user_service = client.GetUserService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-      search_criteria = {
-          'searchString': client._headers['Username']
-      }
-      self.__class__.user_self = user_service.GetUsersByCriteria(
-          search_criteria)[0]['records'][0]
-
-  def testSaveSubnetwork(self):
-    """Test whether we can save a subnetwork"""
-    if self.__class__.test_super_user:
-      network_id = self.__class__.user_self['networkId']
-      subnetwork = {
-          'name': 'Subnetwork #%s' % Utils.GetUniqueName(),
-          'networkId': network_id,
-      }
-      subnetwork = self.__class__.service.SaveSubnetwork(subnetwork)
-      self.__class__.subnetwork_id = subnetwork[0]['id']
-      self.assert_(isinstance(subnetwork, tuple))
-
-  def testGetSubnetwork(self):
-    """Test whether we can fetch a subnetwork by id."""
-    subnetwork_id = self.__class__.user_self['subnetworkId']
-    self.assert_(isinstance(self.__class__.service.GetSubnetwork(
-        subnetwork_id), tuple))
-
-  def testGetSubnetworks(self):
-    """Test whether we can fetch subnetworks by criteria."""
-    search_criteria = {
-        'ids': [self.__class__.user_self['subnetworkId']]
-    }
-    self.assert_(isinstance(self.__class__.service.GetSubnetworks(
-        search_criteria), tuple))
-
-  def testGetSubnetworkSummaries(self):
-    """Test whether we can fetch subnetwork summaries."""
-    search_criteria = {
-        'ids': [self.__class__.user_self['subnetworkId']]
-    }
-    self.assert_(isinstance(self.__class__.service.GetSubnetworkSummaries(
-        search_criteria), tuple))
-
-  def testGetAllAvailablePermissions(self):
-    """Test whether we can fetch all available permissions."""
-    self.assert_(isinstance(
-        self.__class__.service.GetAllAvailablePermissions(), tuple))
-
-  def testGetDefaultPermissions(self):
-    """Test whether we can fetch default permissions."""
-    self.assert_(isinstance(
-        self.__class__.service.GetDefaultPermissions(), tuple))
 
 
 class SubnetworkServiceTestV1_16(unittest.TestCase):
@@ -257,17 +181,6 @@ class SubnetworkServiceTestV1_15(unittest.TestCase):
         self.__class__.service.GetDefaultPermissions(), tuple))
 
 
-def makeTestSuiteV1_14():
-  """Set up test suite using v1_14.
-
-  Returns:
-    TestSuite test suite using v1_14.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(SubnetworkServiceTestV1_14))
-  return suite
-
-
 def makeTestSuiteV1_16():
   """Set up test suite using v1_16.
 
@@ -292,8 +205,6 @@ def makeTestSuiteV1_15():
 
 if __name__ == '__main__':
   suites = []
-  if TEST_VERSION_V1_14:
-    suites.append(makeTestSuiteV1_14())
   if TEST_VERSION_V1_16:
     suites.append(makeTestSuiteV1_16())
   if TEST_VERSION_V1_15:

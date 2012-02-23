@@ -64,9 +64,9 @@ were introduced.
 How do I start?
 ---------------
 
-Start by making sure that you have Python and SOAPpy installed on your machine.
-Once that's taken care of, proceed to the step-by-step guide below.
-Write some code and enjoy!
+Start by making sure that you have Python installed on your machine. Once that's
+taken care of, proceed to the step-by-step guide below. Write some code and
+enjoy!
 
 
 Step-by-step guide for accessing the DoubleClick network:
@@ -82,20 +82,17 @@ Step-by-step guide for accessing the DoubleClick network:
 3) Make sure you have Python v2.4 or above installed. The latest stable version
    can be fetched from http://www.python.org/.
 
-4) The SOAPpy web services toolkits is needed. It can be fetched from
-   http://pywebsvcs.sourceforge.net/.
-
-5) Fetch the latest version of PyXML module from
+4) Fetch the latest version of PyXML module from
    http://sourceforge.net/projects/pyxml/. This is required by the client
    library.
 
-6) Navigate to the directory that contains your downloaded unzipped client
+5) Navigate to the directory that contains your downloaded unzipped client
    library and run the "setup.py" script to install the "adspygoogle.dfa"
    module.
 
    $ python setup.py build install
 
-7) From the same directory, run the "config.py" script to set
+6) From the same directory, run the "config.py" script to set
    authentication headers. More information about the format of each header is
    at http://code.google.com/apis/dfa/docs/SOAP_headers.html
    Example,
@@ -109,7 +106,7 @@ Step-by-step guide for accessing the DoubleClick network:
    Enable API request logging mode [y/n]: y
    Enter an application name: companyName-programName
 
-8) Read over the documentation in "docs/index.html" to familiarize yourself with
+7) Read over the documentation in "docs/index.html" to familiarize yourself with
    the API of the client library.
 
 
@@ -132,9 +129,9 @@ External Dependencies:
                            (part of the Python v2.5+)
                            or
       lxml v2.2+           -- http://codespeak.net/lxml/index.html
-    - SOAPpy v0.12.0       -- http://pywebsvcs.sourceforge.net/
     - Epydoc               -- http://epydoc.sourceforge.net/
                            (only if you will be generating docs)
+    - fpconst              -- http://pypi.python.org/pypi/fpconst/#downloads
     - Google Account       -- https://www.google.com/accounts/NewAccount
 
 

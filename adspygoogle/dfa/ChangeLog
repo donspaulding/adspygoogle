@@ -1,3 +1,10 @@
+2.1.0:
+- Added support for v1.17, removed support for v1.14.
+- Added the library's signature to the application name header.
+- Changed DfaClient to support generic service creation. Services can be created
+  by calling GetService with the name of the service.
+- Enforces SSL encrypted connections to the DFA API.
+
 2.0.1:
 - Added support for receiving compressed HTTP messages from the DFA servers.
 
