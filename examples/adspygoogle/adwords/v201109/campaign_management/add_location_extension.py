@@ -75,7 +75,10 @@ def main(client, campaign_id):
                   'address': geo_locations[0]['address'],
                   'geoPoint': geo_locations[0]['geoPoint'],
                   'encodedLocation': geo_locations[0]['encodedLocation'],
-                  'source': 'ADWORDS_FRONTEND'
+                  'source': 'ADWORDS_FRONTEND',
+                  # Optional fields.
+                  'companyName': 'ACME Inc.',
+                  'phoneNumber': '(650) 253-0000'
               }
           }
       },

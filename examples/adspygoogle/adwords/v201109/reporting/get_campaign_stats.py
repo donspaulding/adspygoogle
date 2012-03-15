@@ -14,59 +14,70 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example gets all images and videos. To upload an image, run
-upload_image.py. To upload video, see:
-http://adwords.google.com/support/aw/bin/answer.py?hl=en&answer=39454.
+"""This example gets stats for all campaigns with an impression in the last
+week. To add a campaign, run add_campaign.py.
 
-Tags: MediaService.get
+Tags: CampaignService.get
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
+import datetime
 import os
 import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
-from adspygoogle.common import Utils
 
 
-PAGE_SIZE = 500
+PAGE_SIZE = 100
 
 
 def main(client):
   # Initialize appropriate service.
-  media_service = client.GetMediaService(
+  campaign_service = client.GetCampaignService(
       'https://adwords-sandbox.google.com', 'v201109')
 
-  # Construct selector and get all images.
+  # Construct selector and get all campaigns.
   offset = 0
   selector = {
-      'fields': ['MediaId', 'Type', 'Width', 'Height', 'MimeType'],
+      'fields': ['Id', 'Name', 'Impressions', 'Clicks', 'Cost', 'Ctr'],
       'predicates': [{
-          'field': 'Type',
-          'operator': 'IN',
-          'values': ['IMAGE', 'VIDEO']
+          'field': 'Impressions',
+          'operator': 'GREATER_THAN',
+          'values': ['0']
       }],
+      'dateRange': {
+          'min': (datetime.datetime.now() -
+                  datetime.timedelta(7)).strftime('%Y%m%d'),
+          'max': (datetime.datetime.now() -
+                  datetime.timedelta(1)).strftime('%Y%m%d')
+      },
       'paging': {
           'startIndex': str(offset),
           'numberResults': str(PAGE_SIZE)
       }
   }
+
   more_pages = True
   while more_pages:
-    page = media_service.Get(selector)[0]
+    page = campaign_service.Get(selector)[0]
 
     # Display results.
     if 'entries' in page:
-      for image in page['entries']:
-        dimensions = Utils.GetDictFromMap(image['dimensions'])
-        print ('Media with id \'%s\', dimensions \'%sx%s\', and MimeType \'%s\''
-               ' was found.' % (image['mediaId'], dimensions['FULL']['height'],
-                                dimensions['FULL']['width'], image['mimeType']))
+      for campaign in page['entries']:
+        print ('Campaign with id \'%s\' and name \'%s\' had the following '
+               'stats during the last week.' % (campaign['id'],
+                                                campaign['name']))
+        print '  Impressions: %s' % campaign['campaignStats']['impressions']
+        print '  Clicks: %s' % campaign['campaignStats']['clicks']
+        cost = int(campaign['campaignStats']['cost']['microAmount']) / 1000000
+        print '  Cost: %.02f' % cost
+        ctr = float(campaign['campaignStats']['ctr']) * 100
+        print '  CTR: %.02f %%' % ctr
     else:
-      print 'No images/videos were found.'
+      print 'No matching campaigns were found.'
     offset += PAGE_SIZE
     selector['paging']['startIndex'] = str(offset)
     more_pages = offset < int(page['totalNumEntries'])

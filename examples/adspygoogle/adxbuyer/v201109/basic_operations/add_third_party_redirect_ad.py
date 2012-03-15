@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 run get_ad_groups.py.
 
 Tags: AdGroupAdService.mutate
-Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -29,6 +28,7 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
+from adspygoogle.common import Utils
 
 
 ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
@@ -44,40 +44,24 @@ def main(client, ad_group_id):
       {
           'operator': 'ADD',
           'operand': {
-              'xsi_type': 'AdGroupAd',
+              'type': 'AdGroupAd',
               'adGroupId': ad_group_id,
               'ad': {
-                  'xsi_type': 'TextAd',
+                  'type': 'ThirdPartyRedirectAd',
+                  'name': 'Example third party ad #%s' % Utils.GetUniqueName(),
                   'url': 'http://www.example.com',
-                  'displayUrl': 'example.com',
-                  'description1': 'Visit the Red Planet in style.',
-                  'description2': 'Low-gravity fun for everyone!',
-                  'headline': 'Luxury Cruise to Mars'
-              },
-              # Optional fields.
-              'status': 'PAUSED'
-          }
-          # If needed, you could specify an exemption request here.
-          # 'exemptionRequests': [{
-          #     # This comes back in a PolicyViolationError.
-          #     'key' {
-          #         'policyName': '...',
-          #         'violatingText': '...'
-          #     }
-          # }]
-      },
-      {
-          'operator': 'ADD',
-          'operand': {
-              'xsi_type': 'AdGroupAd',
-              'adGroupId': ad_group_id,
-              'ad': {
-                  'xsi_type': 'TextAd',
-                  'url': 'http://www.example.com',
-                  'displayUrl': 'example.com',
-                  'description1': 'Enjoy your stay at Red Planet.',
-                  'description2': 'Buy your tickets now!',
-                  'headline': 'Luxury Cruise to Mars'
+                  'dimensions': {
+                      'width': '300',
+                      'height': '250'
+                  },
+                  # This field normally contains the javascript ad tag.
+                  'snippet': ('<img src="http://www.google.com/intl/en/adwords/'
+                              'select/images/samples/inline.jpg"/>'),
+                  'impressionBeaconUrl': 'http://www.examples.com/beacon',
+                  'certifiedVendorFormatId': '119',
+                  'isCookieTargeted': 'false',
+                  'isUserInterestTargeted': 'false',
+                  'isTagged': 'false'
               }
           }
       }

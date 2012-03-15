@@ -35,7 +35,8 @@ LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
 LIB_VERSION = '9.1.0'
 LIB_MIN_COMMON_VERSION = '3.0.6'
-LIB_SIG = '%s-%s' % (LIB_SHORT_NAME, LIB_VERSION)
+PYTHON_VERSION = 'Python %d.%d' % (sys.version_info[0], sys.version_info[1])
+LIB_SIG = '%s-%s (%s)' % (LIB_SHORT_NAME, LIB_VERSION, PYTHON_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:
   msg = ('Unsupported version of the core module is detected. Please download '

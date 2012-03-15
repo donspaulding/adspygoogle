@@ -70,7 +70,19 @@ def main(client, ad_id, ad_extension_id):
                   'address': geo_location['address'],
                   'geoPoint': geo_location['geoPoint'],
                   'encodedLocation': geo_location['encodedLocation'],
-                  'source': 'ADWORDS_FRONTEND'
+                  'source': 'ADWORDS_FRONTEND',
+                  # Optional fields.
+                  'companyName': 'ACME Inc.',
+                  'phoneNumber': '(650) 253-0000'
+                  # 'iconMediaId': '...',
+                  # 'imageMediaId': '...'
+              },
+              # Optional fields.
+              'overrideInfo': {
+                  'LocationOverrideInfo': {
+                      'radius': '5',
+                      'radiusUnits': 'MILES'
+                  }
               }
           }
       }

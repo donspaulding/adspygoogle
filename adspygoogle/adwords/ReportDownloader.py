@@ -34,6 +34,7 @@ from adspygoogle.common import MessageHandler
 from adspygoogle.common import SanityCheck
 from adspygoogle.common import Utils
 from adspygoogle.common.Errors import ValidationError
+from adspygoogle.common.Logger import Logger
 
 SERVICE_NAME = 'ReportDefinitionService'
 DOWNLOAD_URL_BASE = '/api/adwords/reportdownload'
@@ -48,7 +49,7 @@ class ReportDownloader(object):
 
   """Utility class that downloads reports."""
 
-  def __init__(self, headers, config, op_config):
+  def __init__(self, headers, config, op_config, logger):
     """Inits ReportDownloader.
 
     Args:
@@ -70,6 +71,7 @@ class ReportDownloader(object):
                                                       namespace_suffix)
     self._soappyservice = SOAPpy.WSDL.Proxy(
         wsdl_url, noroot=1)
+    self._logger = logger
 
   def DownloadReport(self, report_definition_or_id, return_micros=False,
                      file_path=None, fileobj=None):
@@ -110,12 +112,6 @@ class ReportDownloader(object):
     report_xml = self.__GetReportXml(report)
 
     payload = urllib.urlencode({'__rdxml': report_xml})
-    if Utils.BoolTypeConvert(self._config['compress']):
-      buffer = StringIO.StringIO()
-      gzip_file = gzip.GzipFile(mode='wb', fileobj=buffer)
-      gzip_file.write(payload)
-      gzip_file.close()
-      payload = buffer.getvalue()
 
     url = self.__GenerateUrl()
     self.__ReloadAuthToken()
@@ -258,9 +254,23 @@ class ReportDownloader(object):
     """
     headers = headers or {}
     request_url = self._op_config['server'] + url
+
+    orig_payload = payload
+
+    if Utils.BoolTypeConvert(self._config['compress']):
+      buffer = StringIO.StringIO()
+      gzip_file = gzip.GzipFile(mode='wb', fileobj=buffer)
+      gzip_file.write(payload)
+      gzip_file.close()
+      payload = buffer.getvalue()
+      headers['Content-Length'] = str(len(payload))
+
+    start_time = time.strftime('%Y-%m-%d %H:%M:%S')
     request = urllib2.Request(request_url, payload, headers)
     try:
       response = urllib2.urlopen(request)
+      response_code = response.code
+      response_headers = response.info().headers
       if response.info().get('Content-Encoding') == 'gzip':
         response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
                                  mode='rb')
@@ -271,6 +281,8 @@ class ReportDownloader(object):
         return response.read()
     except urllib2.HTTPError, e:
       response = e
+      response_code = response.code
+      response_headers = response.info().headers
       if response.info().get('Content-Encoding') == 'gzip':
         response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
                                  mode='rb')
@@ -279,6 +291,12 @@ class ReportDownloader(object):
       if match:
         error = match.group(3)
       raise AdWordsError('%s %s' % (str(e), error))
+    finally:
+      end_time = time.strftime('%Y-%m-%d %H:%M:%S')
+      xml_log_data = self.__CreateXmlLogData(start_time, end_time, request_url,
+                                             headers, orig_payload,
+                                             response_code, response_headers)
+      self.__LogRequest(xml_log_data)
 
   def __ReloadAuthToken(self):
     """Ensures we have a valid auth_token in our headers."""
@@ -322,3 +340,101 @@ class ReportDownloader(object):
       else:
         break
     return byteswritten
+
+  def __LogRequest(self, xml_log_data):
+    """Logs the Report Download request.
+
+    Args:
+      xml_log_data: str Data to log for this request.
+    """
+    log_handlers = self.__GetLogHandlers()
+    for handler in log_handlers:
+      if handler['tag'] == 'xml_log':
+        handler['target'] = Logger.NONE
+        handler['data'] += xml_log_data
+    for handler in log_handlers:
+      if (handler['tag'] and
+          Utils.BoolTypeConvert(self._config[handler['tag']])):
+        handler['target'] = Logger.FILE
+      # If debugging is On, raise handler's target two levels,
+      #   NONE -> CONSOLE
+      #   FILE -> FILE_AND_CONSOLE.
+      if Utils.BoolTypeConvert(self._config['debug']):
+        handler['target'] += 2
+
+      if (handler['target'] != Logger.NONE and handler['data'] and
+          handler['data'] != 'None' and handler['data'] != 'DEBUG: '):
+        self._logger.Log(handler['name'], handler['data'],
+                         log_level=Logger.DEBUG, log_handler=handler['target'])
+
+  def __GetLogHandlers(self):
+    """Gets a list of log handlers for the AdWords library.
+
+    Returns:
+      list Log handlers for the AdWords library.
+    """
+    return [
+        {
+            'tag': 'xml_log',
+            'name': 'soap_xml',
+            'data': ''
+        },
+        {
+            'tag': 'request_log',
+            'name': 'request_info',
+            'data': ('host=%s operation=%s'
+                     % (self._op_config['server'], 'ReportDownload'))
+        }
+    ]
+
+  def __CreateXmlLogData(self, start_time, end_time, request_url,
+                         request_headers, payload, response_code,
+                         response_headers):
+    """Transforms arguments into a string to log.
+
+    Args:
+      start_time: str Formatted start time.
+      end_time: str Formatted end time.
+      request_url: str URL POSTed to.
+      request_headers: dict Request headers sent with request.
+      payload: str Payload (http request body).
+      response_code: int Response code from remote server.
+      response_headers: list List of string headers received.
+
+    Returns:
+      str Data to log.
+    """
+    # Errors will have a response code, otherwise it should have been success.
+    response_code = response_code or 200
+    return ('StartTime: %s\n%s\n%s\n\n%s\n\n%s\n%s\nEndTime: %s'
+            % (start_time, 'POST: %s' % request_url,
+               self.__SerializeRequestHeaders(request_headers), payload,
+               'HTTP %s' % response_code,
+               self.__SerializeResponseHeaders(response_headers), end_time))
+
+  def __SerializeRequestHeaders(self, request_headers):
+    """Serializes the request headers into a string for logging.
+
+    Returns each key->value pair as "key: value" with newlines separating them.
+
+    Args:
+      request_headers: dict Dictionary of headers to serialize.
+
+    Returns:
+      str Serialized request headers.
+    """
+    return '\n'.join(['%s: %s' % (key, request_headers[key])
+                      for key in request_headers])
+
+  def __SerializeResponseHeaders(self, response_headers):
+    """Serializes the response headers.
+
+    Headers are already formatted, this joins them into a single string.
+
+    Args:
+      response_headers: list List of string headers received.
+
+    Returns:
+      str Serialized response headers.
+    """
+    return (''.join(response_headers)).strip()

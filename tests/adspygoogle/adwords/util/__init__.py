@@ -46,10 +46,46 @@ def CreateTestCampaign(client):
           'budget': {
               'period': 'DAILY',
               'amount': {
-                  'microAmount': '1000000'
+                  'microAmount': '10000000'
               },
               'deliveryMethod': 'STANDARD'
           }
+      }
+  }]
+  return campaign_service.Mutate(
+      operations)[0]['value'][0]['id']
+
+
+def CreateTestRTBCampaign(client):
+  """Creates a CPM campaign to run tests with.
+
+  Args:
+    client: AdWordsClient client to obtain services from.
+
+  Returns:
+    int CampaignId
+  """
+  campaign_service = client.GetCampaignService(SERVER_V201109, VERSION_V201109,
+                                               HTTP_PROXY)
+  operations = [{
+      'operator': 'ADD',
+      'operand': {
+          'name': 'Campaign #%s' % Utils.GetUniqueName(),
+          'status': 'PAUSED',
+          'biddingStrategy': {
+              'type': 'ManualCPM'
+          },
+          'budget': {
+              'period': 'DAILY',
+              'amount': {
+                  'microAmount': '10000000'
+              },
+              'deliveryMethod': 'STANDARD'
+          },
+          'settings': [{
+              'xsi_type': 'RealTimeBiddingSetting',
+              'optIn': 'true'
+          }]
       }
   }]
   return campaign_service.Mutate(
@@ -77,6 +113,38 @@ def CreateTestAdGroup(client, campaign_id):
           'bids': {
               'type': 'ManualCPCAdGroupBids',
               'keywordMaxCpc': {
+                  'amount': {
+                      'microAmount': '1000000'
+                  }
+              }
+          }
+      }
+  }]
+  ad_groups = ad_group_service.Mutate(operations)[0]['value']
+  return ad_groups[0]['id']
+
+
+def CreateTestCPMAdGroup(client, campaign_id):
+  """Creates a CPM AdGroup to run tests with.
+
+  Args:
+    client: AdWordsClient client to obtain services from.
+    campaign_id: int ID of a CPM Campaign.
+
+  Returns:
+    int AdGroupId
+  """
+  ad_group_service = client.GetAdGroupService(SERVER_V201109, VERSION_V201109,
+                                              HTTP_PROXY)
+  operations = [{
+      'operator': 'ADD',
+      'operand': {
+          'campaignId': campaign_id,
+          'name': 'AdGroup #%s' % Utils.GetUniqueName(),
+          'status': 'ENABLED',
+          'bids': {
+              'type': 'ManualCPMAdGroupBids',
+              'maxCpm': {
                   'amount': {
                       'microAmount': '1000000'
                   }
@@ -142,6 +210,33 @@ def CreateTestKeyword(client, ad_group_id):
               'matchType': 'BROAD',
               'text': 'mars cruise'
           }
+      }
+  }]
+  criteria = ad_group_criterion_service.Mutate(operations)
+  return criteria[0]['value'][0]['criterion']['id']
+
+
+def CreateTestPlacement(client, ad_group_id):
+  """Creates a Placement for running tests with.
+
+  Args:
+    client: AdWordsClient client to obtain services from.
+    ad_group_id: int ID of the AdGroup the Ad should belong to.
+
+  Returns:
+    int: KeywordId
+  """
+  ad_group_criterion_service = client.GetAdGroupCriterionService(
+      SERVER_V201109, VERSION_V201109, HTTP_PROXY)
+  operations = [{
+      'operator': 'ADD',
+      'operand': {
+          'xsi_type': 'BiddableAdGroupCriterion',
+          'adGroupId': ad_group_id,
+          'criterion': {
+              'xsi_type': 'Placement',
+              'url': 'http://mars.google.com'
+          },
       }
   }]
   criteria = ad_group_criterion_service.Mutate(operations)

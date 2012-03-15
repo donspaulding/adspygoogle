@@ -51,13 +51,17 @@ def main(client, campaign_id, ad_group_id):
 
   # Construct operations and add experiment.
   tomorrow = datetime.datetime.now() + datetime.timedelta(1)
+  thirty_days = datetime.datetime.now() + datetime.timedelta(30)
   operations = [{
       'operator': 'ADD',
       'operand': {
           'campaignId': campaign_id,
           'name': 'Interplanetary Experiment #%s' % Utils.GetUniqueName(),
           'queryPercentage': '10',
-          'startDateTime': tomorrow.strftime('%Y%m%d %H%M%S')
+          'startDateTime': tomorrow.strftime('%Y%m%d %H%M%S'),
+          # Optional fields.
+          'status': 'ACTIVE',
+          'endDateTime': thirty_days.strftime('%Y%m%d %H%M%S')
       }
   }]
   result = experiment_service.Mutate(operations)[0]

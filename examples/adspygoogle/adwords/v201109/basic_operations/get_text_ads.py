@@ -18,6 +18,7 @@
 add_text_ads.py.
 
 Tags: AdGroupAdService.get
+Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'

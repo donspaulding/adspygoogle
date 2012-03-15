@@ -19,6 +19,7 @@ groups, run get_ad_groups.py. To get criteria, run
 get_keywords.py.
 
 Tags: BidLandscapeService.getBidLandscape
+Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'

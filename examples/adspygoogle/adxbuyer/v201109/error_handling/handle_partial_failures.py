@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,73 +42,67 @@ def main(client, ad_group_id):
   ad_group_criterion_service = client.GetAdGroupCriterionService(
       'https://adwords-sandbox.google.com', 'v201109')
 
-  # Construct keyword ad group criteria objects.
-  keywords = [
+  # Construct placement ad group criteria objects.
+  placements = [
       {
           'xsi_type': 'BiddableAdGroupCriterion',
           'adGroupId': ad_group_id,
           'criterion': {
-              'xsi_type': 'Keyword',
-              'matchType': 'BROAD',
-              'text': 'mars cruise'
+              'xsi_type': 'Placement',
+              'url': 'www.example.com/something'
           }
       },
       {
           'xsi_type': 'BiddableAdGroupCriterion',
           'adGroupId': ad_group_id,
           'criterion': {
-              'xsi_type': 'Keyword',
-              'matchType': 'BROAD',
-              'text': 'inv\@lid cruise'
+              'xsi_type': 'Placement',
+              'url': 'INVALID!!_URL'
           }
       },
       {
           'xsi_type': 'BiddableAdGroupCriterion',
           'adGroupId': ad_group_id,
           'criterion': {
-              'xsi_type': 'Keyword',
-              'matchType': 'BROAD',
-              'text': 'venus cruise'
+              'xsi_type': 'Placement',
+              'url': 'www.example.com/somethingelse'
           }
       },
       {
           'xsi_type': 'BiddableAdGroupCriterion',
           'adGroupId': ad_group_id,
           'criterion': {
-              'xsi_type': 'Keyword',
-              'matchType': 'BROAD',
-              'text': 'b\(a\)d keyword cruise'
+              'xsi_type': 'Placement',
+              'url': 'BAD!!_URL'
           }
       }
   ]
 
   # Construct operations and add ad group criteria.
   operations = []
-  for keyword in keywords:
+  for placement in placements:
     operations.append(
         {
             'operator': 'ADD',
-            'operand': keyword
+            'operand': placement
         })
   result = ad_group_criterion_service.Mutate(operations)[0]
 
   # Display results.
   for criterion in result['value']:
     if criterion['AdGroupCriterion_Type'] == 'BiddableAdGroupCriterion':
-      print ('Added keyword ad group criterion with ad group id \'%s\', '
-             'criterion id \'%s\', text \'%s\', and match type \'%s\' was '
-             'added.'
+      print ('Added placement ad group criterion with ad group id \'%s\', '
+             'criterion id \'%s\' and url \'%s\''
              % (criterion['adGroupId'], criterion['criterion']['id'],
-                criterion['criterion']['text'],
-                criterion['criterion']['matchType']))
+                criterion['criterion']['url']))
 
   for error in result['partialFailureErrors']:
     index = re.findall('operations\[(.*)\]\.', error['fieldPath'])
     if index:
-      print ('Keyword ad group criterion with ad group id \'%s\' and text '
+      print ('Placement ad group criterion with ad group id \'%s\' and url '
              '\'%s\' triggered a failure for the following reason: \'%s\'.'
-             % (keywords[int(index[0])]['adGroupId'],
-                keywords[int(index[0])]['criterion']['text'],
+             % (placements[int(index[0])]['adGroupId'],
+                placements[int(index[0])]['criterion']['url'],
                 error['errorString']))
     else:
       print 'The following failure has occurred: \'%s\'.' % error['errorString']

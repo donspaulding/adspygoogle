@@ -19,6 +19,7 @@
 Note by default this account will only be accessible via parent MCC.
 
 Tags: CreateAccountService.mutate
+Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'

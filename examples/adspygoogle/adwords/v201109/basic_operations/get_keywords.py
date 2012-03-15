@@ -18,6 +18,7 @@
 add_keywords.py.
 
 Tags: AdGroupCriterionService.get
+Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'

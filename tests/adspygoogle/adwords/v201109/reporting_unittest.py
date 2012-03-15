@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 import unittest
 
 from examples.adspygoogle.adwords.v201109.reporting import download_criteria_report
+from examples.adspygoogle.adwords.v201109.reporting import get_campaign_stats
 from examples.adspygoogle.adwords.v201109.reporting import get_defined_reports
 from examples.adspygoogle.adwords.v201109.reporting import get_report_fields
 from tests.adspygoogle.adwords import client
@@ -47,6 +48,10 @@ class Reporting(unittest.TestCase):
   def testDownloadCriteriaReport(self):
     """Tests whether we can download a criteria report."""
     download_criteria_report.main(client, '/tmp/report.rpt')
+
+  def testGetCampaignStats(self):
+    """Tests whether we can get campaign stats."""
+    get_campaign_stats.main(client)
 
   def testGetDefinedReports(self):
     """Test whether we can get defined reports."""

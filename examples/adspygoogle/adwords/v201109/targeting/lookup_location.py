@@ -68,11 +68,12 @@ def main(client):
                                  location_criterion['location']
                                  ['parentLocations']])
     print ('The search term \'%s\' returned the location \'%s\' of type \'%s\''
-           ' with parent locations \'%s\' and reach \'%s\''
+           ' with parent locations \'%s\', reach \'%s\' and id \'%s\''
            % (location_criterion['searchTerm'],
               location_criterion['location']['locationName'],
               location_criterion['location']['displayType'], parent_string,
-              location_criterion.get('reach')))
+              location_criterion.get('reach'),
+              location_criterion['location']['id']))
 
   print
   print ('Usage: %s units, %s operations' % (client.GetUnits(),

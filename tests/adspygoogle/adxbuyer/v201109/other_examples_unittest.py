@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests to cover Optimization examples."""
+"""Unit tests to cover other examples."""
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
@@ -24,10 +24,9 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 import time
 import unittest
 
-from examples.adspygoogle.adwords.v201109.optimization import estimate_keyword_traffic
-from examples.adspygoogle.adwords.v201109.optimization import get_keyword_bid_simulations
-from examples.adspygoogle.adwords.v201109.optimization import get_keyword_ideas
-from examples.adspygoogle.adwords.v201109.optimization import get_placement_ideas
+from examples.adspygoogle.adxbuyer.v201109.campaign_management import add_placements_in_bulk
+from examples.adspygoogle.adxbuyer.v201109.error_handling import handle_partial_failures
+from examples.adspygoogle.adxbuyer.v201109.optimization import get_placement_ideas
 from tests.adspygoogle.adwords import client
 from tests.adspygoogle.adwords import SERVER_V201109
 from tests.adspygoogle.adwords import TEST_VERSION_V201109
@@ -35,9 +34,9 @@ from tests.adspygoogle.adwords import util
 from tests.adspygoogle.adwords import VERSION_V201109
 
 
-class Optimization(unittest.TestCase):
+class OtherExamples(unittest.TestCase):
 
-  """Unittest suite for Optimization code examples."""
+  """Unittest suite for other code examples."""
 
   SERVER = SERVER_V201109
   VERSION = VERSION_V201109
@@ -46,31 +45,25 @@ class Optimization(unittest.TestCase):
 
   def setUp(self):
     """Prepare unittest."""
-    time.sleep(3)
+    time.sleep(1)
     client.use_mcc = False
     if not self.__class__.loaded:
-      self.__class__.campaign_id = util.CreateTestCampaign(client)
-      self.__class__.ad_group_id = util.CreateTestAdGroup(
+      self.__class__.campaign_id = util.CreateTestRTBCampaign(
+          client)
+      self.__class__.ad_group_id = util.CreateTestCPMAdGroup(
           client, self.__class__.campaign_id)
-      self.__class__.keyword_id = util.CreateTestKeyword(
-          client, self.__class__.ad_group_id)
       self.__class__.loaded = True
 
-  def testEstimateKeywordTraffic(self):
-    """Test whether we can estimate keyword traffic."""
-    estimate_keyword_traffic.main(client)
+  def testAddPlacementsInBulk(self):
+    """Tests whether we can add placements in bulk."""
+    add_placements_in_bulk.main(client, self.__class__.ad_group_id)
 
-  def testGetKeywordBidSimulations(self):
-    """Test whether we can get keyword bid simulations."""
-    get_keyword_bid_simulations.main(client, self.__class__.ad_group_id,
-                                     self.__class__.keyword_id)
-
-  def testGetKeywordIdeas(self):
-    """Test whether we can get keyword ideas."""
-    get_keyword_ideas.main(client)
+  def testHandlePartialFailures(self):
+    """Tests whether we can handle partial failures."""
+    handle_partial_failures.main(client, self.__class__.ad_group_id)
 
   def testGetPlacementIdeas(self):
-    """Test whether we can get placement ideas."""
+    """Tests whether we can get placement ideas."""
     get_placement_ideas.main(client)
 
 

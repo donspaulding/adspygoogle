@@ -51,7 +51,9 @@ def main(client):
                       'name': ('Mars cruise customers #%s'
                                % Utils.GetUniqueName())
                   }
-              ]
+              ],
+              # Optional field.
+              'status': 'OPEN',
           }
       }
   ]

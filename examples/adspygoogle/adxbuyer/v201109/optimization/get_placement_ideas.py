@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example gets all the keyword opportunities for the account.
+"""This example retrieves placements that are related to a given placement.
 
-Tags: BulkOpportunityService.get
+Tags: TargetingIdeaService.get
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -27,23 +27,27 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
-from adspygoogle.common import Utils
 
 
-PAGE_SIZE = 20
+PAGE_SIZE = 100
 
 
 def main(client):
   # Initialize appropriate service.
-  bulk_opportunity_service = client.GetBulkOpportunityService(
+  targeting_idea_service = client.GetTargetingIdeaService(
       'https://adwords-sandbox.google.com', 'v201109')
 
-  # Construct selector and get all campaigns.
+  # Construct selector object and retrieve related placements.
   offset = 0
+  url = 'mars.google.com'
   selector = {
-      'ideaTypes': ['KEYWORD'],
-      'requestedAttributeTypes': ['ADGROUP_ID', 'AVERAGE_MONTHLY_SEARCHES',
-                                  'CAMPAIGN_ID', 'IDEA_TYPE', 'KEYWORD'],
+      'searchParameters': [{
+          'xsi_type': 'RelatedToUrlSearchParameter',
+          'urls': [ url ]
+      }],
+      'ideaType': 'PLACEMENT',
+      'requestType': 'IDEAS',
+      'requestedAttributeTypes': ['CRITERION'],
       'paging': {
           'startIndex': str(offset),
           'numberResults': str(PAGE_SIZE)
@@ -51,25 +55,19 @@ def main(client):
   }
   more_pages = True
   while more_pages:
-    page = bulk_opportunity_service.Get(selector)[0]
+    page = targeting_idea_service.Get(selector)[0]
 
     # Display results.
-    if 'entries' in page and page['entries']:
-      for opportunity in page['entries']:
-        for idea in opportunity['opportunityIdeas']:
-          data = Utils.GetDictFromMap(idea['data'])
-          idea_type = data['IDEA_TYPE']['value']
-          keyword_text = data['KEYWORD']['value']['text']
-          campaign_id = data['CAMPAIGN_ID']['value']
-          ad_group_id = data['ADGROUP_ID']['value']
-          average_monthly_searches = data['AVERAGE_MONTHLY_SEARCHES']['value']
-
-          print ('%s opportunity for Campaign %s and AdGroup %s: %s with %s '
-                 'average monthly searches\n' % (idea_type, campaign_id,
-                                                 ad_group_id, keyword_text,
-                                                 average_monthly_searches))
+    if 'entries' in page:
+      for result in page['entries']:
+        result = result['data'][0]['value']
+        print ('Placement with url \'%s\' was found.'
+               % (result['value']['url']))
+      print
+      print ('Total placements found related to \'%s\': %s'
+             % (url, page['totalNumEntries']))
     else:
-      print 'No campaigns were found.'
+      print 'No placements found related to \'%s\'.' % url
     offset += PAGE_SIZE
     selector['paging']['startIndex'] = str(offset)
     more_pages = offset < int(page['totalNumEntries'])

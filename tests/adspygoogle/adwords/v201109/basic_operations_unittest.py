@@ -24,8 +24,8 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 import time
 import unittest
 
-from examples.adspygoogle.adwords.v201109.basic_operations import add_ad_group
-from examples.adspygoogle.adwords.v201109.basic_operations import add_campaign
+from examples.adspygoogle.adwords.v201109.basic_operations import add_ad_groups
+from examples.adspygoogle.adwords.v201109.basic_operations import add_campaigns
 from examples.adspygoogle.adwords.v201109.basic_operations import add_keywords
 from examples.adspygoogle.adwords.v201109.basic_operations import add_text_ads
 from examples.adspygoogle.adwords.v201109.basic_operations import delete_ad
@@ -71,13 +71,13 @@ class BasicOperations(unittest.TestCase):
           client, self.__class__.ad_group_id)
       self.__class__.loaded = True
 
-  def testAddAdGroup(self):
-    """Tests whether we can add an ad group."""
-    add_ad_group.main(client, self.__class__.campaign_id)
+  def testAddAdGroups(self):
+    """Tests whether we can add ad groups."""
+    add_ad_groups.main(client, self.__class__.campaign_id)
 
-  def testAddCampaign(self):
-    """Tests whether we can add a campaign."""
-    add_campaign.main(client)
+  def testAddCampaigns(self):
+    """Tests whether we can add campaigns."""
+    add_campaigns.main(client)
 
   def testAddKeywords(self):
     """Tests whether we can add keywords."""

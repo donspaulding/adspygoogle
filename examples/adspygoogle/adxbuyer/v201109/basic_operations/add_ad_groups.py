@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example updates the bid of a keyword. To add a keyword, run
-add_keywords.py.
+"""This example adds ad groups to a given campaign. To get ad groups, run
+get_ad_groups.py.
 
-Tags: AdGroupCriterionService.mutate
-Api: AdWordsOnly
+Tags: AdGroupService.mutate
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -29,49 +28,55 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
+from adspygoogle.common import Utils
 
 
-ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
-criterion_id = 'INSERT_KEYWORD_CRITERION_ID_HERE'
+campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
 
 
-def main(client, ad_group_id, criterion_id):
+def main(client, campaign_id):
   # Initialize appropriate service.
-  ad_group_criterion_service = client.GetAdGroupCriterionService(
+  ad_group_service = client.GetAdGroupService(
       'https://adwords-sandbox.google.com', 'v201109')
 
-  # Construct operations and update bids.
-
+  # Construct operations and add ad groups.
   operations = [{
-      'operator': 'SET',
+      'operator': 'ADD',
       'operand': {
-          'xsi_type': 'BiddableAdGroupCriterion',
-          'adGroupId': ad_group_id,
-          'criterion': {
-              'id': criterion_id,
-          },
+          'campaignId': campaign_id,
+          'name': 'Earth to Mars Cruises #%s' % Utils.GetUniqueName(),
+          'status': 'ENABLED',
           'bids': {
-              'xsi_type': 'ManualCPCAdGroupCriterionBids',
-              'maxCpc': {
+              'xsi_type': 'ManualCPMAdGroupBids',
+              'maxCpm': {
                   'amount': {
-                      'microAmount': '500000'
+                      'microAmount': '10000000'
+                  }
+              }
+          }
+      }
+  }, {
+      'operator': 'ADD',
+      'operand': {
+          'campaignId': campaign_id,
+          'name': 'Earth to Venus Cruises #%s' % Utils.GetUniqueName(),
+          'status': 'ENABLED',
+          'bids': {
+              'xsi_type': 'ManualCPMAdGroupBids',
+              'maxCpm': {
+                  'amount': {
+                      'microAmount': '10000000'
                   }
               }
           }
       }
   }]
-  ad_group_criteria = ad_group_criterion_service.Mutate(operations)[0]
+  ad_groups = ad_group_service.Mutate(operations)[0]
 
   # Display results.
-  if 'value' in ad_group_criteria:
-    for criterion in ad_group_criteria['value']:
-      if criterion['criterion']['Criterion_Type'] == 'Keyword':
-        print ('Ad group criterion with ad group id \'%s\' and criterion id '
-               '\'%s\' had its bid set to \'%s\'.'
-               % (criterion['adGroupId'], criterion['criterion']['id'],
-                  criterion['bids']['maxCpc']['amount']['microAmount']))
-  else:
-    print 'No ad group criteria were updated.'
+  for ad_group in ad_groups['value']:
+    print ('Ad group with name \'%s\' and id \'%s\' was added.'
+           % (ad_group['name'], ad_group['id']))
 
   print
   print ('Usage: %s units, %s operations' % (client.GetUnits(),
@@ -82,4 +87,4 @@ if __name__ == '__main__':
   # Initialize client object.
   client = AdWordsClient(path=os.path.join('..', '..', '..', '..', '..'))
 
-  main(client, ad_group_id, criterion_id)
+  main(client, campaign_id)

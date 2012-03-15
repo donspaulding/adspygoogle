@@ -18,6 +18,7 @@
 get ad group criteria, run get_keywords.py.
 
 Tags: AdGroupCriterionService.mutate
+Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'

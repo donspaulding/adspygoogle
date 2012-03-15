@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example adds ad group criteria to an ad group. To get ad groups, run
-get_ad_groups.py.
+"""This example deletes an ad group criterion using the 'REMOVE' operator. To
+get ad group criteria, run get_placements.py.
 
 Tags: AdGroupCriterionService.mutate
-Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -32,57 +31,35 @@ from adspygoogle.adwords.AdWordsClient import AdWordsClient
 
 
 ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
+criterion_id = 'INSERT_CRITERION_ID_HERE'
 
 
-def main(client, ad_group_id):
+def main(client, ad_group_id, criterion_id):
   # Initialize appropriate service.
   ad_group_criterion_service = client.GetAdGroupCriterionService(
       'https://adwords-sandbox.google.com', 'v201109')
 
-  # Construct keyword ad group criterion object.
-  keyword1 = {
-      'xsi_type': 'BiddableAdGroupCriterion',
-      'adGroupId': ad_group_id,
-      'criterion': {
-          'xsi_type': 'Keyword',
-          'matchType': 'BROAD',
-          'text': 'mars'
-      },
-      # These fields are optional.
-      'userStatus': 'PAUSED',
-      'destinationUrl': 'http://example.com/mars'
-  }
-
-  keyword2 = {
-      'xsi_type': 'NegativeAdGroupCriterion',
-      'adGroupId': ad_group_id,
-      'criterion': {
-          'xsi_type': 'Keyword',
-          'matchType': 'EXACT',
-          'text': 'pluto'
-      }
-  }
-
-  # Construct operations and add ad group criteria.
+  # Construct operations and delete ad group criteria.
   operations = [
       {
-          'operator': 'ADD',
-          'operand': keyword1
-      },
-      {
-          'operator': 'ADD',
-          'operand': keyword2
+          'operator': 'REMOVE',
+          'operand': {
+              'xsi_type': 'BiddableAdGroupCriterion',
+              'adGroupId': ad_group_id,
+              'criterion': {
+                  'id': criterion_id
+              }
+          }
       }
   ]
-  ad_group_criteria = ad_group_criterion_service.Mutate(operations)[0]['value']
+  result = ad_group_criterion_service.Mutate(operations)[0]
 
   # Display results.
-  for criterion in ad_group_criteria:
-    print ('Keyword ad group criterion with ad group id \'%s\', criterion id '
-           '\'%s\', text \'%s\', and match type \'%s\' was added.'
+  for criterion in result['value']:
+    print ('Ad group criterion with ad group id \'%s\', criterion id \'%s\', '
+           'and type \'%s\' was deleted.'
            % (criterion['adGroupId'], criterion['criterion']['id'],
-              criterion['criterion']['text'],
-              criterion['criterion']['matchType']))
+              criterion['criterion']['Criterion_Type']))
 
   print
   print ('Usage: %s units, %s operations' % (client.GetUnits(),
@@ -93,4 +70,4 @@ if __name__ == '__main__':
   # Initialize client object.
   client = AdWordsClient(path=os.path.join('..', '..', '..', '..', '..'))
 
-  main(client, ad_group_id)
+  main(client, ad_group_id, criterion_id)

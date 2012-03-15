@@ -82,8 +82,9 @@ def main(sandbox_email, client_customer_id):
   print ('OAuth authorization successful.  Store these credentials to reuse' +
          ' until revoked: %s' % credentials)
 
-  # Note: you could simply client.SetOAuthCredentials(credentials) and skip the
-  # previous steps once access has been granted.
+  # Note: you could simply set the crendentials as below and skip the previous
+  # steps once access has been granted.
+  client.oauth_credentials = credentials
 
   campaign_service = client.GetCampaignService(
       'https://adwords-sandbox.google.com', 'v201109')

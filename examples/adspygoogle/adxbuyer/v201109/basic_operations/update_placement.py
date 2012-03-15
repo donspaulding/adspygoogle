@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example updates the bid of a keyword. To add a keyword, run
-add_keywords.py.
+"""This example updates the bid of a placement. To add a placement, run
+add_placements.py.
 
 Tags: AdGroupCriterionService.mutate
-Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -32,7 +31,7 @@ from adspygoogle.adwords.AdWordsClient import AdWordsClient
 
 
 ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
-criterion_id = 'INSERT_KEYWORD_CRITERION_ID_HERE'
+criterion_id = 'INSERT_PLACEMENT_CRITERION_ID_HERE'
 
 
 def main(client, ad_group_id, criterion_id):
@@ -41,7 +40,6 @@ def main(client, ad_group_id, criterion_id):
       'https://adwords-sandbox.google.com', 'v201109')
 
   # Construct operations and update bids.
-
   operations = [{
       'operator': 'SET',
       'operand': {
@@ -51,8 +49,8 @@ def main(client, ad_group_id, criterion_id):
               'id': criterion_id,
           },
           'bids': {
-              'xsi_type': 'ManualCPCAdGroupCriterionBids',
-              'maxCpc': {
+              'xsi_type': 'ManualCPMAdGroupCriterionBids',
+              'maxCpm': {
                   'amount': {
                       'microAmount': '500000'
                   }

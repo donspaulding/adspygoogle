@@ -45,7 +45,16 @@ def main(client):
               'category': 'DEFAULT',
               'markupLanguage': 'HTML',
               'httpProtocol': 'HTTP',
-              'textFormat': 'HIDDEN'
+              'textFormat': 'HIDDEN',
+              # Optional fields.
+              'status': 'ENABLED',
+              'viewthroughLookbackWindow': '15',
+              'viewthroughConversionDeDupSearch': 'true',
+              'isProductAdsChargeable': 'true',
+              'productAdsChargeableConversionWindow': '15',
+              'conversionPageLanguage': 'en',
+              'backgroundColor': '#0000FF',
+              'userRevenueValue': 'someJavascriptVariable'
           }
       }
   ]

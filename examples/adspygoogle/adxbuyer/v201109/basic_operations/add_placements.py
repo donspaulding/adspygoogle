@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 get_ad_groups.py.
 
 Tags: AdGroupCriterionService.mutate
-Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -40,49 +39,46 @@ def main(client, ad_group_id):
       'https://adwords-sandbox.google.com', 'v201109')
 
   # Construct keyword ad group criterion object.
-  keyword1 = {
+  placement1 = {
       'xsi_type': 'BiddableAdGroupCriterion',
       'adGroupId': ad_group_id,
       'criterion': {
-          'xsi_type': 'Keyword',
-          'matchType': 'BROAD',
-          'text': 'mars'
+          'xsi_type': 'Placement',
+          'url': 'http://mars.google.com'
       },
       # These fields are optional.
       'userStatus': 'PAUSED',
       'destinationUrl': 'http://example.com/mars'
   }
 
-  keyword2 = {
+  placement2 = {
       'xsi_type': 'NegativeAdGroupCriterion',
       'adGroupId': ad_group_id,
       'criterion': {
-          'xsi_type': 'Keyword',
-          'matchType': 'EXACT',
-          'text': 'pluto'
-      }
+          'xsi_type': 'Placement',
+          'url': 'http://example.com/pluto'
+      },
   }
 
   # Construct operations and add ad group criteria.
   operations = [
       {
           'operator': 'ADD',
-          'operand': keyword1
+          'operand': placement1
       },
       {
           'operator': 'ADD',
-          'operand': keyword2
+          'operand': placement2
       }
   ]
   ad_group_criteria = ad_group_criterion_service.Mutate(operations)[0]['value']
 
   # Display results.
   for criterion in ad_group_criteria:
-    print ('Keyword ad group criterion with ad group id \'%s\', criterion id '
-           '\'%s\', text \'%s\', and match type \'%s\' was added.'
+    print ('Placement ad group criterion with ad group id \'%s\', criterion '
+           'id \'%s\', and url \'%s\' was added.'
            % (criterion['adGroupId'], criterion['criterion']['id'],
-              criterion['criterion']['text'],
-              criterion['criterion']['matchType']))
+              criterion['criterion']['url']))
 
   print
   print ('Usage: %s units, %s operations' % (client.GetUnits(),

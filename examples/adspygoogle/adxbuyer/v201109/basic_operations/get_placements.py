@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example gets all images and videos. To upload an image, run
-upload_image.py. To upload video, see:
-http://adwords.google.com/support/aw/bin/answer.py?hl=en&answer=39454.
+"""This example gets all ad group criteria in an account. To add placements, run
+add_placements.py.
 
-Tags: MediaService.get
+Tags: AdGroupCriterionService.get
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -29,7 +28,6 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
-from adspygoogle.common import Utils
 
 
 PAGE_SIZE = 500
@@ -37,17 +35,17 @@ PAGE_SIZE = 500
 
 def main(client):
   # Initialize appropriate service.
-  media_service = client.GetMediaService(
+  ad_group_criterion_service = client.GetAdGroupCriterionService(
       'https://adwords-sandbox.google.com', 'v201109')
 
-  # Construct selector and get all images.
+  # Construct selector and get all ad group criteria.
   offset = 0
   selector = {
-      'fields': ['MediaId', 'Type', 'Width', 'Height', 'MimeType'],
+      'fields': ['AdGroupId', 'Id', 'PlacementUrl'],
       'predicates': [{
-          'field': 'Type',
-          'operator': 'IN',
-          'values': ['IMAGE', 'VIDEO']
+          'field': 'CriteriaType',
+          'operator': 'EQUALS',
+          'values': ['PLACEMENT']
       }],
       'paging': {
           'startIndex': str(offset),
@@ -56,17 +54,17 @@ def main(client):
   }
   more_pages = True
   while more_pages:
-    page = media_service.Get(selector)[0]
+    page = ad_group_criterion_service.Get(selector)[0]
 
     # Display results.
     if 'entries' in page:
-      for image in page['entries']:
-        dimensions = Utils.GetDictFromMap(image['dimensions'])
-        print ('Media with id \'%s\', dimensions \'%sx%s\', and MimeType \'%s\''
-               ' was found.' % (image['mediaId'], dimensions['FULL']['height'],
-                                dimensions['FULL']['width'], image['mimeType']))
+      for criterion in page['entries']:
+        print ('Placement ad group criterion with ad group id \'%s\', '
+               'criterion id \'%s\' and url \'%s\'.'
+               % (criterion['adGroupId'], criterion['criterion']['id'],
+                  criterion['criterion']['url']))
     else:
-      print 'No images/videos were found.'
+      print 'No placements were found.'
     offset += PAGE_SIZE
     selector['paging']['startIndex'] = str(offset)
     more_pages = offset < int(page['totalNumEntries'])

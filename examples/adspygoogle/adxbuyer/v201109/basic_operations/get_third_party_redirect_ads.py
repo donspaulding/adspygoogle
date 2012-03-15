@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example gets all images and videos. To upload an image, run
-upload_image.py. To upload video, see:
-http://adwords.google.com/support/aw/bin/answer.py?hl=en&answer=39454.
+"""This example gets all text ads for a given ad group. To add an ad, run
+add_text_ads.py.
 
-Tags: MediaService.get
+Tags: AdGroupAdService.get
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -29,26 +28,33 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
-from adspygoogle.common import Utils
 
 
 PAGE_SIZE = 500
+ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
 
 
-def main(client):
+def main(client, ad_group_id):
   # Initialize appropriate service.
-  media_service = client.GetMediaService(
+  ad_group_ad_service = client.GetAdGroupAdService(
       'https://adwords-sandbox.google.com', 'v201109')
 
-  # Construct selector and get all images.
+  # Construct selector and get all ads for a given ad group.
   offset = 0
   selector = {
-      'fields': ['MediaId', 'Type', 'Width', 'Height', 'MimeType'],
-      'predicates': [{
-          'field': 'Type',
-          'operator': 'IN',
-          'values': ['IMAGE', 'VIDEO']
-      }],
+      'fields': ['Id', 'AdGroupId', 'Status'],
+      'predicates': [
+          {
+              'field': 'AdGroupId',
+              'operator': 'EQUALS',
+              'values': [ad_group_id]
+          },
+          {
+              'field': 'AdType',
+              'operator': 'EQUALS',
+              'values': ['THIRD_PARTY_REDIRECT_AD']
+          }
+      ],
       'paging': {
           'startIndex': str(offset),
           'numberResults': str(PAGE_SIZE)
@@ -56,17 +62,15 @@ def main(client):
   }
   more_pages = True
   while more_pages:
-    page = media_service.Get(selector)[0]
+    page = ad_group_ad_service.Get(selector)[0]
 
     # Display results.
     if 'entries' in page:
-      for image in page['entries']:
-        dimensions = Utils.GetDictFromMap(image['dimensions'])
-        print ('Media with id \'%s\', dimensions \'%sx%s\', and MimeType \'%s\''
-               ' was found.' % (image['mediaId'], dimensions['FULL']['height'],
-                                dimensions['FULL']['width'], image['mimeType']))
+      for ad in page['entries']:
+        print ('Ad with id \'%s\', status \'%s\', and of type \'%s\' was found.'
+               % (ad['ad']['id'], ad['status'], ad['ad']['Ad_Type']))
     else:
-      print 'No images/videos were found.'
+      print 'No ads were found.'
     offset += PAGE_SIZE
     selector['paging']['startIndex'] = str(offset)
     more_pages = offset < int(page['totalNumEntries'])
@@ -80,4 +84,4 @@ if __name__ == '__main__':
   # Initialize client object.
   client = AdWordsClient(path=os.path.join('..', '..', '..', '..', '..'))
 
-  main(client)
+  main(client, ad_group_id)

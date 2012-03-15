@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example adds an ad group to a given campaign. To get ad groups, run
+"""This example adds ad groups to a given campaign. To get ad groups, run
 get_ad_groups.py.
 
 Tags: AdGroupService.mutate
@@ -39,7 +39,7 @@ def main(client, campaign_id):
   ad_group_service = client.GetAdGroupService(
       'https://adwords-sandbox.google.com', 'v201109')
 
-  # Construct operations and add an ad group.
+  # Construct operations and add ad groups.
   operations = [{
       'operator': 'ADD',
       'operand': {
@@ -52,7 +52,28 @@ def main(client, campaign_id):
                   'amount': {
                       'microAmount': '1000000'
                   }
+              },
+              # Optional field.
+              'keywordContentMaxCpc': {
+                  'amount': {
+                      'microAmount': '2000000'
+                  }
               }
+          }
+      }
+  }, {
+      'operator': 'ADD',
+      'operand': {
+          'campaignId': campaign_id,
+          'name': 'Earth to Venus Cruises #%s' % Utils.GetUniqueName(),
+          'status': 'ENABLED',
+          'bids': {
+              'xsi_type': 'ManualCPCAdGroupBids',
+              'keywordMaxCpc': {
+                  'amount': {
+                      'microAmount': '2000000'
+                  }
+              },
           }
       }
   }]

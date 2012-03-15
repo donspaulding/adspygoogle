@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example adds a campaign. To get campaigns, run get_campaigns.py.
+"""This example adds campaigns. To get campaigns, run get_campaigns.py.
 
 Tags: CampaignService.mutate
 """
@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
 from adspygoogle.common import Utils
 from datetime import date
+import datetime
 
 
 def main(client):
@@ -36,7 +37,7 @@ def main(client):
   campaign_service = client.GetCampaignService(
       'https://adwords-sandbox.google.com', 'v201109')
 
-  # Construct operations and add campaign.
+  # Construct operations and add campaigns.
   operations = [{
       'operator': 'ADD',
       'operand': {
@@ -45,7 +46,8 @@ def main(client):
           'biddingStrategy': {
               'xsi_type': 'ManualCPC'
           },
-          'endDate': date(date.today().year + 1, 12, 31).strftime('%Y%m%d'),
+          'endDate': (datetime.datetime.now() +
+                      datetime.timedelta(365)).strftime('%Y%m%d'),
           'budget': {
               'period': 'DAILY',
               'amount': {
@@ -58,6 +60,40 @@ def main(client):
               'targetSearchNetwork': 'true',
               'targetContentNetwork': 'false',
               'targetContentContextual': 'false',
+              'targetPartnerSearchNetwork': 'false'
+          },
+          # Optional fields
+          'startDate': (datetime.datetime.now() +
+                        datetime.timedelta(1)).strftime('%Y%m%d'),
+          'adServingOptimizationStatus': 'ROTATE',
+          'frequencyCap': {
+              'impressions': '5',
+              'timeUnit': 'DAY',
+              'level': 'ADGROUP'
+          }
+      }
+  }, {
+      'operator': 'ADD',
+      'operand': {
+          'name': 'Interplanetary Cruise banner #%s' % Utils.GetUniqueName(),
+          'status': 'PAUSED',
+          'biddingStrategy': {
+              'xsi_type': 'ManualCPM'
+          },
+          'endDate': (datetime.datetime.now() +
+                      datetime.timedelta(365)).strftime('%Y%m%d'),
+          'budget': {
+              'period': 'DAILY',
+              'amount': {
+                  'microAmount': '150000000'
+              },
+              'deliveryMethod': 'STANDARD'
+          },
+          'networkSetting': {
+              'targetGoogleSearch': 'false',
+              'targetSearchNetwork': 'false',
+              'targetContentNetwork': 'true',
+              'targetContentContextual': 'true',
               'targetPartnerSearchNetwork': 'false'
           }
       }

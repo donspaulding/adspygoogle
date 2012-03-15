@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ MutateJobService.
 Tags: MutateJobService.mutate
 Tags: MutateJobService.get
 Tags: MutateJobService.getResult
-Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
@@ -39,7 +38,7 @@ from adspygoogle.common import Utils
 
 RETRY_INTERVAL = 10
 RETRIES_COUNT = 30
-KEYWORD_NUMBER = 100
+PLACEMENT_NUMBER = 100
 INDEX_REGEX = r'operations\[(\d+)\].operand'
 
 ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
@@ -53,11 +52,11 @@ def main(client, ad_group_id):
   # Create list of all operations for the job.
   operations = []
 
-    # Create AdGroupCriterionOperations to add keywords.
-  for i in range(KEYWORD_NUMBER):
-    keyword = 'mars%d' % i
+    # Create AdGroupCriterionOperations to add placements.
+  for i in range(PLACEMENT_NUMBER):
+    url = 'www.example.com/mars%d' % i
     if random.randint(1,10) == 1:
-      keyword += '!!!'
+      url = 'NOT_@_URL'
     operations.append({
         'xsi_type': 'AdGroupCriterionOperation',
         'operator': 'ADD',
@@ -65,9 +64,8 @@ def main(client, ad_group_id):
             'xsi_type': 'BiddableAdGroupCriterion',
             'adGroupId': ad_group_id,
             'criterion': {
-                'xsi_type': 'Keyword',
-                'matchType': 'BROAD',
-                'text': keyword
+                'xsi_type': 'Placement',
+                'url': url
             }
         }
     })
@@ -129,9 +127,9 @@ def main(client, ad_group_id):
   for error in result_response['SimpleMutateResult']['errors']:
     index = int(re.search(INDEX_REGEX, error['fieldPath']).group(1))
     reason = error['reason']
-    keyword = operations[index]['operand']['criterion']['text']
-    print ('ERROR - keyword \'%s\' failed due to \'%s\'' %
-           (keyword, reason))
+    url = operations[index]['operand']['criterion']['url']
+    print ('ERROR - placement \'%s\' failed due to \'%s\'' %
+           (url, reason))
 
   print
   print ('Usage: %s units, %s operations' % (client.GetUnits(),

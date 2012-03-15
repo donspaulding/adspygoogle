@@ -1,3 +1,9 @@
+15.2.3:
+- Adding logging to ReportDownloader, to aid in troubleshooting.
+
+15.2.2:
+- Removing support for BulkOpportunityService (was recently shut down).
+
 15.2.1:
 - Re-addressing issue #16 and #25.
 - Misc example fixes.

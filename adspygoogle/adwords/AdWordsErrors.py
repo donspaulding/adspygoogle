@@ -172,7 +172,7 @@ for index in ERROR_CODES+ERROR_TYPES:
                  'AlertError', 'ApiError', 'ApiUsageError', 'AudioError',
                  'BidLandscapeServiceError', 'BiddingError',
                  'BiddingTransitionError', 'BudgetError', 'BulkMutateJobError',
-                 'BulkOpportunityServiceError', 'CampaignAdExtensionError',
+                 'CampaignAdExtensionError',
                  'CampaignCriterionError', 'CampaignError',
                  'CollectionSizeError', 'ConversionTrackingError',
                  'CriterionError', 'CriterionPolicyError', 'CurrencyCodeError',

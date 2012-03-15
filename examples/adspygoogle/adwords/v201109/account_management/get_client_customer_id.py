@@ -19,6 +19,7 @@ We recommend to use this script as a one off to convert your identifiers to IDs
 and store them for future use.
 
 Tags: InfoService.get
+Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'

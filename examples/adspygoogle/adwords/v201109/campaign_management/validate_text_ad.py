@@ -17,6 +17,7 @@
 """This example shows how to use validateOnly SOAP header.
 
 Tags: CampaignService.mutate
+Api: AdWordsOnly
 """
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
