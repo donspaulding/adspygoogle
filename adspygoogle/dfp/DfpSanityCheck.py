@@ -32,16 +32,11 @@ def ValidateServer(server, version):
     ValidationError: if the given API server or version is not valid.
   """
   # Map of supported API servers and versions.
-  prod = {'v201103': 'https://www.google.com',
-          'v201104': 'https://www.google.com',
-          'v201107': 'https://www.google.com',
-          'v201108': 'https://www.google.com',
+  prod = {'v201108': 'https://www.google.com',
           'v201111': 'https://www.google.com',
-          'v201201': 'https://www.google.com'}
-  sandbox = {'v201103': 'https://sandbox.google.com',
-             'v201104': 'https://sandbox.google.com',
-             'v201107': 'https://sandbox.google.com',
-             'v201108': 'https://sandbox.google.com',
+          'v201201': 'https://www.google.com',
+          'v201203': 'https://www.google.com'}
+  sandbox = {'v201108': 'https://sandbox.google.com',
              'v201111': 'https://sandbox.google.com',
              'v201201': 'https://sandbox.google.com'}
 

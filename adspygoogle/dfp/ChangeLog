@@ -1,3 +1,11 @@
+9.2.0
+- Added support for v201203 and set it as default.
+- Examples service creation, DfpClient, and DfpUtils will no longer default to
+  the sandbox environment.
+- Added support for AudienceSegmentService.
+- Starting in v201203, network codes are no longer optional in config.py.
+- Sunset versions v201103, v201104, v201107.
+
 9.1.0
 - Added support for v201201 and set it as default.
 - Change DfpUtils.GetAllEntitiesByStatementWithService to accept bind variables.

@@ -57,8 +57,10 @@ must include SOAP header elements. Currently accepted
 header elements are email, password, networkCode, and
 applicationName.
 
-The networkCode is optional, if user belongs to only
-one network.
+Starting in v201203, networkCodes are required for
+all calls other than GetAllNetworks and
+MakeTestNetwork. In earlier versions, networkCode is
+optional if the user belongs to only one network.
 
 For the applicationName header, the client library name
 and its version is automatically prefixed. Supply
@@ -72,7 +74,7 @@ The default behavior is to keep old values.
 prompts = (('Your DFP account\'s login email', 'email',
             'auth'),
            ('Login password', 'password', 'auth'),
-           ('Network code [optional]', 'networkCode', 'auth'),
+           ('Network code', 'networkCode', 'auth'),
            ('Application name', 'applicationName', 'auth'),
            ('Select XML parser [1=PyXML, 2=ElementTree]', 'xml_parser',
             'config'),

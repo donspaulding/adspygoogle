@@ -233,17 +233,15 @@ class DfpClient(Client):
                                                   http_proxy=http_proxy)
     return service.CallRawMethod(soap_message)
 
-  def GetService(self, service_name, server='https://sandbox.google.com',
+  def GetService(self, service_name, server='https://www.google.com',
                  version=None, http_proxy=None, op_config=None):
     """Generic method to create a service.
 
     Args:
       service_name: str Name of the service to create.
       [optional]
-      server: str API server to access for this API call. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior is
-              to access sandbox site.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -265,15 +263,14 @@ class DfpClient(Client):
     return GenericDfpService(self._headers, self._config, op_config,
                              self.__lock, self.__logger, service_name)
 
-  def GetCompanyService(self, server='https://sandbox.google.com', version=None,
+  def GetCompanyService(self, server='https://www.google.com', version=None,
                         http_proxy=None):
     """Create a CompanyService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -282,15 +279,14 @@ class DfpClient(Client):
     """
     return self.GetService('CompanyService', server, version, http_proxy)
 
-  def GetContentService(self, server='https://sandbox.google.com', version=None,
+  def GetContentService(self, server='https://www.google.com', version=None,
                         http_proxy=None):
     """Create a ContentService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -299,15 +295,14 @@ class DfpClient(Client):
     """
     return self.GetService('ContentService', server, version, http_proxy)
 
-  def GetCreativeService(self, server='https://sandbox.google.com',
+  def GetCreativeService(self, server='https://www.google.com',
                          version=None, http_proxy=None):
     """Create a CreativeService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -317,15 +312,14 @@ class DfpClient(Client):
     """
     return self.GetService('CreativeService', server, version, http_proxy)
 
-  def GetCreativeTemplateService(self, server='https://sandbox.google.com',
+  def GetCreativeTemplateService(self, server='https://www.google.com',
                                  version=None, http_proxy=None):
     """Create a CreativeTemplateService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -336,15 +330,14 @@ class DfpClient(Client):
     return self.GetService('CreativeTemplateService', server, version,
                            http_proxy)
 
-  def GetCustomTargetingService(self, server='https://sandbox.google.com',
+  def GetCustomTargetingService(self, server='https://www.google.com',
                                 version=None, http_proxy=None):
     """Create a CustomTargetingService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -355,15 +348,14 @@ class DfpClient(Client):
     return self.GetService('CustomTargetingService', server, version,
                            http_proxy)
 
-  def GetForecastService(self, server='https://sandbox.google.com',
+  def GetForecastService(self, server='https://www.google.com',
                          version=None, http_proxy=None):
     """Create a ForecastService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -372,15 +364,14 @@ class DfpClient(Client):
     """
     return self.GetService('ForecastService', server, version, http_proxy)
 
-  def GetInventoryService(self, server='https://sandbox.google.com',
+  def GetInventoryService(self, server='https://www.google.com',
                           version=None, http_proxy=None):
     """Create a InventoryService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -389,15 +380,14 @@ class DfpClient(Client):
     """
     return self.GetService('InventoryService', server, version, http_proxy)
 
-  def GetLabelService(self, server='https://sandbox.google.com',
+  def GetLabelService(self, server='https://www.google.com',
                       version=None, http_proxy=None):
     """Create a LabelService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -407,15 +397,14 @@ class DfpClient(Client):
     return self.GetService('LabelService', server, version, http_proxy)
 
   def GetLineItemCreativeAssociationService(self,
-                                            server='https://sandbox.google.com',
+                                            server='https://www.google.com',
                                             version=None, http_proxy=None):
     """Create a LineItemCreativeAssociationService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -426,15 +415,14 @@ class DfpClient(Client):
     return self.GetService('LineItemCreativeAssociationService', server,
                            version, http_proxy)
 
-  def GetLineItemService(self, server='https://sandbox.google.com',
+  def GetLineItemService(self, server='https://www.google.com',
                          version=None, http_proxy=None):
     """Create a LineItemService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -443,15 +431,14 @@ class DfpClient(Client):
     """
     return self.GetService('LineItemService', server, version, http_proxy)
 
-  def GetNetworkService(self, server='https://sandbox.google.com', version=None,
+  def GetNetworkService(self, server='https://www.google.com', version=None,
                         http_proxy=None):
     """Create a NetworkService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -460,15 +447,14 @@ class DfpClient(Client):
     """
     return self.GetService('NetworkService', server, version, http_proxy)
 
-  def GetOrderService(self, server='https://sandbox.google.com', version=None,
+  def GetOrderService(self, server='https://www.google.com', version=None,
                       http_proxy=None):
     """Create a OrderService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -477,15 +463,14 @@ class DfpClient(Client):
     """
     return self.GetService('OrderService', server, version, http_proxy)
 
-  def GetPlacementService(self, server='https://sandbox.google.com',
+  def GetPlacementService(self, server='https://www.google.com',
                           version=None, http_proxy=None):
     """Create a PlacementService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -495,15 +480,14 @@ class DfpClient(Client):
     return self.GetService('PlacementService', server, version, http_proxy)
 
   def GetPublisherQueryLanguageService(self,
-                                       server='https://sandbox.google.com',
+                                       server='https://www.google.com',
                                        version=None, http_proxy=None):
     """Create a PublisherQueryLanguageService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -514,15 +498,14 @@ class DfpClient(Client):
     return self.GetService('PublisherQueryLanguageService', server, version,
                            http_proxy)
 
-  def GetReportService(self, server='https://sandbox.google.com',
+  def GetReportService(self, server='https://www.google.com',
                        version=None, http_proxy=None):
     """Create a ReportService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -531,15 +514,14 @@ class DfpClient(Client):
     """
     return self.GetService('ReportService', server, version, http_proxy)
 
-  def GetSuggestedAdUnitService(self, server='https://sandbox.google.com',
+  def GetSuggestedAdUnitService(self, server='https://www.google.com',
                                 version=None, http_proxy=None):
     """Create a SuggestedAdUnitService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -550,15 +532,14 @@ class DfpClient(Client):
     return self.GetService('SuggestedAdUnitService', server, version,
                            http_proxy)
 
-  def GetThirdPartySlotService(self, server='https://sandbox.google.com',
+  def GetThirdPartySlotService(self, server='https://www.google.com',
                                version=None, http_proxy=None):
     """Create a ThirdPartySlotService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -568,15 +549,14 @@ class DfpClient(Client):
     """
     return self.GetService('ThirdPartySlotService', server, version, http_proxy)
 
-  def GetUserService(self, server='https://sandbox.google.com', version=None,
+  def GetUserService(self, server='https://www.google.com', version=None,
                      http_proxy=None):
     """Create a UserService.
 
     Args:
       [optional]
-      server: str API server to access for API calls. Possible values
-              are 'https://www.google.com' for live site and
-              'https://sandbox.google.com' for sandbox.
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 

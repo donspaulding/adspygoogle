@@ -26,132 +26,12 @@ import unittest
 
 from tests.adspygoogle.dfp import client
 from tests.adspygoogle.dfp import HTTP_PROXY
-from tests.adspygoogle.dfp import SERVER_V201103
-from tests.adspygoogle.dfp import SERVER_V201104
-from tests.adspygoogle.dfp import SERVER_V201107
 from tests.adspygoogle.dfp import SERVER_V201108
 from tests.adspygoogle.dfp import SERVER_V201111
-from tests.adspygoogle.dfp import TEST_VERSION_V201103
-from tests.adspygoogle.dfp import TEST_VERSION_V201104
-from tests.adspygoogle.dfp import TEST_VERSION_V201107
 from tests.adspygoogle.dfp import TEST_VERSION_V201108
 from tests.adspygoogle.dfp import TEST_VERSION_V201111
-from tests.adspygoogle.dfp import VERSION_V201103
-from tests.adspygoogle.dfp import VERSION_V201104
-from tests.adspygoogle.dfp import VERSION_V201107
 from tests.adspygoogle.dfp import VERSION_V201108
 from tests.adspygoogle.dfp import VERSION_V201111
-
-
-class NetworkServiceTestV201103(unittest.TestCase):
-
-  """Unittest suite for NetworkService using v201103."""
-
-  SERVER = SERVER_V201103
-  VERSION = VERSION_V201103
-  client.debug = False
-  service = None
-  network = None
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetNetworkService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testGetAllNetworks(self):
-    """Test whether we can fetch all networks."""
-    self.assert_(isinstance(self.__class__.service.GetAllNetworks(), tuple))
-
-  def testGetCurrentNetwork(self):
-    """Test whether we can fetch current network."""
-    self.__class__.network = self.__class__.service.GetCurrentNetwork()[0]
-    self.assert_(isinstance(self.__class__.network, dict))
-
-  def testUpdateNetwork(self):
-    """Test whether we can update a network."""
-    if not self.__class__.network:
-      self.testGetCurrentNetwork()
-    display_name = 'My test network'
-    self.__class__.network['displayName'] = 'My test network'
-    order = self.__class__.service.UpdateNetwork(self.__class__.network)
-    self.assert_(isinstance(order, tuple))
-    self.assertEqual(order[0]['displayName'], display_name)
-
-
-class NetworkServiceTestV201104(unittest.TestCase):
-
-  """Unittest suite for NetworkService using v201104."""
-
-  SERVER = SERVER_V201104
-  VERSION = VERSION_V201104
-  client.debug = False
-  service = None
-  network = None
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetNetworkService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testGetAllNetworks(self):
-    """Test whether we can fetch all networks."""
-    self.assert_(isinstance(self.__class__.service.GetAllNetworks(), tuple))
-
-  def testGetCurrentNetwork(self):
-    """Test whether we can fetch current network."""
-    self.__class__.network = self.__class__.service.GetCurrentNetwork()[0]
-    self.assert_(isinstance(self.__class__.network, dict))
-
-  def testUpdateNetwork(self):
-    """Test whether we can update a network."""
-    if not self.__class__.network:
-      self.testGetCurrentNetwork()
-    display_name = 'My test network'
-    self.__class__.network['displayName'] = 'My test network'
-    order = self.__class__.service.UpdateNetwork(self.__class__.network)
-    self.assert_(isinstance(order, tuple))
-    self.assertEqual(order[0]['displayName'], display_name)
-
-
-class NetworkServiceTestV201107(unittest.TestCase):
-
-  """Unittest suite for NetworkService using v201107."""
-
-  SERVER = SERVER_V201107
-  VERSION = VERSION_V201107
-  client.debug = False
-  service = None
-  network = None
-
-  def setUp(self):
-    """Prepare unittest."""
-    print self.id()
-    if not self.__class__.service:
-      self.__class__.service = client.GetNetworkService(
-          self.__class__.SERVER, self.__class__.VERSION, HTTP_PROXY)
-
-  def testGetAllNetworks(self):
-    """Test whether we can fetch all networks."""
-    self.assert_(isinstance(self.__class__.service.GetAllNetworks(), tuple))
-
-  def testGetCurrentNetwork(self):
-    """Test whether we can fetch current network."""
-    self.__class__.network = self.__class__.service.GetCurrentNetwork()[0]
-    self.assert_(isinstance(self.__class__.network, dict))
-
-  def testUpdateNetwork(self):
-    """Test whether we can update a network."""
-    if not self.__class__.network:
-      self.testGetCurrentNetwork()
-    display_name = 'My test network'
-    self.__class__.network['displayName'] = 'My test network'
-    order = self.__class__.service.UpdateNetwork(self.__class__.network)
-    self.assert_(isinstance(order, tuple))
-    self.assertEqual(order[0]['displayName'], display_name)
 
 
 class NetworkServiceTestV201108(unittest.TestCase):
@@ -228,39 +108,6 @@ class NetworkServiceTestV201111(unittest.TestCase):
     self.assertEqual(order[0]['displayName'], display_name)
 
 
-def makeTestSuiteV201103():
-  """Set up test suite using v201103.
-
-  Returns:
-    TestSuite test suite using v201103.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(NetworkServiceTestV201103))
-  return suite
-
-
-def makeTestSuiteV201104():
-  """Set up test suite using v201104.
-
-  Returns:
-    TestSuite test suite using v201104.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(NetworkServiceTestV201104))
-  return suite
-
-
-def makeTestSuiteV201107():
-  """Set up test suite using v201107.
-
-  Returns:
-    TestSuite test suite using v201107.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(NetworkServiceTestV201107))
-  return suite
-
-
 def makeTestSuiteV201108():
   """Set up test suite using v201108.
 
@@ -285,12 +132,6 @@ def makeTestSuiteV201111():
 
 if __name__ == '__main__':
   suites = []
-  if TEST_VERSION_V201103:
-    suites.append(makeTestSuiteV201103())
-  if TEST_VERSION_V201104:
-    suites.append(makeTestSuiteV201104())
-  if TEST_VERSION_V201107:
-    suites.append(makeTestSuiteV201107())
   if TEST_VERSION_V201108:
     suites.append(makeTestSuiteV201108())
   if TEST_VERSION_V201111:

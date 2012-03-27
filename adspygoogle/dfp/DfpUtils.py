@@ -52,7 +52,7 @@ def GetTimezones():
 
 
 def GetAllEntitiesByStatement(client, service_name, query='', page_size=500,
-                              server='https://sandbox.google.com',
+                              server='https://www.google.com',
                               version=DEFAULT_API_VERSION, http_proxy=None):
   """Get all existing entities by statement.
 
@@ -68,10 +68,8 @@ def GetAllEntitiesByStatement(client, service_name, query='', page_size=500,
     query: str a statement filter to apply, if any. The default is empty string.
     page_size: int size of the page to use. If page size is less than 0 or
                greater than 500, defaults to 500.
-    server: str API server to access for this API call. Possible values
-            are: 'https://www.google.com' for live site and
-            'https://sandbox.google.com' for sandbox. The default behavior is
-            to access sandbox site.
+    server: str API server to access for this API call. The default value is
+            'https://www.google.com'.
     version: str API version to use.
     http_proxy: str HTTP proxy to use.
 

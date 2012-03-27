@@ -48,10 +48,6 @@ maintained. The last update for the ElementTree library is dated 2007-09-12.
 Out of these three libraries, the lxml is the one that was updated most
 recently. Also, if you have Python v2.5+, the ElementTree comes with it.
 
-Although, there are projects out there that still support PyXML, it is no longer
-maintained. The last update for ElementTree library is dated 2007-09-12. Out of
-these three libraries, the lxml is the one that was updated most recently.
-
 The code examples, located in "examples/", demonstrate how to use client
 library. For additional examples, take a look at the unit tests in "tests/".
 
@@ -60,8 +56,7 @@ Useful scripts are located in the "scripts/" directory.
 The documentation was generated using Epydoc, a nice tool for generating API
 documentation for Python modules, and is located in "docs/".
 
-The client library includes a set of unit tests located in "tests/". All unit
-tests are (and should be) executed against the Sandbox environment. Whenever
+The client library includes a set of unit tests located in "tests/". Whenever
 changes are made to the client library, the appropriate unit test should be
 executed to make sure that everything is working as intended and no new bugs
 were introduced.
@@ -70,13 +65,18 @@ were introduced.
 How do I start?
 ---------------
 
-If you haven't yet done so, you'll need to request sandbox access to the API as
-directed on this page: http://code.google.com/apis/dfp/docs/signup.html. Once
-that's taken care of, proceed to the step-by-step guide below. Write some code
-and enjoy!
+If you haven't done so yet, you'll need to a DFP account with API access to
+make requests. If you do not have a DFP account, you can follow the instructions
+here:
 
+  https://developers.google.com/doubleclick-publishers/docs/signup.html
 
-Step-by-step guide for accessing the sandbox:
+If you do have a DFP account, you can enable API access by following the
+instructions here:
+
+  https://developers.google.com/doubleclick-publishers/docs/prod_signup
+
+Step-by-step guide for accessing the test account:
 -----------------------------------------
 
 1) Make sure you have Python v2.4 or above installed. The latest stable version
@@ -97,12 +97,12 @@ Step-by-step guide for accessing the sandbox:
 
 5) From the same directory, run the "config.py" script to set
    authentication headers. More information about the format of each header is
-   at http://code.google.com/apis/dfp/docs/developers_guide.html#headers.
+   at https://developers.google.com/doubleclick-publishers/docs/developers_guide#headers.
    Example,
 
    Login email: joe.shmoe@gmail.com
    Login password: secret
-   Network code [optional]:
+   Network code: 123456
    Application name: GoogleTest
 
    Select XML parser [1=PyXML, 2=ElementTree]: 1
