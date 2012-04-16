@@ -1,3 +1,6 @@
+15.2.4:
+- Fixing bug with ReportDownloader logging when request_log is disabled.
+
 15.2.3:
 - Adding logging to ReportDownloader, to aid in troubleshooting.
 

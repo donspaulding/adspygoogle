@@ -349,8 +349,8 @@ class ReportDownloader(object):
     """
     log_handlers = self.__GetLogHandlers()
     for handler in log_handlers:
+      handler['target'] = Logger.NONE
       if handler['tag'] == 'xml_log':
-        handler['target'] = Logger.NONE
         handler['data'] += xml_log_data
     for handler in log_handlers:
       if (handler['tag'] and
