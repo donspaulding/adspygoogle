@@ -36,7 +36,7 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
-from adspygoogle.dfp.DfpClient import DfpClient
+from adspygoogle import DfpClient
 
 
 # Initialize client object.
@@ -52,5 +52,5 @@ network = network_service.MakeTestNetwork()[0]
 # Display results.
 print ('Test network with network code \'%s\' and display name \'%s\' created.'
        % (network['networkCode'], network['displayName']))
-print ('You may now sign in at http://www.google.com/dfp/main?networkCode=' %
+print ('You may now sign in at http://www.google.com/dfp/main?networkCode=%s' %
        network['networkCode'])

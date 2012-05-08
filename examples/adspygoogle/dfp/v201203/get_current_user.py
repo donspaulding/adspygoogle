@@ -25,7 +25,7 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
-from adspygoogle.dfp.DfpClient import DfpClient
+from adspygoogle import DfpClient
 
 
 # Initialize client object.

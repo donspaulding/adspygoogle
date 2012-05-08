@@ -13,3 +13,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+try:
+  from adspygoogle.adwords.AdWordsClient import AdWordsClient
+except ImportError:
+  pass
+try:
+  from adspygoogle.dfa.DfaClient import DfaClient
+except ImportError:
+  pass
+try:
+  from adspygoogle.dfp.DfpClient import DfpClient
+except ImportError:
+  pass

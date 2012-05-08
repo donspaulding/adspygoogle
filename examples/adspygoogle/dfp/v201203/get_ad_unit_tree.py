@@ -26,8 +26,8 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
+from adspygoogle import DfpClient
 from adspygoogle.dfp import DfpUtils
-from adspygoogle.dfp.DfpClient import DfpClient
 
 
 def DisplayAdUnitTree(root_ad_unit, ad_unit_tree, depth=0):

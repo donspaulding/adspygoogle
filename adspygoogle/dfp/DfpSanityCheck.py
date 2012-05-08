@@ -35,7 +35,8 @@ def ValidateServer(server, version):
   prod = {'v201108': 'https://www.google.com',
           'v201111': 'https://www.google.com',
           'v201201': 'https://www.google.com',
-          'v201203': 'https://www.google.com'}
+          'v201203': 'https://www.google.com',
+          'v201204': 'https://www.google.com'}
   sandbox = {'v201108': 'https://sandbox.google.com',
              'v201111': 'https://sandbox.google.com',
              'v201201': 'https://sandbox.google.com'}

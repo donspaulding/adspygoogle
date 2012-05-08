@@ -1,3 +1,11 @@
+3.0.8:
+- Added shortcuts for importing Client classes into the adspygoogle module.
+  Where you previous had to use the following import -
+      from adspygoogle.adwords.AdWordsClient import AdWordsClient
+  you may now do the following -
+      from adspygoogle import AdWordsClient
+  The same style of import works for DfaClient and DfpClient.
+
 3.0.7:
 - Patched MessageHandler's PackForSoappy function to no longer treat strings and
   unicode strings the same way.
