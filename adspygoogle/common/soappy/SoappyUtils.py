@@ -268,12 +268,12 @@ def GetComplexFieldNamespaceByFieldName(field, type_name, ns, soappy_service):
           soappy_service)
     except TypeError:
       raise TypeError('There is no field with the name %s in complex type %s.'
-                      % (key, type_name))
+                      % (field, type_name))
   else:
     for element in type_obj.content.content:
       if element.attributes['name'] == field: return ns
     raise TypeError('There is no field with the name %s in complex type %s.'
-                    % (key, type_name))
+                    % (field, type_name))
 
 
 def GetExplicitType(obj, type_name, ns, soappy_service):

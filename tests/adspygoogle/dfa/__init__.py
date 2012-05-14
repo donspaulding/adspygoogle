@@ -14,24 +14,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""Settings and configuration for the unit tests."""
-
-__author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
-
-import os
-import sys
-sys.path.insert(0, os.path.join('..', '..', '..'))
-
-from adspygoogle.dfa.DfaClient import DfaClient
-
-
-HTTP_PROXY = None
-TEST_VERSION_V1_15 = True
-SERVER_V1_15 = 'https://advertisersapitest.doubleclick.net'
-VERSION_V1_15 = 'v1.15'
-TEST_VERSION_V1_16 = True
-SERVER_V1_16 = 'https://advertisersapitest.doubleclick.net'
-VERSION_V1_16 = 'v1.16'
-TEST_VERSION_V1_17 = True
-client = DfaClient(path=os.path.join('..', '..', '..'))

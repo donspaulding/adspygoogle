@@ -33,8 +33,8 @@ LIB_SHORT_NAME = 'DfaApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python/'
 LIB_AUTHOR = 'Joseph DiLallo'
 LIB_AUTHOR_EMAIL = 'api.jdilallo@gmail.com'
-LIB_VERSION = '2.1.0'
-LIB_MIN_COMMON_VERSION = '3.0.6'
+LIB_VERSION = '2.2.0'
+LIB_MIN_COMMON_VERSION = '3.0.8'
 PYTHON_VERSION = 'Python %d.%d' % (sys.version_info[0], sys.version_info[1])
 LIB_SIG = '%s-%s (%s)' % (LIB_SHORT_NAME, LIB_VERSION, PYTHON_VERSION)
 
@@ -44,7 +44,7 @@ if VERSION < LIB_MIN_COMMON_VERSION:
   raise MissingPackageError(msg)
 
 # Tuple of strings representing API versions.
-API_VERSIONS = ('v1.15', 'v1.16', 'v1.17')
+API_VERSIONS = ('v1.17', 'v1.18')
 DEFAULT_API_VERSION = API_VERSIONS[len(API_VERSIONS) - 1]
 
 # Accepted combinations of headers which user has to provide. Either one of

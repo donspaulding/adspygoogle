@@ -28,7 +28,7 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
-from adspygoogle.dfa.DfaClient import DfaClient
+from adspygoogle import DfaClient
 
 
 # Initialize client object.
