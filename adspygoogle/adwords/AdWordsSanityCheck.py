@@ -32,8 +32,10 @@ def ValidateServer(server, version):
     ValidationError: if the given API server or version is not valid.
   """
   # Map of supported API servers and versions.
-  prod = {'v201109': 'https://adwords.google.com'}
-  sandbox = {'v201109': 'https://adwords-sandbox.google.com'}
+  prod = {'v201109': 'https://adwords.google.com',
+          'v201109_1': 'https://adwords.google.com'}
+  sandbox = {'v201109': 'https://adwords-sandbox.google.com',
+             'v201109_1': 'https://adwords-sandbox.google.com'}
 
   if server not in prod.values() and server not in sandbox.values():
     msg = ('Given API server, \'%s\', is not valid. Expecting one of %s.'

@@ -26,7 +26,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
-from adspygoogle.adwords.AdWordsClient import AdWordsClient
+from adspygoogle import AdWordsClient
 from adspygoogle.common.oauth.PythonOAuth2OAuthHandler import PythonOAuth2OAuthHandler
 
 

@@ -26,7 +26,7 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
-from adspygoogle.adwords.AdWordsClient import AdWordsClient
+from adspygoogle import AdWordsClient
 from adspygoogle.common import Utils
 from datetime import date
 import datetime

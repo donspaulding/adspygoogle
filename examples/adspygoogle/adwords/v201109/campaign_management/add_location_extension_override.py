@@ -29,7 +29,7 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
-from adspygoogle.adwords.AdWordsClient import AdWordsClient
+from adspygoogle import AdWordsClient
 
 
 ad_id = 'INSERT_AD_GROUP_AD_ID_HERE'

@@ -23,22 +23,6 @@ import os
 from adspygoogle.adwords import LIB_HOME
 from adspygoogle.common import Utils
 
-GENERIC_SELECTOR_SWITCHOVER = {
-    'AdGroupAdService': 'v201101',
-    'AdGroupCriterionService': 'v201101',
-    'AdGroupService': 'v201101',
-    'AdParamService': 'v201109',
-    'CampaignAdExtensionService': 'v201101',
-    'CampaignCriterionService': 'v201101',
-    'CampaignService': 'v201101',
-    'ConversionTrackerService': 'v201101',
-    'ExperimentService': 'v201101',
-    'MediaService': 'v201101',
-    'UserListService': 'v201101'
-}
-
-GENERIC_SELECTOR_XSI_TYPE = 'Selector'
-
 
 def GetCurrencies():
   """Get a list of available currencies.
@@ -68,41 +52,6 @@ def GetTimezones():
   """
   return Utils.GetDataFromCsvFile(os.path.join(LIB_HOME, 'data',
                                                'timezones.csv'))
-
-
-def GetSelectorTag(version, service):
-  """Get the correct selector tag for the version of the API.
-
-  Args:
-    version: string Version currently being used.
-
-  Returns:
-    string Tag to use for selector element.
-  """
-  # versions after v201101 use generic selectors, tag is serviceSelector
-  if (service in GENERIC_SELECTOR_SWITCHOVER and
-      version >= GENERIC_SELECTOR_SWITCHOVER[service]):
-    return 'serviceSelector'
-  else:
-    return 'selector'
-
-
-def GetSelectorType(old_type, version, service):
-  """Get the correct selector xsi_type for the version of the API.
-
-  Args:
-    old_type: str The xsi_type for this selector before the introduction of
-              generic selectors.
-    version: str Version currently being used.
-
-  Returns:
-    str Xsi_type to use for the given version.
-  """
-  if (service in GENERIC_SELECTOR_SWITCHOVER and
-      version >= GENERIC_SELECTOR_SWITCHOVER[service]):
-    return GENERIC_SELECTOR_XSI_TYPE
-  else:
-    return old_type
 
 
 def TransformJobOperationXsi(operation):

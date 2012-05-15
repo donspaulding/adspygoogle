@@ -56,7 +56,7 @@ class Misc(unittest.TestCase):
 
   def testUploadImage(self):
     """Test whether we can upload an image."""
-    upload_image.main(client, '/home/kwinter/Public/image.jpg')
+    upload_image.main(client, os.path.join('..', 'data', 'image.jpg'))
 
 
 if __name__ == '__main__':

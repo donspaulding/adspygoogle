@@ -22,6 +22,9 @@ Usage:
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
+from adspygoogle.adwords import DEFAULT_API_VERSION as ADWORDS_MAX_VER
+from adspygoogle.dfa import DEFAULT_API_VERSION as DFA_MAX_VER
+from adspygoogle.dfp import DEFAULT_API_VERSION as DFP_MAX_VER
 import os
 import platform
 import re
@@ -34,7 +37,11 @@ sys.path.insert(0, os.path.join('..', '..', '..'))
 LIBS = ['adwords', 'adxbuyer', 'dfa', 'dfp']
 TARGET_DIR_BASE = '/tmp/google-py'
 ADWORDS_ONLY_REGEX = 'Api:.*AdWordsOnly'
-
+MAX_VERSIONS = {
+    'adwords': ADWORDS_MAX_VER,
+    'dfa': DFA_MAX_VER,
+    'dfp': DFP_MAX_VER
+}
 
 def FileMatches(filename, regex=ADWORDS_ONLY_REGEX):
   """Runs the regex against the provided file.
@@ -69,10 +76,14 @@ def Main(argv):
   Args:
     argv: list Commandline args with script name removed.
   """
-  if not argv or len(argv) > 1 or argv[0] not in LIBS:
+  if not argv or len(argv) > 2 or argv[0] not in LIBS:
     print ('Nothing was done. Make sure to pass in the right argument: %s'
            % LIBS)
     return
+
+  if '--test' in argv:
+    release_tests = os.path.abspath('releasetests.sh')
+    argv.remove('--test')
 
   effective_target = actual_target = argv[0]
   if actual_target == 'adxbuyer': effective_target = 'adwords'
@@ -142,6 +153,13 @@ def Main(argv):
   else:
     shutil.copytree(os.path.join(source_dir, 'examples', 'adspygoogle',
                                  effective_target), target_examples_dir)
+  # Copy __init.py__ files in examples
+  shutil.copyfile(os.path.join(source_dir, 'examples', '__init__.py'),
+                  os.path.join(target_dir, 'examples', '__init__.py'))
+  shutil.copyfile(os.path.join(source_dir, 'examples', 'adspygoogle',
+                               '__init__.py'),
+                  os.path.join(target_dir, 'examples', 'adspygoogle',
+                               '__init__.py'))
 
   # Copy the rest of the data that comes with client library.
   shutil.copytree(os.path.join(source_dir, 'docs'), target_docs_dir)
@@ -209,6 +227,12 @@ def Main(argv):
   os.chdir(os.path.abspath(os.path.join(target_dir, '..')))
   os.system('tar -cf %s.tar %s/' % (lib_tag, lib_tag))
   os.system('gzip %s.tar' % lib_tag)
+
+  # Optionally run tests.
+  if release_tests:
+    os.system('%s %s %s %s' % (release_tests, target_dir, effective_target,
+                               MAX_VERSIONS[effective_target]))
+
   print 'Built %s at %s' % (actual_target, TARGET_DIR_BASE)
 
 

@@ -20,8 +20,8 @@ __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
 from adspygoogle.common import Utils
 from tests.adspygoogle.adwords import HTTP_PROXY
-from tests.adspygoogle.adwords import SERVER_V201109
-from tests.adspygoogle.adwords import VERSION_V201109
+from tests.adspygoogle.adwords import SERVER_V201109_1 as SERVER
+from tests.adspygoogle.adwords import VERSION_V201109_1 as VERSION
 
 
 def CreateTestCampaign(client):
@@ -33,8 +33,7 @@ def CreateTestCampaign(client):
   Returns:
     int CampaignId
   """
-  campaign_service = client.GetCampaignService(SERVER_V201109, VERSION_V201109,
-                                               HTTP_PROXY)
+  campaign_service = client.GetCampaignService(SERVER, VERSION, HTTP_PROXY)
   operations = [{
       'operator': 'ADD',
       'operand': {
@@ -65,8 +64,7 @@ def CreateTestRTBCampaign(client):
   Returns:
     int CampaignId
   """
-  campaign_service = client.GetCampaignService(SERVER_V201109, VERSION_V201109,
-                                               HTTP_PROXY)
+  campaign_service = client.GetCampaignService(SERVER, VERSION, HTTP_PROXY)
   operations = [{
       'operator': 'ADD',
       'operand': {
@@ -102,8 +100,7 @@ def CreateTestAdGroup(client, campaign_id):
   Returns:
     int AdGroupId
   """
-  ad_group_service = client.GetAdGroupService(SERVER_V201109, VERSION_V201109,
-                                              HTTP_PROXY)
+  ad_group_service = client.GetAdGroupService(SERVER, VERSION, HTTP_PROXY)
   operations = [{
       'operator': 'ADD',
       'operand': {
@@ -134,8 +131,7 @@ def CreateTestCPMAdGroup(client, campaign_id):
   Returns:
     int AdGroupId
   """
-  ad_group_service = client.GetAdGroupService(SERVER_V201109, VERSION_V201109,
-                                              HTTP_PROXY)
+  ad_group_service = client.GetAdGroupService(SERVER, VERSION, HTTP_PROXY)
   operations = [{
       'operator': 'ADD',
       'operand': {
@@ -166,8 +162,7 @@ def CreateTestAd(client, ad_group_id):
   Returns:
     int AdGroupAdId
   """
-  ad_group_ad_service = client.GetAdGroupAdService(SERVER_V201109,
-                                                   VERSION_V201109, HTTP_PROXY)
+  ad_group_ad_service = client.GetAdGroupAdService(SERVER, VERSION, HTTP_PROXY)
   operations = [{
       'operator': 'ADD',
       'operand': {
@@ -199,7 +194,7 @@ def CreateTestKeyword(client, ad_group_id):
     int: KeywordId
   """
   ad_group_criterion_service = client.GetAdGroupCriterionService(
-      SERVER_V201109, VERSION_V201109, HTTP_PROXY)
+      SERVER, VERSION, HTTP_PROXY)
   operations = [{
       'operator': 'ADD',
       'operand': {
@@ -227,7 +222,7 @@ def CreateTestPlacement(client, ad_group_id):
     int: KeywordId
   """
   ad_group_criterion_service = client.GetAdGroupCriterionService(
-      SERVER_V201109, VERSION_V201109, HTTP_PROXY)
+      SERVER, VERSION, HTTP_PROXY)
   operations = [{
       'operator': 'ADD',
       'operand': {
@@ -254,9 +249,9 @@ def CreateTestLocationExtension(client, campaign_id):
     int Location Extension ID
   """
   geo_location_service = client.GetGeoLocationService(
-      SERVER_V201109, VERSION_V201109, HTTP_PROXY)
+      SERVER, VERSION,HTTP_PROXY)
   campaign_ad_extension_service = client.GetCampaignAdExtensionService(
-      SERVER_V201109, VERSION_V201109, HTTP_PROXY)
+      SERVER, VERSION, HTTP_PROXY)
   selector = {
       'addresses': [
           {
@@ -314,7 +309,6 @@ def GetExperimentIdForCampaign(client, campaign_id):
           'values': ['ACTIVE']
       }]
   }
-  experiment_service = client.GetExperimentService(
-      SERVER_V201109, VERSION_V201109, HTTP_PROXY)
+  experiment_service = client.GetExperimentService(SERVER, VERSION, HTTP_PROXY)
   page = experiment_service.get(selector)[0]
   return page['entries'][0]['id']

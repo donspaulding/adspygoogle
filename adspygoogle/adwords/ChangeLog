@@ -1,3 +1,9 @@
+15.3.0:
+- Adding support for v201109_1.
+
+15.2.5:
+- Adding support for v201109 BudgetOrderService.
+
 15.2.4:
 - Fixing bug with ReportDownloader logging when request_log is disabled.
 
