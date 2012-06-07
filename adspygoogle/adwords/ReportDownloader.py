@@ -215,14 +215,15 @@ class ReportDownloader(object):
       headers['clientCustomerId'] = self._headers['clientCustomerId']
 
     # Handle OAuth (if enabled) and ClientLogin
-    if ('oauth_enabled' in self._config and
-        Utils.BoolTypeConvert(self._config['oauth_enabled'])):
+    if self._headers.get('oauth_credentials'):
       signedrequestparams = (self._config['oauth_handler']
           .GetSignedRequestParameters(self._headers['oauth_credentials'],
                                       self._op_config['server'] + url))
       headers['Authorization'] = ('OAuth ' +
           self._config['oauth_handler']
           .FormatParametersForHeader(signedrequestparams))
+    elif self._headers.get('oauth2credentials'):
+      self._headers['oauth2credentials'].apply(headers)
     else:
       headers['Authorization'] = ('GoogleLogin %s' %
           urllib.urlencode({'auth':
@@ -230,7 +231,7 @@ class ReportDownloader(object):
 
     headers['returnMoneyInMicros'] = str(return_micros).lower()
     headers['developerToken'] = self._headers['developerToken']
-    headers['User-Agent'] = 'Python-urllib,' + self._headers['userAgent']
+    headers['User-Agent'] = self._headers['userAgent']
     if Utils.BoolTypeConvert(self._config['compress']):
       headers['Accept-Encoding'] = 'gzip'
       headers['User-Agent'] += ',gzip'
@@ -304,8 +305,8 @@ class ReportDownloader(object):
     # regenerate it.
     now = time.time()
     # Do not need an AuthToken if OAuth is enabled.
-    if ('oauth_enabled' in self._config and
-        Utils.BoolTypeConvert(self._config['oauth_enabled'])): return
+    if (self._headers.get('oauth_credentials') or
+        self._headers.get('oauth2credentials')): return
     if (('authToken' not in self._headers and
          'auth_token_epoch' not in self._config) or
         int(now - self._config['auth_token_epoch']) >= AUTH_TOKEN_EXPIRE):

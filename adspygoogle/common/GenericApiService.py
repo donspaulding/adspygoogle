@@ -213,7 +213,8 @@ class GenericApiService(object):
 
   def _ReadyOAuth(self):
     """If OAuth is on, sets the transport handler to add OAuth HTTP header."""
-    if Utils.BoolTypeConvert(self._config['oauth_enabled']):
+    if (self._config.get('oauth_handler') and
+        self._headers.get('oauth_credentials')):
       signedrequestparams = self._config[
           'oauth_handler'].GetSignedRequestParameters(
               self._headers['oauth_credentials'], str(self._service_url))
@@ -222,7 +223,9 @@ class GenericApiService(object):
               'OAuth ' +
               self._config['oauth_handler'].FormatParametersForHeader(
                   signedrequestparams))
-
+    elif self._headers.get('oauth2credentials'):
+      self._headers['oauth2credentials'].apply(
+          self._soappyservice.soapproxy.transport.additional_headers)
     else:
       if ('Authorization' in
           self._soappyservice.soapproxy.transport.additional_headers):
@@ -499,7 +502,8 @@ class GenericApiService(object):
       }
 
       # Add OAuth header if OAuth is enabled.
-      if Utils.BoolTypeConvert(self._config['oauth_enabled']):
+      if (self._config.get('oauth_handler') and
+          self._headers.get('oauth_credentials')):
         signedrequestparams = self._config[
             'oauth_handler'].GetSignedRequestParameters(
                 self._headers['oauth_credentials'], self._service_url)
@@ -513,7 +517,9 @@ class GenericApiService(object):
                 ('*'*3, '*'*46, http_header['post'], http_header['host'],
                  http_header['user_agent'], http_header['content_type'],
                  http_header['content_length'], http_header['soap_action']))
-      if Utils.BoolTypeConvert(self._config['oauth_enabled']):
+      if (self._config.get('oauth_handler') and
+          self._headers.get('oauth_credentials') or
+          self._headers.get('oauth2credentials')):
         buf.write('Authorization: ' + http_header['authorization'] + '\n')
       buf.write('%s\n%s Outgoing SOAP %s\n%s\n%s\n' %
                 ('*'*72, '*'*3, '*'*54, soap_message, '*'*72))
@@ -531,7 +537,9 @@ class GenericApiService(object):
       web_service.putheader('Content-type', http_header['content_type'])
       web_service.putheader('Content-length', http_header['content_length'])
       web_service.putheader('SOAPAction', http_header['soap_action'])
-      if Utils.BoolTypeConvert(self._config['oauth_enabled']):
+      if (self._config.get('oauth_handler') and
+          self._headers.get('oauth_credentials') or
+          self._headers.get('oauth2credentials')):
         web_service.putheader('Authorization', http_header['authorization'])
       web_service.endheaders()
       web_service.send(soap_message)

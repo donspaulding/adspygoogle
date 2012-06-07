@@ -137,6 +137,8 @@ External Dependencies:
     - Epydoc               -- http://epydoc.sourceforge.net/
                            (only if you will be generating docs)
     - fpconst              -- http://pypi.python.org/pypi/fpconst/#downloads
+    - oauth2client         -- http://code.google.com/p/google-api-python-client/downloads/list
+                           (only if using oauth2)
     - Google Account       -- https://www.google.com/accounts/NewAccount
 
 

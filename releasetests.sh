@@ -17,13 +17,13 @@ pushd $BASE_DIR
 
 # Move into and test all integration tests.
 pushd $INTEGRATION_TEST_DIR
-python alltests.py | tail -n 20
+python alltests.py
 popd
 
 # If we have a bugs dir, run those to.
 if [ -d $BUGS_DIR ]; then
   pushd $BUGS_DIR
-  python alltests.py | tail -n 20
+  python alltests.py
   popd
 fi
 

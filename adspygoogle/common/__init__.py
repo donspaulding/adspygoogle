@@ -18,6 +18,8 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
+import sys
+
 VERSION = '3.0.8'
 
 MIN_PY_VERSION = '2.4.4'
@@ -27,3 +29,18 @@ MIN_PYXML_VERSION = '0.8.3'
 MIN_ETREE_VERSION = '1.2.6'
 PYXML = '1'
 ETREE = '2'
+COMMON_LIB_SIG = 'Common-Python/%s' % VERSION
+PYTHON_VERSION = 'Python/%d.%d' % (sys.version_info[0], sys.version_info[1])
+
+
+def GenerateLibSig(short_name, version):
+  """Generates a library signature suitable for a UserAgent field.
+
+  Args:
+    short_name: str The short, product-specific name of the library.
+    version: str The product-specific version of the library.
+  Returns:
+    str Library signature suitable to append to user-supplied user-agent value.
+  """
+  return ' (%s/%s, %s, %s)' % (short_name, version, COMMON_LIB_SIG,
+                               PYTHON_VERSION)

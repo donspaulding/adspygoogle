@@ -135,7 +135,6 @@ class Client(object):
         'pretty_xml': 'y',
         'compress': 'y',
         'access': '',
-        'oauth_enabled': 'n',
         'wrap_in_tuple': 'y'
     }
     for key in default_config:
@@ -317,6 +316,24 @@ class Client(object):
 
   oauth_credentials = property(__GetOAuthCredentials, __SetOAuthCredentials)
 
+  def __SetOAuth2Credentials(self, credentials):
+    """Sets the OAuth2 credentials into the config.
+
+    Args:
+      credentials: object OAuth2 credentials.
+    """
+    self._headers['oauth2credentials'] = credentials
+
+  def __GetOAuth2Credentials(self):
+    """Retrieves the OAuth2 credentials from the config.
+
+    Returns:
+      object The OAuth2 credentials.
+    """
+    return self._headers['oauth2credentials']
+
+  oauth2credentials = property(__GetOAuth2Credentials, __SetOAuth2Credentials)
+
   def __SetOAuthHandler(self, oauth_handler):
     """Sets the config to use the specified OAuth Handler.
 
@@ -336,20 +353,23 @@ class Client(object):
   oauth_handler = property(__GetOAuthHandler, __SetOAuthHandler)
 
   def __SetUsingOAuth(self, is_using):
-    """Sets the config to use OAuth.
+    """Deprecated - set oauth_credentials field instead.
 
     Args:
       is_using: boolean Whether the client is using OAuth or not.
     """
-    self._config['oauth_enabled'] = is_using
+    warnings.warn('Set a value in the oauth_credentials field to enable OAuth.',
+                  DeprecationWarning, stacklevel=2)
 
   def __GetUsingOAuth(self):
-    """Returns if the client is currently set to use OAuth.
+    """Deprecated - test field oauth_credentials instead.
 
     Returns:
       boolean Whether this client is using OAuth or not
     """
-    return self._config['oauth_enabled']
+    warnings.warn('Evaluate the oauth_credentials field for truth instead.',
+                  DeprecationWarning, stacklevel=2)
+    return self._headers.get('oauth_credentials')
 
   use_oauth = property(__GetUsingOAuth, __SetUsingOAuth)
 

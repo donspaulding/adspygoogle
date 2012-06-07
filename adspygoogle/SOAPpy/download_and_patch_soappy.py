@@ -30,6 +30,7 @@ import urllib
 DOWNLOAD_URL = ('http://sourceforge.net/projects/pywebsvcs/files/SOAP.py/'
                 '0.12.0_rc1/SOAPpy-0.12.0.tar.gz/'
                 'download?use_mirror=superb-dca2')
+REMOVE_FILES = ['GSIServer.py']
 
 
 def main():
@@ -53,6 +54,8 @@ def main():
   code = subprocess.call(['patch', '-p0'],
                          stdin=open(os.path.join(os.curdir, 'SOAPpy.patch')))
   shutil.rmtree(tar_out_dir)
+  for path in REMOVE_FILES:
+    os.remove(path)
   if not code: print 'Success! SOAPpy-0.12.0 has been downloaded and patched.'
 
 

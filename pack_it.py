@@ -81,6 +81,7 @@ def Main(argv):
            % LIBS)
     return
 
+  release_tests = None
   if '--test' in argv:
     release_tests = os.path.abspath('releasetests.sh')
     argv.remove('--test')
@@ -136,20 +137,33 @@ def Main(argv):
     shutil.copytree(adx_source_dir, target_examples_dir)
 
     # Need to copy examples from adwords for all versions that AdX has.
-    for directory in os.listdir(adx_source_dir):
+    for version_dir in os.listdir(adx_source_dir):
       # Skip non-directories (README)
-      if not os.path.isdir(os.path.join(adwords_source_dir, directory)):
+      if not os.path.isdir(os.path.join(adwords_source_dir, version_dir)):
         continue
-      for filename in os.listdir(os.path.join(adwords_source_dir, directory)):
-        source_file = os.path.join(adwords_source_dir, directory, filename)
-        if not os.path.exists(source_file): continue
-        dest_file = os.path.join(target_examples_dir, directory, filename)
-        # Only copy over if it doesn't match our exclusion list.
-        if FileMatches(source_file,
-                       ADWORDS_ONLY_REGEX) or os.path.exists(dest_file):
-          pass
-        else:
-          shutil.copy(source_file, dest_file)
+      for category_dir in os.listdir(os.path.join(adwords_source_dir,
+                                                  version_dir)):
+        # Skip non-directories (README)
+        if not os.path.isdir(os.path.join(adwords_source_dir, version_dir,
+                                          category_dir)):
+          continue
+        if not os.path.exists(os.path.join(target_examples_dir, version_dir,
+                                           category_dir)):
+          os.makedirs(os.path.join(target_examples_dir, version_dir,
+                                   category_dir))
+        for filename in os.listdir(os.path.join(adwords_source_dir, version_dir,
+                                                category_dir)):
+          source_file = os.path.join(adwords_source_dir, version_dir,
+                                     category_dir, filename)
+          if not os.path.exists(source_file): continue
+          dest_file = os.path.join(target_examples_dir, version_dir,
+                                   category_dir, filename)
+          # Only copy over if it doesn't match our exclusion list.
+          if FileMatches(source_file,
+                         ADWORDS_ONLY_REGEX) or os.path.exists(dest_file):
+            pass
+          else:
+            shutil.copy(source_file, dest_file)
   else:
     shutil.copytree(os.path.join(source_dir, 'examples', 'adspygoogle',
                                  effective_target), target_examples_dir)

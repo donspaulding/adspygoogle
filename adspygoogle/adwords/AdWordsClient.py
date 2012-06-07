@@ -79,7 +79,8 @@ class AdWordsClient(Client):
           'oauth_consumer_secret': ...,
           'oauth_token': ...,
           'oauth_token_secret': ...
-        }
+        },
+        'oauth2credentials': 'See use_oauth2.py'.
       }
       config = {
         'home': '/path/to/home',
@@ -175,7 +176,8 @@ class AdWordsClient(Client):
     if self._headers.get('authToken'):
       # If they have a non-empty authToken, set the epoch and skip the rest.
       self._config['auth_token_epoch'] = time.time()
-    elif self._headers.get('oauth_credentials'):
+    elif (self._headers.get('oauth_credentials') or
+          self._headers.get('oauth2credentials')):
       # If they have oauth_credentials, that's also fine.
       pass
     elif (self._headers.get('email') and self._headers.get('password')
@@ -201,15 +203,11 @@ class AdWordsClient(Client):
     if self._headers['userAgent'].rfind(LIB_SIG) == -1:
       # Make sure library name shows up only once.
       if self._headers['userAgent'].rfind(LIB_SHORT_NAME) > -1:
-        pattern = re.compile('.*\|')
+        pattern = re.compile('.*' + LIB_SHORT_NAME + '.*?\|')
         self._headers['userAgent'] = pattern.sub(
             '', self._headers['userAgent'], 1)
       self._headers['userAgent'] = (
-          '%s|%s' % (LIB_SIG, self._headers['userAgent']))
-
-      # Sync library's version in the new user agent with the one in the pickle.
-      if headers is None:
-        self.__WriteUpdatedAuthValue('userAgent', self._headers['userAgent'])
+          '%s%s' % (self._headers['userAgent'], LIB_SIG))
 
     self.__is_mcc = False
 

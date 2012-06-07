@@ -22,6 +22,7 @@ import os
 import pickle
 import sys
 
+from adspygoogle.common import GenerateLibSig
 from adspygoogle.common import Utils
 from adspygoogle.common import VERSION
 from adspygoogle.common.Errors import MissingPackageError
@@ -33,10 +34,9 @@ LIB_SHORT_NAME = 'AwApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python'
 LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '15.3.0'
-LIB_MIN_COMMON_VERSION = '3.0.7'
-PYTHON_VERSION = 'Python %d.%d' % (sys.version_info[0], sys.version_info[1])
-LIB_SIG = '%s-%s (%s)' % (LIB_SHORT_NAME, LIB_VERSION, PYTHON_VERSION)
+LIB_VERSION = '15.3.1'
+LIB_MIN_COMMON_VERSION = '3.0.8'
+LIB_SIG = GenerateLibSig(LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:
   msg = ('Unsupported version of the core module is detected. Please download '
@@ -53,7 +53,7 @@ REQUIRED_SOAP_HEADERS = (('email', 'password', 'userAgent', 'developerToken'),
                          ('email', 'password', 'userAgent', 'developerToken'),
                          ('authToken', 'userAgent', 'developerToken'),
                          ('oauth_credentials', 'userAgent', 'developerToken'),
-                         ('userAgent', 'developerToken'))
+                         ('oauth2credentials', 'userAgent', 'developerToken'))
 
 AUTH_TOKEN_SERVICE = 'adwords'
 AUTH_TOKEN_EXPIRE = 60 * 60 * 23

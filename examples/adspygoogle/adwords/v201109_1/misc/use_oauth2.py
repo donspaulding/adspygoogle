@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example demonstrates how to authenticate using OAuth.
+"""This example demonstrates how to authenticate using OAuth2.
 
 This example is meant to be run from the command line and requires
 user input.
@@ -22,68 +22,70 @@ user input.
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
+import httplib2
 import os
 import sys
 
 sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 from adspygoogle import AdWordsClient
-from adspygoogle.common.oauth.PythonOAuth2OAuthHandler import PythonOAuth2OAuthHandler
+from oauth2client.client import OAuth2WebServerFlow
+from oauth2client.client import FlowExchangeError
 
 
 sandbox_email = 'INSERT_SANDBOX_EMAIL'
 client_customer_id = 'INSERT_SANDBOX_CLIENT_CUSTOMER_ID'
+# Visit https://code.google.com/apis/console to generate your client_id,
+# client_secret and to register your redirect_uri.
+# See the oauth2client wiki for more information on performing the OAuth2 flow:
+# http://code.google.com/p/google-api-python-client/wiki/OAuth2
+oauth2_client_id = 'INSERT_OAUTH2_CLIENT_ID'
+oauth2_client_secret = 'INSERT_OAUTH2_CLIENT_SECRET'
 
 
-def main(sandbox_email, client_customer_id):
-  # Set the OAuth consumer key and secret. Anonymous values can be used for
-  # testing, and real values can be obtained by registering your application:
-  # http://code.google.com/apis/accounts/docs/RegistrationForWebAppsAuto.html
-  credentials = {
-      'oauth_consumer_key': 'anonymous',
-      'oauth_consumer_secret': 'anonymous'
-  }
+def main(sandbox_email, client_customer_id, oauth2_client_id,
+         oauth2_client_secret):
+  # We're using the oauth2client library:
+  # http://code.google.com/p/google-api-python-client/downloads/list
+  flow = OAuth2WebServerFlow(
+      client_id=oauth2_client_id,
+      client_secret=oauth2_client_secret,
+      # Scope is the server address with '/api/adwords' appended.
+      scope='https://adwords-sandbox.google.com/api/adwords',
+      user_agent='oauth2 code example')
 
-  # Create the AdWordsUser and set the OAuth credentials.
+  # Get the authorization URL to direct the user to.
+  authorize_url = flow.step1_get_authorize_url()
+
+  print ('Log in to your AdWords account and open the following URL: \n%s\n' %
+         authorize_url)
+  print 'After approving the token enter the verification code (if specified).'
+  code = raw_input('Code: ').strip()
+
+  credential = None
+  try:
+    credential = flow.step2_exchange(code)
+  except FlowExchangeError, e:
+    sys.exit('Authentication has failed: %s' % e)
+
+  # Create the AdWordsUser and set the OAuth2 credentials.
   client = AdWordsClient(headers={
       'developerToken': '%s++USD' % sandbox_email,
       'clientCustomerId': client_customer_id,
-      'userAgent': 'OAuth Example',
-      'oauth_credentials': credentials
+      'userAgent': 'OAuth2 Example',
+      'oauth2credentials': credential
   })
 
-  # Now set the handler - you can define your own if needed.
-  client.oauth_handler = PythonOAuth2OAuthHandler()
+  # OAuth2 credentials objects can be reused
+  credentials = client.oauth2credentials
+  print 'OAuth2 authorization successful!'
 
-  # Request a new OAuth token. Web applications should pass in a callback URL to
-  # redirect the user to after authorizing the token.
-  client.RequestOAuthToken('https://adwords-sandbox.google.com',
-                           applicationname='OAuth Example')
+  # OAuth2 credential objects can be refreshed via credentials.refresh() - the
+  # access token expires after 1 hour.
+  credentials.refresh(httplib2.Http())
 
-  # Get the authorization URL for the OAuth token.
-  authorizationurl = client.GetOAuthAuthorizationUrl()
-
-  # In a web application you would redirect the user to the authorization URL
-  # and after approving the token they would be redirected back to the
-  # callback URL with the URL parameter "oauth_verifier" added. For desktop or
-  # server applications, spawn a browser to the URL and then have the user enter
-  # the verification code that is displayed.
-  print ('Log in to your AdWords account and open the following URL: %s\n' %
-         authorizationurl)
-  print 'After approving the token enter the verification code (if specified).'
-  verifier = raw_input('Verifier: ').strip()
-
-  # Upgrade the authorized token.
-  client.UpgradeOAuthToken(verifier)
-
-  # An upgraded token does not expire and should be stored and reused for
-  # every request to the API.
-  credentials = client.oauth_credentials
-  print ('OAuth authorization successful.  Store these credentials to reuse' +
-         ' until revoked: %s' % credentials)
-
-  # Note: you could simply set the crendentials as below and skip the previous
+  # Note: you could simply set the credentials as below and skip the previous
   # steps once access has been granted.
-  client.oauth_credentials = credentials
+  client.oauth2credentials = credentials
 
   campaign_service = client.GetCampaignService(
       'https://adwords-sandbox.google.com', 'v201109_1')
@@ -128,4 +130,5 @@ if __name__ == '__main__':
   # Initialize client object.
   client = AdWordsClient(path=os.path.join('..', '..', '..', '..', '..'))
 
-  main(sandbox_email, client_customer_id)
+  main(sandbox_email, client_customer_id, oauth2_client_id,
+       oauth2_client_secret)

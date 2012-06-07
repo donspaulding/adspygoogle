@@ -1,3 +1,10 @@
+15.3.1:
+- Updating user agent, no longer persisting useragent changes to pickle.
+- Adding support for OAuth2.  Note that the enable_oauth* settings are no longer
+  necessary - simply set the oauth_credentials to enable OAuth usage.
+- Fixing issue #34 - GSIServer from SOAPpy not compatible with python2.7 (and
+  wasn't being used) - removing it via our patch.
+
 15.3.0:
 - Adding support for v201109_1.
 
