@@ -1,3 +1,6 @@
+15.3.2:
+- Fixing issue #36, unicode in report definition failed to URL encode.
+
 15.3.1:
 - Updating user agent, no longer persisting useragent changes to pickle.
 - Adding support for OAuth2.  Note that the enable_oauth* settings are no longer

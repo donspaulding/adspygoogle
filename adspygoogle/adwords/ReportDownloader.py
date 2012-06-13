@@ -146,7 +146,6 @@ class ReportDownloader(object):
 
     # Hack, need to remove top element and body wrapper.
     builder._xml_top = ''
-    builder.encoding = None
     builder.body = 0
 
     # Build the XML.
