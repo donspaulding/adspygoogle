@@ -44,8 +44,8 @@ team_service = client.GetService('TeamService', version='v201204')
 # Set the ID of the ad unit to add to the teams.
 ad_unit_id = 'INSERT_AD_UNIT_ID_HERE'
 
-# Create a statement to select first 5 teams.
-filter_statement = {'query': 'LIMIT 5'}
+# Create a statement to select first 5 teams that aren't built-in.
+filter_statement = {'query': 'WHERE id > 0 LIMIT 5'}
 
 # Get teams by statement.
 response = team_service.GetTeamsByStatement(filter_statement)[0]

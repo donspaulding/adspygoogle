@@ -59,7 +59,8 @@ class DfaWebServiceTestV1_18(unittest.TestCase):
   def testCallRawMethod(self):
     """Test whether we can call an API method by posting SOAP XML message."""
     soap_message = Utils.ReadFile(
-        os.path.join('..', 'data', 'request_getadvertisers.xml'))
+        os.path.join(__file__[:__file__.rfind('/')], '..', 'data',
+                     'request_getadvertisers.xml'))
     url = '/v1.16/api/dfa-api/advertiser'
     http_proxy = None
 

@@ -42,7 +42,8 @@ class GenericDfpService(GenericApiService):
 
   # The _IGNORED_HEADER_VALUES are keys in the headers dictionary passed into
   # this class' constuctor which should NOT be packed into the SOAP header.
-  _IGNORED_HEADER_VALUES = ('authToken', 'email', 'password')
+  _IGNORED_HEADER_VALUES = ('authToken', 'email', 'password',
+                            'oauth2credentials')
   # The _WRAP_LISTS constant indicates that DFP services do not need to wrap
   # lists in an extra layer of XML element tags.
   _WRAP_LISTS = False
@@ -87,7 +88,7 @@ class GenericDfpService(GenericApiService):
     if ((('authToken' not in self._headers and
           'auth_token_epoch' not in self._config) or
          int(now - self._config['auth_token_epoch']) >= AUTH_TOKEN_EXPIRE) and
-        not 'oauth_enabled' in self._config):
+        not self._headers.get('oauth2credentials')):
       if ('email' not in self._headers or not self._headers['email'] or
           'password' not in self._headers or not self._headers['password']):
         raise ValidationError('Required authentication headers, \'email\' and '
@@ -101,11 +102,12 @@ class GenericDfpService(GenericApiService):
     # Apply headers to the SOAPpy service.
     soap_headers = SOAPpy.Types.headerType(attrs={'xmlns': self._namespace})
     request_header_data = {}
-    authentication_block = SOAPpy.Types.structType(
-        data={'token': self._headers['authToken']},
-        name='authentication', typed=0,
-        attrs={(SOAPpy.NS.XSI3, 'type'): 'ClientLogin'})
-    request_header_data['authentication'] = authentication_block
+    if 'authToken' in self._headers:
+      authentication_block = SOAPpy.Types.structType(
+          data={'token': self._headers['authToken']},
+          name='authentication', typed=0,
+          attrs={(SOAPpy.NS.XSI3, 'type'): 'ClientLogin'})
+      request_header_data['authentication'] = authentication_block
     for key in self._headers:
       if (key in GenericDfpService._IGNORED_HEADER_VALUES or
           not self._headers[key]):
@@ -114,7 +116,8 @@ class GenericDfpService(GenericApiService):
     request_header = SOAPpy.Types.structType(
         data=request_header_data, name='RequestHeader', typed=0)
     soap_headers.RequestHeader = request_header
-    soap_headers.RequestHeader._keyord = ['applicationName', 'authentication']
+    if 'authToken' in self._headers:
+      soap_headers.RequestHeader._keyord = ['applicationName', 'authentication']
     self._soappyservice.soapproxy.header = soap_headers
 
   def _GetMethodInfo(self, method_name):

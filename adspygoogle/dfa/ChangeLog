@@ -1,3 +1,6 @@
+2.2.1:
+- Updating user agent.
+
 2.2.0:
 - Added support for v1.18. Removed support for v1.15 and v1.16.
 - The deprecated version of the DFA API will no longer be supported.

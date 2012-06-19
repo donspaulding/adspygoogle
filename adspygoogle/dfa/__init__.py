@@ -22,6 +22,7 @@ import os
 import pickle
 import sys
 
+from adspygoogle.common import GenerateLibSig
 from adspygoogle.common import Utils
 from adspygoogle.common import VERSION
 from adspygoogle.common.Errors import MissingPackageError
@@ -33,10 +34,9 @@ LIB_SHORT_NAME = 'DfaApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python/'
 LIB_AUTHOR = 'Joseph DiLallo'
 LIB_AUTHOR_EMAIL = 'api.jdilallo@gmail.com'
-LIB_VERSION = '2.2.0'
+LIB_VERSION = '2.2.1'
 LIB_MIN_COMMON_VERSION = '3.0.8'
-PYTHON_VERSION = 'Python %d.%d' % (sys.version_info[0], sys.version_info[1])
-LIB_SIG = '%s-%s (%s)' % (LIB_SHORT_NAME, LIB_VERSION, PYTHON_VERSION)
+LIB_SIG = GenerateLibSig(LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:
   msg = ('Unsupported version of the core module is detected. Please download '

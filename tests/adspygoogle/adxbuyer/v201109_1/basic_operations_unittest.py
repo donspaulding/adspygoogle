@@ -73,7 +73,7 @@ class BasicOperations(unittest.TestCase):
     """Tests whether we can add placements."""
     add_placements.main(client, self.__class__.ad_group_id)
 
-# TODO(kwinter): currently we get an error trying to set impressionBeaconUrl in
+# TODO(user): currently we get an error trying to set impressionBeaconUrl in
 # sandbox
 #  def testAddThirdPartyRedirectAd(self):
 #    """Tests whether we can add a third party redirect ad."""

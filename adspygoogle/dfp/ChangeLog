@@ -1,3 +1,9 @@
+9.3.2:
+- Adding support for OAuth2. See use_oauth2.py for example.
+
+9.3.1:
+- Updating user agent, no longer persisting useragent changes to pickle.
+
 9.3.0
 - Added support for v201204 and set it as default.
 - Use default server for all  v201204 examples.

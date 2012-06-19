@@ -22,6 +22,7 @@ import os
 import pickle
 import sys
 
+from adspygoogle.common import GenerateLibSig
 from adspygoogle.common import Utils
 from adspygoogle.common import VERSION
 from adspygoogle.common.Errors import MissingPackageError
@@ -33,10 +34,9 @@ LIB_SHORT_NAME = 'DfpApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python'
 LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '9.3.0'
+LIB_VERSION = '9.3.2'
 LIB_MIN_COMMON_VERSION = '3.0.6'
-PYTHON_VERSION = 'Python %d.%d' % (sys.version_info[0], sys.version_info[1])
-LIB_SIG = '%s-%s (%s)' % (LIB_SHORT_NAME, LIB_VERSION, PYTHON_VERSION)
+LIB_SIG = GenerateLibSig(LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:
   msg = ('Unsupported version of the core module is detected. Please download '
@@ -51,7 +51,7 @@ DEFAULT_API_VERSION = API_VERSIONS[len(API_VERSIONS) - 1]
 # these is required in order to make a succesful API request.
 REQUIRED_SOAP_HEADERS = (('email', 'password', 'applicationName'),
                          ('authToken', 'applicationName'),
-                         ('oAuthToken', 'applicationName'))
+                         ('oauth2credentials', 'applicationName'))
 
 AUTH_TOKEN_SERVICE = 'gam'
 AUTH_TOKEN_EXPIRE = 60 * 60 * 23

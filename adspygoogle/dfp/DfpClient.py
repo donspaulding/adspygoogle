@@ -65,6 +65,7 @@ class DfpClient(Client):
         'authToken': '...',
         'applicationName': 'GoogleTest',
         'networkCode': 'ca-01234567',
+        'oauth2credentials': 'See use_oauth2.py'
       }
       config = {
         'home': '/path/to/home',
@@ -139,8 +140,12 @@ class DfpClient(Client):
         self._headers['authToken'] = Utils.GetAuthToken(
             self._headers['email'], self._headers['password'],
             AUTH_TOKEN_SERVICE, LIB_SIG, self._config['proxy'])
+      elif (self._headers.get('oauth2credentials')):
+        # If they have oauth2credentials, that's also fine.
+        pass
       else:
-        msg = 'Authentication data, email or/and password, is missing.'
+        msg = ('Authentication data, email or/and password, OAuth2 credentials '
+               'is missing.')
         raise ValidationError(msg)
       self._config['auth_token_epoch'] = time.time()
     except AuthTokenError:
@@ -153,17 +158,11 @@ class DfpClient(Client):
     if self._headers['applicationName'].rfind(LIB_SIG) == -1:
       # Make sure library name shows up only once.
       if self._headers['applicationName'].rfind(LIB_SHORT_NAME) > -1:
-        pattern = re.compile('.*\|')
+        pattern = re.compile('.*' + LIB_SHORT_NAME + '.*?\|')
         self._headers['applicationName'] = pattern.sub(
             '', self._headers['applicationName'], 1)
       self._headers['applicationName'] = (
-          '%s|%s' % (LIB_SIG, self._headers['applicationName']))
-
-      # Sync library's version in the new application name with the one in the
-      # pickle.
-      if headers is None:
-        self.__WriteUpdatedAuthValue('applicationName',
-                                     self._headers['applicationName'])
+          '%s%s' % (self._headers['applicationName'], LIB_SIG))
 
     # Initialize logger.
     self.__logger = Logger(LIB_SIG, self._config['log_home'])
@@ -244,6 +243,7 @@ class DfpClient(Client):
               'https://www.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
+      op_config: dict service configuration.
 
     Returns:
       GenericDfpService New object representing the SOAP service.
