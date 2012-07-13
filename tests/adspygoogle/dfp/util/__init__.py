@@ -18,7 +18,9 @@
 
 __author__ = 'api.shamjeff@gmail.com (Jeff Sham)'
 
+import base64
 from datetime import date
+import os
 from adspygoogle.common import Utils
 
 
@@ -44,6 +46,21 @@ def CreateTestAdvertiser(client, server, version):
   # Add the company.
   companies = company_service.CreateCompanies([company])
   return companies[0]['id']
+
+
+def GetEffectiveRootAdUnitId(client, server, version):
+  """Get the effective root ad unit ID.
+
+  Args:
+    client: DfpClient used for service creation.
+    server: str the API server.
+    version: str the API version.
+
+  Returns:
+    The effective root ad unit ID.
+  """
+  network_service = client.GetService('NetworkService', server, version)
+  return network_service.GetCurrentNetwork()[0]['effectiveRootAdUnitId']
 
 
 def CreateTestLineItemCustomField(client, server, version, data_type):
@@ -300,3 +317,65 @@ def GetTrafficker(client, server, version):
   # Get users by statement.
   response = user_service.GetUsersByStatement(filter_statement)[0]
   return response['results'][0]['id']
+
+
+def CreateTestCreative(client, server, version, advertiser_id):
+  """Create a test creative.
+
+  Args:
+    client: DfpClient used for service creation.
+    server: str the API server.
+    version: str the API version.
+    advertiser_id: str the company ID for the creative's advertiser.
+
+  Returns:
+    The ID of the creative.
+  """
+  creative_service = client.GetService('CreativeService', server, version)
+
+  # Create creative object.
+  image_data = Utils.ReadFile(os.path.join(__file__[:__file__.rfind('/')], '..',
+                                           'data', 'medium_rectangle.jpg'))
+  image_data = base64.encodestring(image_data)
+
+  creative = {
+      'type': 'ImageCreative',
+      'name': 'Image Creative #%s' % Utils.GetUniqueName(),
+      'advertiserId': advertiser_id,
+      'destinationUrl': 'http://google.com',
+      'imageName': 'image.jpg',
+      'imageByteArray': image_data,
+      'size': {'width': '300', 'height': '250'}
+  }
+
+  # Add creatives.
+  creatives = creative_service.CreateCreatives([creative])
+  return creatives[0]['id']
+
+
+def CreateTestCreativeSet(client, server, version, master_creative_id,
+                          companion_creative_id):
+  """Create a test creative.
+
+  Args:
+    client: DfpClient used for service creation.
+    server: str the API server.
+    version: str the API version.
+    master_creative_id: str creative ID for the master.
+    companion_creative_id: str creative ID for a companion.
+
+  Returns:
+    The ID of the creative.
+  """
+  creative_set_service = client.GetService('CreativeSetService', server,
+                                           version)
+
+  # Create creative set objects.
+  creative_sets = {'name': 'Creative set #%s' % Utils.GetUniqueName(),
+                   'masterCreativeId': master_creative_id,
+                   'companionCreativeIds': [companion_creative_id]}
+
+  # Add creative sets.
+  creative_sets = creative_set_service.CreateCreativeSet(creative_sets)
+  return creative_sets[0]['id']
+

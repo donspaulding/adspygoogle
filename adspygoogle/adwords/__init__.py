@@ -45,7 +45,7 @@ if VERSION < LIB_MIN_COMMON_VERSION:
 
 # Tuple of strings representing API versions.
 API_VERSIONS = ('v201109', 'v201109_1')
-DEFAULT_API_VERSION = API_VERSIONS[len(API_VERSIONS) - 1]
+DEFAULT_API_VERSION = API_VERSIONS[-1]
 
 # Accepted combinations of headers which user has to provide. Either one of
 # these is required in order to make a succesful API request.

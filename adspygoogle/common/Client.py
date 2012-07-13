@@ -28,6 +28,26 @@ from adspygoogle.common import Utils
 from adspygoogle.common.Errors import ValidationError
 
 
+# The values in _DEFAULT_CONFIG will be used to populate a user's configuration
+# if any of these keys was not provided.
+_DEFAULT_CONFIG = {
+    'proxy': None,
+    'xml_parser': PYXML,
+    'debug': 'n',
+    'raw_debug': 'n',
+    'xml_log': 'y',
+    'request_log': 'y',
+    'raw_response': 'n',
+    'strict': 'y',
+    'auth_token_epoch': 0,
+    'auth_type': '',
+    'pretty_xml': 'y',
+    'compress': 'y',
+    'access': '',
+    'wrap_in_tuple': 'y'
+}
+
+
 class Client(object):
 
   """Provides entry point to all web services.
@@ -121,25 +141,9 @@ class Client(object):
       dict Given config dictionary with default values added in.
     """
     if config is None: config = {}
-    default_config = {
-        'proxy': None,
-        'xml_parser': PYXML,
-        'debug': 'n',
-        'raw_debug': 'n',
-        'xml_log': 'y',
-        'request_log': 'y',
-        'raw_response': 'n',
-        'strict': 'y',
-        'auth_token_epoch': 0,
-        'auth_type': '',
-        'pretty_xml': 'y',
-        'compress': 'y',
-        'access': '',
-        'wrap_in_tuple': 'y'
-    }
-    for key in default_config:
+    for key in _DEFAULT_CONFIG:
       if key not in config:
-        config[key] = default_config[key]
+        config[key] = _DEFAULT_CONFIG[key]
     return config
 
   def GetAuthCredentials(self):

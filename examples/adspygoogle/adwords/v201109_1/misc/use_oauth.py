@@ -125,7 +125,4 @@ def main(sandbox_email, client_customer_id):
 
 
 if __name__ == '__main__':
-  # Initialize client object.
-  client = AdWordsClient(path=os.path.join('..', '..', '..', '..', '..'))
-
   main(sandbox_email, client_customer_id)

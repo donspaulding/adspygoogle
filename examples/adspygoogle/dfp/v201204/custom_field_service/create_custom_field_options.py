@@ -32,7 +32,7 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
-from adspygoogle.dfp.DfpClient import DfpClient
+from adspygoogle import DfpClient
 
 # Set the ID of the drop-down custom field to create options for.
 CUSTOM_FIELD_ID = 'INSERT_DROP_DOWN_CUSTOM_FIELD_ID_HERE'
