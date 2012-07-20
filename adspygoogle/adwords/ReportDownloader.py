@@ -30,11 +30,13 @@ from adspygoogle.adwords import AUTH_TOKEN_EXPIRE
 from adspygoogle.adwords import AUTH_TOKEN_SERVICE
 from adspygoogle.adwords import LIB_SIG
 from adspygoogle.adwords.AdWordsErrors import AdWordsError
+from adspygoogle.adwords.util import XsdToWsdl
 from adspygoogle.common import MessageHandler
 from adspygoogle.common import SanityCheck
 from adspygoogle.common import Utils
 from adspygoogle.common.Errors import ValidationError
 from adspygoogle.common.Logger import Logger
+
 
 SERVICE_NAME = 'ReportDefinitionService'
 DOWNLOAD_URL_BASE = '/api/adwords/reportdownload'
@@ -66,11 +68,10 @@ class ReportDownloader(object):
     namespace_suffix = '/'.join(('/api/adwords', op_config['group'],
                                  self._op_config['version']))
     self._namespace = 'https://adwords.google.com' + namespace_suffix
-
-    wsdl_url = '%s%s/ReportDefinitionService?wsdl' % (op_config['server'],
-                                                      namespace_suffix)
-    self._soappyservice = SOAPpy.WSDL.Proxy(
-        wsdl_url, noroot=1)
+    xsd_url = '%s%s%s/reportDefinition.xsd' % (op_config['server'],
+                                               '/api/adwords/reportdownload/',
+                                               self._op_config['version'])
+    self._soappyservice = XsdToWsdl.CreateWsdlFromXsdUrl(xsd_url)
     self._logger = logger
 
   def DownloadReport(self, report_definition_or_id, return_micros=False,
@@ -98,27 +99,89 @@ class ReportDownloader(object):
       return self.__DownloadReportById(report_definition_or_id, return_micros,
                                        fileobj) or file_path
 
-  def __DownloadAdHocReport(self, report, return_micros=False, fileobj=None):
+  def DownloadReportWithAwql(self, report_query, download_format,
+                             return_micros=False, file_path=None, fileobj=None):
+    """Downloads a report with AWQL.
+
+    Args:
+      report_query: str AWQL for the report.
+      download_format: str Download format. E.g. CSV, TSV, XML.
+      return_micros: bool Whether to return currency in micros (optional).
+      file_path: str File path to download to (optional).
+      fileobj: file An already-open file-like object that supports write()
+               (optional).
+
+    Returns:
+      str Report data if file_path and fileobj are None, None if fileobj is
+          not None and file_path otherwise.
+    """
+    if not fileobj and file_path:
+      fileobj = open(file_path, 'w+')
+
+    return self.__DownloadAdHocReportWithAwql(report_query,
+                                              download_format,
+                                              return_micros,
+                                              fileobj) or file_path
+
+  def __DownloadAdHocReport(self, report_definition, return_micros=False,
+                            fileobj=None):
     """Downloads an AdHoc report.
 
     Args:
-      report: dict Report to download.
+      report_definition: dict Report to download.
       return_micros: bool Whether to return currency in micros (optional).
       fileobj: file File to write to (optional).
 
     Returns:
       str Report data if no fileobj, otherwise None.
     """
-    report_xml = self.__GetReportXml(report)
+    report_xml = self.__GetReportXml(report_definition)
+    query_params = {'__rdxml': report_xml}
 
-    payload = urllib.urlencode({'__rdxml': report_xml})
+    payload = urllib.urlencode(query_params)
+    return self.__DownloadReport(payload, return_micros, fileobj)
 
+  def __DownloadAdHocReportWithAwql(self,
+                                    report_query,
+                                    download_format,
+                                    return_micros=False,
+                                    fileobj=None):
+    """Downloads an AdHoc report with AWQL.
+
+    Args:
+      report_query: str AWQL to download a report for.
+      download_format: str Format of the report download.
+      return_micros: bool Whether to return currency in micros (optional).
+      fileobj: file File to write to (optional).
+
+    Returns:
+      str Report data if no fileobj, otherwise None.
+    """
+    query_params = {
+        '__fmt': download_format,
+        '__rdquery': report_query
+    }
+
+    payload = urllib.urlencode(query_params)
+    return self.__DownloadReport(payload, return_micros, fileobj)
+
+  def __DownloadReport(self, report_payload, return_micros=False, fileobj=None):
+    """Downloads an AdHoc report for the specified payload.
+
+    Args:
+      report_payload: str Report payload to POST to the server.
+      return_micros: bool Whether to return currency in micros (optional).
+      fileobj: file File to write to (optional).
+
+    Returns:
+      str Report data if no fileobj, otherwise None.
+    """
     url = self.__GenerateUrl()
     self.__ReloadAuthToken()
     headers = self.__GenerateHeaders(return_micros, url)
     headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    headers['Content-Length'] = str(len(payload))
-    return self.__MakeRequest(url, headers, fileobj, payload=payload)
+    headers['Content-Length'] = str(len(report_payload))
+    return self.__MakeRequest(url, headers, fileobj, payload=report_payload)
 
   def __GetReportXml(self, report):
     """Transforms the report object into xml.
@@ -130,10 +193,10 @@ class ReportDownloader(object):
       str ReportDefinition XML.
     """
     SanityCheck.SoappySanityCheck(self._soappyservice, report, self._namespace,
-                                  u'ReportDefinition')
+                                  u'reportDefinition')
 
     packed = self._message_handler.PackForSoappy(report, self._namespace,
-                                                 'ReportDefinition',
+                                                 'reportDefinition',
                                                  self._soappyservice, False,
                                                  lambda x: '')
 
@@ -268,29 +331,30 @@ class ReportDownloader(object):
     start_time = time.strftime('%Y-%m-%d %H:%M:%S')
     request = urllib2.Request(request_url, payload, headers)
     try:
-      response = urllib2.urlopen(request)
-      response_code = response.code
-      response_headers = response.info().headers
-      if response.info().get('Content-Encoding') == 'gzip':
-        response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
-                                 mode='rb')
-      if fileobj:
-        self.__DumpToFile(response, fileobj)
-        return None
-      else:
-        return response.read()
-    except urllib2.HTTPError, e:
-      response = e
-      response_code = response.code
-      response_headers = response.info().headers
-      if response.info().get('Content-Encoding') == 'gzip':
-        response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
-                                 mode='rb')
-      error = response.read()
-      match = re.search(OLD_ERROR_REGEX, error)
-      if match:
-        error = match.group(3)
-      raise AdWordsError('%s %s' % (str(e), error))
+      try:
+        response = urllib2.urlopen(request)
+        response_code = response.code
+        response_headers = response.info().headers
+        if response.info().get('Content-Encoding') == 'gzip':
+          response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
+                                   mode='rb')
+        if fileobj:
+          self.__DumpToFile(response, fileobj)
+          return None
+        else:
+          return response.read()
+      except urllib2.HTTPError, e:
+        response = e
+        response_code = response.code
+        response_headers = response.info().headers
+        if response.info().get('Content-Encoding') == 'gzip':
+          response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
+                                   mode='rb')
+        error = response.read()
+        match = re.search(OLD_ERROR_REGEX, error)
+        if match:
+          error = match.group(3)
+        raise AdWordsError('%s %s' % (str(e), error))
     finally:
       end_time = time.strftime('%Y-%m-%d %H:%M:%S')
       xml_log_data = self.__CreateXmlLogData(start_time, end_time, request_url,

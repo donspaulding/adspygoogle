@@ -24,7 +24,6 @@ import pickle
 from adspygoogle.common import SanityCheck
 from adspygoogle.common.Errors import InvalidInputError
 from adspygoogle.common.Logger import Logger
-from adspygoogle.dfp import LIB_SIG
 from adspygoogle.dfp import REQUIRED_SOAP_HEADERS
 
 
@@ -104,11 +103,6 @@ for prompt_msg, header, source in prompts:
     else:
       if auth[header] == 'none':
         auth[header] = ''
-
-    # Prefix client library name and version to the useragent.
-    if header == 'applicationName':
-      if auth[header].rfind(LIB_SIG) == -1:
-        auth[header] = '%s|%s' % (LIB_SIG, auth[header])
   elif source == 'config':
     # Prompt user to update configuration values.
     if header == 'xml_parser':

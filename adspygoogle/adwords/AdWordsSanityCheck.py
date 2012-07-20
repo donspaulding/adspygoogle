@@ -20,6 +20,12 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
 from adspygoogle.common.Errors import ValidationError
 
+DEPRECATED_AFTER = {
+    'ServicedAccountService': 'v201109_1',
+    'CreateAccountService': 'v201109_1',
+    'CampaignTargetService': 'v201109_1'
+}
+
 
 def ValidateServer(server, version):
   """Sanity check for API server.
@@ -33,9 +39,11 @@ def ValidateServer(server, version):
   """
   # Map of supported API servers and versions.
   prod = {'v201109': 'https://adwords.google.com',
-          'v201109_1': 'https://adwords.google.com'}
+          'v201109_1': 'https://adwords.google.com',
+          'v201206': 'https://adwords.google.com'}
   sandbox = {'v201109': 'https://adwords-sandbox.google.com',
-             'v201109_1': 'https://adwords-sandbox.google.com'}
+             'v201109_1': 'https://adwords-sandbox.google.com',
+             'v201206': 'https://adwords-sandbox.google.com'}
 
   if server not in prod.values() and server not in sandbox.values():
     msg = ('Given API server, \'%s\', is not valid. Expecting one of %s.'
@@ -88,3 +96,14 @@ def ValidateHeadersForServer(headers, server):
              'adwords/docs/developer/index.html#adwords_api_intro_request.'
              % server)
       raise ValidationError(msg)
+
+
+def ValidateService(service, version):
+  """Checks if this service is available in the requested version.
+
+  Args:
+    service: str Service being requested.
+    version: str Version being requested.
+  """
+  if service in DEPRECATED_AFTER and version > DEPRECATED_AFTER[service]:
+    raise ValidationError('%s is not available in %s' % (service, version))

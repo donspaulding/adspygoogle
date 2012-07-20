@@ -1,3 +1,12 @@
+15.4.0:
+- Adding support for v201206.
+- ManagedCustomerService and CustomerService supported in v201109, v201109_1 and
+  v201206.
+- Updating ReportDownloader to use the reportDefinition.xsd.
+- Adding support for AWQL in reports and examples.
+- Addressing issue #39, forcing SOAP header values to string.
+- Fixing issue #41 by using nested trys.
+
 15.3.2:
 - Fixing issue #36, unicode in report definition failed to URL encode.
 

@@ -874,6 +874,7 @@ class AdWordsClient(Client):
       version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       AdWordsSanityCheck.ValidateServer(server, version)
+    AdWordsSanityCheck.ValidateService('CampaignTargetService', version)
 
     # Load additional configuration data.
     op_config = {
@@ -908,6 +909,7 @@ class AdWordsClient(Client):
       version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       AdWordsSanityCheck.ValidateServer(server, version)
+    AdWordsSanityCheck.ValidateService('CreateAccountService', version)
 
     # Load additional configuration data.
     op_config = {
@@ -953,6 +955,40 @@ class AdWordsClient(Client):
     }
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'ConstantDataService')
+
+  def GetCustomerService(self, server='https://adwords.google.com',
+                         version=None, http_proxy=None):
+    """Call API method in CustomerService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. Possible
+              values are: 'https://adwords.google.com' for live site and
+              'https://sandbox.google.com' for sandbox. The default behavior
+              is to access live site.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of CustomerService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'mcm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'CustomerService')
 
   def GetCustomerSyncService(self, server='https://adwords.google.com',
                              version=None, http_proxy=None):
@@ -1126,6 +1162,40 @@ class AdWordsClient(Client):
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'LocationCriterionService')
 
+  def GetManagedCustomerService(self, server='https://adwords.google.com',
+                                version=None, http_proxy=None):
+    """Call API method in ManagedCustomerService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. Possible
+              values are: 'https://adwords.google.com' for live site and
+              'https://sandbox.google.com' for sandbox. The default behavior
+              is to access live site.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of ManagedCustomerService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'mcm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'ManagedCustomerService')
+
   def GetMediaService(self, server='https://adwords.google.com', version=None,
                       http_proxy=None):
     """Call API method in MediaService.
@@ -1251,6 +1321,7 @@ class AdWordsClient(Client):
       version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       AdWordsSanityCheck.ValidateServer(server, version)
+    AdWordsSanityCheck.ValidateService('ServicedAccountService', version)
 
     # Load additional configuration data.
     op_config = {

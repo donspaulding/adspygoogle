@@ -89,7 +89,7 @@ class GenericDfaService(GenericApiService):
           name='Security', typed=0, attrs={'xmlns': WSSE_NS})
       soap_headers.Security = wsse_header
     request_header = SOAPpy.Types.structType(
-        data={'applicationName': '|'.join([LIB_SIG, self._config['app_name']])},
+        data={'applicationName': ' '.join([self._config['app_name'], LIB_SIG])},
         name='RequestHeader', typed=0)
     soap_headers.RequestHeader = request_header
     self._soappyservice.soapproxy.header = soap_headers

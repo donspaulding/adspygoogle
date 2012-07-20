@@ -76,15 +76,15 @@ def Main(argv):
   Args:
     argv: list Commandline args with script name removed.
   """
-  if not argv or len(argv) > 2 or argv[0] not in LIBS:
-    print ('Nothing was done. Make sure to pass in the right argument: %s'
-           % LIBS)
-    return
-
   release_tests = None
   if '--test' in argv:
     release_tests = os.path.abspath('releasetests.sh')
     argv.remove('--test')
+
+  if not argv or len(argv) != 1 or argv[0] not in LIBS:
+    print ('Nothing was done. Make sure to pass in the right argument: %s'
+           % LIBS)
+    return
 
   effective_target = actual_target = argv[0]
   if actual_target == 'adxbuyer': effective_target = 'adwords'
@@ -244,8 +244,9 @@ def Main(argv):
 
   # Optionally run tests.
   if release_tests:
-    os.system('%s %s %s %s' % (release_tests, target_dir, effective_target,
-                               MAX_VERSIONS[effective_target]))
+    os.system('/bin/bash %s %s %s %s' % (release_tests, target_dir,
+                                         effective_target,
+                                         MAX_VERSIONS[effective_target]))
 
   print 'Built %s at %s' % (actual_target, TARGET_DIR_BASE)
 

@@ -56,6 +56,8 @@ class GenericAdWordsService(GenericApiService):
   # The _BUFFER_CLASS is the subclass of SoapBuffer that should be used to track
   # all SOAP interactions
   _BUFFER_CLASS = AdWordsSoapBuffer
+  # List of fields we should convert to string.
+  _STR_CONVERT = ['clientCustomerId']
 
   def __init__(self, headers, config, op_config, lock, logger, service_name):
     """Inits GenericAdWordsService.
@@ -126,8 +128,11 @@ class GenericAdWordsService(GenericApiService):
                self._headers.get('oauth2credentials'))):
         continue
       if key in self._headers and self._headers[key]:
+        value = self._headers[key]
+        if key in GenericAdWordsService._STR_CONVERT:
+          value = str(value)
         request_header_data['cm:' + key] = SOAPpy.Types.stringType(
-            self._headers[key])
+            value)
     request_header = SOAPpy.Types.structType(
         data=request_header_data, name='RequestHeader', typed=0)
     soap_headers.RequestHeader = request_header

@@ -95,7 +95,6 @@ Step-by-step guide for accessing the sandbox:
 
    Your AdWords account's login email: joe.shmoe@gmail.com
    Login password: secret
-   Login client email: client_1+joe.shmoe@gmail.com
    Login client customer id:
    User agent: GoogleTest
    Developer token: joe.shmoe@gmail.com++USD
@@ -105,11 +104,12 @@ Step-by-step guide for accessing the sandbox:
    Enable SOAP XML logging mode [y/n]: y
    Enable API request logging mode [y/n]: y
 
-6) Run "examples/adspygoogle/adwords/v201109/get_unit_count.py", which will set
-   up your Sandbox with five client accounts. Please note that starting with
-   v201109 you must use a clientCustomerId instead of optionally using
-   clientEmail. We have provided a code example to translate between them:
-   "examples/adspygoogle/adwords/v201109/get_client_customer_id.py"
+6) Run "examples/adspygoogle/adwords/VERSION/basic_operations/get_campaigns.py",
+   which will set up your Sandbox with five client accounts. Please note that
+   starting with v201109 you must use a clientCustomerId (you can run the script
+   again to update the value). We have provided a code example to translate
+   between them:
+   "examples/adspygoogle/adwords/VERSION/basic_operations/get_client_customer_id.py"
 
 7) Read over the documentation in "docs/index.html" to familiarize yourself with
    the API of the client library.

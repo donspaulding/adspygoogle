@@ -58,7 +58,7 @@ licas = lica_service.CreateLineItemCreativeAssociations(licas)
 if licas:
   for lica in licas:
     print ('LICA with line item id \'%s\', creative id \'%s\', and '
-           'status \'%s\' was created.' % (lica['id'], lica['creativeId'],
-                                           lica['status']))
+           'status \'%s\' was created.' % (lica['lineItemId'],
+                                           lica['creativeId'], lica['status']))
 else:
   print 'No LICAs created.'

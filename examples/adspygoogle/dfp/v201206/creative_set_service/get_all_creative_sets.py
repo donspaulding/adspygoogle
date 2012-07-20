@@ -46,7 +46,7 @@ def main(client):
   # Display results.
   for creative_set in creative_sets:
     print (('Creative set with ID \'%s\', master creative ID \'%s\', and '
-            'companion creative IDs {\'%s\'} was found.')
+            'companion creative IDs {%s} was found.')
            % (creative_set['id'], creative_set['masterCreativeId'],
               ','.join(creative_set['companionCreativeIds'])))
 

@@ -20,8 +20,8 @@ __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
 from adspygoogle.common import Utils
 from tests.adspygoogle.adwords import HTTP_PROXY
-from tests.adspygoogle.adwords import SERVER_V201109_1 as SERVER
-from tests.adspygoogle.adwords import VERSION_V201109_1 as VERSION
+from tests.adspygoogle.adwords import SERVER_V201206 as SERVER
+from tests.adspygoogle.adwords import VERSION_V201206 as VERSION
 
 
 def CreateTestCampaign(client):
@@ -48,7 +48,13 @@ def CreateTestCampaign(client):
                   'microAmount': '10000000'
               },
               'deliveryMethod': 'STANDARD'
-          }
+          },
+          'settings': [
+              {
+                  'xsi_type': 'KeywordMatchSetting',
+                  'optIn': 'false'
+              }
+          ]
       }
   }]
   return campaign_service.Mutate(
@@ -83,6 +89,9 @@ def CreateTestRTBCampaign(client):
           'settings': [{
               'xsi_type': 'RealTimeBiddingSetting',
               'optIn': 'true'
+          }, {
+              'xsi_type': 'KeywordMatchSetting',
+              'optIn': 'false'
           }]
       }
   }]

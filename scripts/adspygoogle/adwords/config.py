@@ -21,9 +21,6 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 import os
 import pickle
 
-from adspygoogle.adwords import AdWordsSanityCheck
-from adspygoogle.adwords import LIB_SIG
-from adspygoogle.adwords import REQUIRED_SOAP_HEADERS
 from adspygoogle.common import SanityCheck
 from adspygoogle.common.Errors import InvalidInputError
 from adspygoogle.common.Logger import Logger
@@ -100,11 +97,6 @@ for prompt_msg, header, source in prompts:
     else:
       if auth[header] == 'none':
         auth[header] = ''
-
-    # Prefex client library name and version to the userAgent.
-    if header == 'userAgent':
-      if auth[header].rfind(LIB_SIG) == -1:
-        auth[header] = '%s|%s' % (LIB_SIG, auth[header])
   elif source == 'config':
     # Prompt user to update configuration values.
     if header == 'xml_parser':

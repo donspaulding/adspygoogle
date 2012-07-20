@@ -61,7 +61,8 @@ if 'results' in response:
 # Display results.
 for lica in licas:
   print ('LICA with line item id \'%s\', creative id \'%s\', and status '
-         '\'%s\' was found.' % (lica['id'], lica['creativeId'], lica['status']))
+         '\'%s\' was found.' % (lica['lineItemId'], lica['creativeId'],
+                                lica['status']))
 
 print
 print 'Number of results found: %s' % len(licas)
