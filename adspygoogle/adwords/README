@@ -36,15 +36,9 @@ will correctly return back a list with a single element.
 Multiple modules are supported for parsing SOAP XML messages. By default, the
 client library uses the PyXML module in order to parse SOAP XML messages. In
 addition, the SOAPpy library supports ElementTree module, which may be activated
-simply by setting the appropriate config value (i.e. config['xml_parser']). Note
-that if you already have an lxml module installed and wish to use ElementTree,
-you do not need to install ElementTree. The lxml module is mostly compatible
-with ElementTree. Also, if you have Python v2.5+, the ElementTree comes with it.
-The cElementTree module is now also supported.
-
-Although there are projects out there that still support PyXML, it is no longer
-maintained. The last update for ElementTree library is dated 2007-09-12. Out of
-these three modules, the lxml is the one that was updated most recently.
+simply by setting the appropriate config value (i.e. config['xml_parser']).
+Also, if you have Python v2.5+, the ElementTree comes with it. The cElementTree
+module is now also supported.
 
 The code examples, located in "examples/", demonstrate how to use the client
 library. For additional examples, take a look at the unit tests in "tests/".
@@ -132,8 +126,6 @@ External Dependencies:
                            or
       cElementTree v1.0.6+ -- http://www.python.org/
                            (part of the Python v2.5+)
-                           or
-      lxml v2.2+           -- http://codespeak.net/lxml/index.html
     - Epydoc               -- http://epydoc.sourceforge.net/
                            (only if you will be generating docs)
     - fpconst              -- http://pypi.python.org/pypi/fpconst/#downloads

@@ -86,7 +86,7 @@ class AdWordsClient(Client):
         'home': '/path/to/home',
         'log_home': '/path/to/logs/home',
         'proxy': 'http://example.com:8080',
-        'xml_parser': PYXML,
+        'xml_parser': 1, # PYXML = 1, ELEMENTREE = 2
         'debug': 'n',
         'raw_debug': 'n',
         'xml_log': 'y',

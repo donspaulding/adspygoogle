@@ -41,7 +41,7 @@ line_item_service = client.GetService('LineItemService', version='v201206')
 
 # Set order that all created line items will belong to and the placement id to
 # target.
-order_id = 'INSERT_LINE_ITEM_ID_HERE'
+order_id = 'INSERT_ORDER_ID_HERE'
 targeted_placement_ids = ['INSERT_PLACEMENT_ID_HERE']
 
 # Create line item objects.
@@ -69,7 +69,8 @@ for i in xrange(5):
                   {
                       'id': '9000093',
                       'xsi_type': 'PostalCodeLocation',
-                      'postalCode': 'B3P'
+                      'postalCode': 'B3P',
+                      'countryCode': 'CA'
                   }
               ],
               'excludedLocations': [
@@ -158,7 +159,8 @@ for i in xrange(5):
       'creativeRotationType': 'EVEN',
       'discountType': 'PERCENTAGE',
       'unitsBought': '500000',
-      'unitType': 'IMPRESSIONS'
+      'unitType': 'IMPRESSIONS',
+      'allowOverbook': 'true'
   }
   line_items.append(line_item)
 

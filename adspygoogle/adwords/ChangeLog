@@ -1,3 +1,6 @@
+15.4.1:
+- Addressing issue #42, making the installer handle new adwords.util package.
+
 15.4.0:
 - Adding support for v201206.
 - ManagedCustomerService and CustomerService supported in v201109, v201109_1 and

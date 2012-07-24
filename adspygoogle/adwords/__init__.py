@@ -34,7 +34,7 @@ LIB_SHORT_NAME = 'AwApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python'
 LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '15.4.0'
+LIB_VERSION = '15.4.1'
 LIB_MIN_COMMON_VERSION = '3.0.8'
 LIB_SIG = GenerateLibSig(LIB_SHORT_NAME, LIB_VERSION)
 
