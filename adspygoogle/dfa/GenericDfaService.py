@@ -94,6 +94,21 @@ class GenericDfaService(GenericApiService):
     soap_headers.RequestHeader = request_header
     self._soappyservice.soapproxy.header = soap_headers
 
+  def _ReadyOAuth(self):
+    """If OAuth is on, sets the transport handler to add OAuth2 HTTP header.
+
+    DFA overrides the default implementation because only the login service
+    should have this header.
+    """
+    if self._service_name == 'login' and self._headers.get('oauth2credentials'):
+      self._headers['oauth2credentials'].apply(
+          self._soappyservice.soapproxy.transport.additional_headers)
+    else:
+      if ('Authorization' in
+          self._soappyservice.soapproxy.transport.additional_headers):
+        del self._soappyservice.soapproxy.transport.additional_headers[
+            'Authorization']
+
   def _GetMethodInfo(self, method_name):
     """Pulls all of the relevant data about a method from a SOAPpy service.
 
@@ -215,7 +230,8 @@ class GenericDfaService(GenericApiService):
       DfaAuthenticationError: if there are not enough credentials to generate a
                               token or if the given credentials are invalid.
     """
-    if 'Username' in self._headers and 'Password' in self._headers:
+    if ('Username' in self._headers and
+        ('Password' in self._headers or 'oauth2credentials' in self._headers)):
       # Ensure the 'raw_response' config value is off while generating tokens.
       old_raw_response = self._config['raw_response']
       self._config['raw_response'] = 'n'
@@ -225,13 +241,13 @@ class GenericDfaService(GenericApiService):
             self._logger, 'login')
         self._headers['AuthToken'] = login_service.authenticate(
             self._headers['Username'],
-            self._headers['Password'])[0]['token']
+            self._headers.get('Password'))[0]['token']
       finally:
         self._config['raw_response'] = old_raw_response
     else:
       fault = {
-          'faultstring': ('Authentication data, username and/or password, is '
-                          'missing.')
+          'faultstring': ('Authentication data, username/password or username/'
+                          'oauth2credentials, is missing.')
       }
       raise DfaAuthenticationError(fault)
 

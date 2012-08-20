@@ -34,7 +34,7 @@ LIB_SHORT_NAME = 'DfaApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python/'
 LIB_AUTHOR = 'Joseph DiLallo'
 LIB_AUTHOR_EMAIL = 'api.jdilallo@gmail.com'
-LIB_VERSION = '2.2.1'
+LIB_VERSION = '2.3.0'
 LIB_MIN_COMMON_VERSION = '3.0.8'
 LIB_SIG = GenerateLibSig(LIB_SHORT_NAME, LIB_VERSION)
 
@@ -44,13 +44,14 @@ if VERSION < LIB_MIN_COMMON_VERSION:
   raise MissingPackageError(msg)
 
 # Tuple of strings representing API versions.
-API_VERSIONS = ('v1.17', 'v1.18')
+API_VERSIONS = ('v1.18', 'v1.19')
 DEFAULT_API_VERSION = API_VERSIONS[-1]
 
 # Accepted combinations of headers which user has to provide. Either one of
 # these is required in order to make a succesful API request.
 REQUIRED_SOAP_HEADERS = (('Username', 'Password'),
-                         ('Username', 'AuthToken',))
+                         ('Username', 'AuthToken'),
+                         ('Username', 'oauth2credentials'))
 
 WSSE_NS = ('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-'
            'secext-1.0.xsd')

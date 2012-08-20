@@ -250,9 +250,9 @@ class GenericApiService(object):
       """Perform a SOAP call."""
       try:
         self._lock.acquire()
-        self._SetHeaders()
         self._ReadyOAuth()
         self._ReadyCompression()
+        self._SetHeaders()
 
         args = self._TakeActionOnSoapCall(method_name, args)
         method_info = self._GetMethodInfo(method_name)

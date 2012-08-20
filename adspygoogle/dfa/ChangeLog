@@ -1,3 +1,7 @@
+2.3.0:
+- Added support for v1.19. Removed support for v1.17.
+- Added support for OAuth2. See use_oauth2.py for example.
+
 2.2.1:
 - Updating user agent.
 

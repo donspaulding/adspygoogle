@@ -45,9 +45,8 @@ advertiser_id = 'INSERT_ADVERTISER_COMPANY_ID_HERE'
 # Use the image banner with optional third party tracking template.
 creative_template_id = '10000680'
 
-image_data = open(
-    os.path.join('..', '..', '..', '..', 'tests', 'adspygoogle', 'dfp', 'data',
-                 'medium_rectangle.jpg'), 'r').read()
+image_data = open(os.path.join(__file__[:__file__.rfind('/')], '..', 'data',
+                               'medium_rectangle.jpg'), 'r').read()
 image_data = base64.encodestring(image_data)
 # Create creative from templates.
 creative = {
