@@ -63,6 +63,7 @@ def main(client, parent_id):
       'description': 'Mobile ad unit description.',
       'targetWindow': 'BLANK',
       'targetPlatform': 'MOBILE',
+      'mobilePlatform': 'APPLICATION',
       'adUnitSizes': [ad_unit_size]
   }
 

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """This code example gets all line item creative associations (LICA). To create
-LICAs, run create_licas.py."""
+LICAs, run create_licas.py or associate_creative_set_to_line_item.py."""
 
 __author__ = 'api.shamjeff@gmail.com (Jeff Sham)'
 
@@ -42,9 +42,14 @@ licas = DfpUtils.GetAllEntitiesByStatementWithService(lica_service)
 
 # Display results.
 for lica in licas:
-  print ('LICA with line item id \'%s\', creative id \'%s\', and status '
-         '\'%s\' was found.' % (lica['lineItemId'], lica['creativeId'],
-                                lica['status']))
+  if 'creativeSetId' in lica:
+    print ('LICA with line item ID \'%s\', creative set ID \'%s\', and status '
+           '\'%s\' was found.' % (lica['lineItemId'], lica['creativeSetId'],
+                                  lica['status']))
+  else:
+    print ('LICA with line item ID \'%s\', creative ID \'%s\', and status '
+           '\'%s\' was found.' % (lica['lineItemId'], lica['creativeId'],
+                                  lica['status']))
 
 print
 print 'Number of results found: %s' % len(licas)

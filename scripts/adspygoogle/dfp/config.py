@@ -54,7 +54,9 @@ print """
 All requests that are sent to the DFP API web services
 must include SOAP header elements. Currently accepted
 header elements are email, password, networkCode, and
-applicationName.
+applicationName. Detailed descriptions of these
+properties can be found at:
+https://developers.google.com/doubleclick-publishers/docs/soap_xml
 
 Starting in v201203, networkCodes are required for
 all calls other than GetAllNetworks and

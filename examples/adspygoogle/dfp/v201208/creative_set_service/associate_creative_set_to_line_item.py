@@ -14,9 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This example gets all mobile target platform ad unit sizes.
+"""This code example creates a line item creative association for a creative
+set.
 
-Tags: InventoryService.getAdUnitSizesByStatement
+To create creative sets, run create_creative_set.py. To create creatives, run
+create_creatives.py. To determine which LICAs exist, run get_all_licas.py.
+
+Tags: LineItemCreativeAssociationService.CreateLineItemCreativeAssociations
 """
 
 __author__ = 'api.shamjeff@gmail.com (Jeff Sham)'
@@ -30,36 +34,26 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..', '..'))
 # Import appropriate classes from the client library.
 from adspygoogle import DfpClient
 
+CREATIVE_SET_ID = 'INSERT_CREATIVE_SET_ID_HERE'
+LINE_ITEM_ID = 'INSERT_LINE_ITEM_ID_HERE'
 
-def main(client):
+
+def main(client, creative_set_id, line_item_id):
   # Initialize appropriate service.
-  inventory_service = client.GetService('InventoryService', version='v201208')
+  lica_service = client.GetService(
+      'LineItemCreativeAssociationService', version='v201208')
 
-  target_platform = 'MOBILE'
+  # Create LICA for a creative set.
+  lica = {'creativeSetId': creative_set_id, 'lineItemId': line_item_id}
 
-  # Create statement to select ad unit sizes available for the mobile platform.
-  values = [{
-      'key': 'targetPlatform',
-      'value': {
-          'xsi_type': 'TextValue',
-          'value': target_platform
-      }
-  }]
-  filter_statement = {'query': 'WHERE targetPlatform = :targetPlatform',
-                      'values': values}
-
-  # Get all ad unit sizes.
-  ad_unit_sizes = inventory_service.GetAdUnitSizesByStatement(filter_statement)
+  # Add LICA.
+  lica = lica_service.CreateLineItemCreativeAssociations([lica])[0]
 
   # Display results.
-  for ad_unit_size in ad_unit_sizes:
-    print ('Mobile ad unit size of dimension %s was found.' %
-           ad_unit_size['fullDisplayString'])
-
-  print
-  print 'Number of ad unit sizes found: %s' % len(ad_unit_sizes)
+  print (('LICA with line item ID \'%s\' and creative set ID \'%s\' was '
+          'created.') % (lica['lineItemId'], lica['creativeSetId']))
 
 if __name__ == '__main__':
   # Initialize client object.
   dfp_client = DfpClient(path=os.path.join('..', '..', '..', '..', '..'))
-  main(dfp_client)
+  main(dfp_client, CREATIVE_SET_ID, LINE_ITEM_ID)

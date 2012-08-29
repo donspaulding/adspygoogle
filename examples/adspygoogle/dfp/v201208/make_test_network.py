@@ -16,15 +16,15 @@
 
 """This example creates a test network.
 
-You do not need to have a DFP account to
-run this example, but you do need to have a new Google account (created at
-http://www.google.com/accounts/newaccount) that is not associated with any
-other DFP networks (including old sandbox networks). Once this network is
-created, you can supply the network code in your settings to make calls to
-other services.
+You do not need to have a DFP account to run this example, but you do need to
+have a Google account (created at http://www.google.com/accounts/newaccount
+if you currently don't have one) that is not associated with any other DFP test
+networks. Once this network is created, you can supply the network code in your
+settings to make calls to other services.
 
-Please see the following URL for more information:
-https://developers.google.com/doubleclick-publishers/docs/signup
+Alternatively, if you do not wish to run this example, you can create a test
+network at:
+https://dfp-playground.appspot.com
 """
 
 __author__ = 'api.shamjeff@gmail.com (Jeff Sham)'
