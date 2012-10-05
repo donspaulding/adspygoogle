@@ -30,10 +30,13 @@ HTTP_PROXY = None
 SERVER_V201109 = 'https://adwords-sandbox.google.com'
 SERVER_V201109_1 = 'https://adwords-sandbox.google.com'
 SERVER_V201206 = 'https://adwords-sandbox.google.com'
+SERVER_V201209 = 'https://adwords-sandbox.google.com'
 TEST_VERSION_V201109 = True
 TEST_VERSION_V201109_1 = True
 TEST_VERSION_V201206 = True
+TEST_VERSION_V201209 = True
 VERSION_V201109 = 'v201109'
 VERSION_V201109_1 = 'v201109_1'
 VERSION_V201206 = 'v201206'
+VERSION_V201209 = 'v201209'
 client = AdWordsClient(path=os.path.join('..', '..', '..'))

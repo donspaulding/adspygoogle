@@ -36,22 +36,27 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+SUBNETWORK_ID = 'INSERT_SUBNETWORK_ID_HERE'
 
-# Initialize appropriate service.
-user_role_service = client.GetUserRoleService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-subnetwork_id = 'INSERT_SUBNETWORK_ID_HERE'
+def main(client, subnetwork_id):
+  # Initialize appropriate service.
+  user_role_service = client.GetUserRoleService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Get available permissions.
-results = user_role_service.GetAvailablePermissions(subnetwork_id)
+  # Get available permissions.
+  results = user_role_service.GetAvailablePermissions(subnetwork_id)
 
-# Display permission name and its ID.
-if results:
-  for permission in results:
-    print ('Permission with name \'%s\' and ID \'%s\' was found.'
-           % (permission['name'], permission['id']))
-else:
-  print 'No permissions found.'
+  # Display permission name and its ID.
+  if results:
+    for permission in results:
+      print ('Permission with name \'%s\' and ID \'%s\' was found.'
+             % (permission['name'], permission['id']))
+  else:
+    print 'No permissions found.'
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, SUBNETWORK_ID)

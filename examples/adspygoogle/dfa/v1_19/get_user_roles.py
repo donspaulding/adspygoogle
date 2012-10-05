@@ -31,38 +31,39 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  user_role_service = client.GetUserRoleService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-user_role_service = client.GetUserRoleService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Set user role search criteria.
+  user_role_search_criteria = {
+      'pageSize': '10'
+  }
 
-search_string = 'INSERT_SEARCH_CRITERIA_HERE'
+  # Get user roles that match the search criteria.
+  results = user_role_service.GetUserRoles(user_role_search_criteria)[0]
 
-# Set user role search criteria.
-user_role_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+  # Display user role names, IDs, subnetwork IDs, number of assigned users, and
+  # assigned permissions.
+  if results['userRoles']:
+    for user_role in results['userRoles']:
+      print ('User role with name \'%s\', ID \'%s\', subnetwork ID \'%s\', and '
+             'assigned to \'%s\' users was found.'
+             % (user_role['name'], user_role['id'], user_role['subnetworkId'],
+                user_role['totalAssignedUsers']))
+      if user_role['permissions']:
+        print '    The above user role has the following permissions:'
+        for permission in user_role['permissions']:
+          print ('        Permission with name \'%s\' and ID \'%s\'.'
+                 % (permission['name'], permission['id']))
+      else:
+        print '    The above user role has no permissions assigned.'
+  else:
+    print 'No user roles found for your criteria.'
 
-# Get user roles that match the search criteria.
-results = user_role_service.GetUserRoles(user_role_search_criteria)[0]
 
-# Display user role names, IDs, subnetwork IDs, number of assigned users, and
-# assigned permissions.
-if results['userRoles']:
-  for user_role in results['userRoles']:
-    print ('User role with name \'%s\', ID \'%s\', subnetwork ID \'%s\', and '
-           'assigned to \'%s\' users was found.'
-           % (user_role['name'], user_role['id'], user_role['subnetworkId'],
-              user_role['totalAssignedUsers']))
-    if user_role['permissions']:
-      print '    The above user role has the following permissions:'
-      for permission in user_role['permissions']:
-        print ('        Permission with name \'%s\' and ID \'%s\'.'
-               % (permission['name'], permission['id']))
-    else:
-      print '    The above user role has no permissions assigned.'
-else:
-  print 'No user roles found for your criteria.'
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

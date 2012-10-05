@@ -31,24 +31,29 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+REPORT_ID = 'INSERT_REPORT_ID_HERE'
 
-# Initialize appropriate service.
-reporting_service = client.GetReportService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-report_id = 'INSERT_REPORT_ID_HERE'
+def main(client, report_id):
+  # Initialize appropriate service.
+  reporting_service = client.GetReportService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Create report search criteria structure.
-report_request = {
-    'reportId': report_id
-}
+  # Create report search criteria structure.
+  report_request = {
+      'reportId': report_id
+  }
 
-# Fetch report information.
-report_info = reporting_service.GetReport(report_request)[0]
+  # Fetch report information.
+  report_info = reporting_service.GetReport(report_request)[0]
 
-# Display information on the report.
-print ('Report with ID \'%s\', status of \'%s\', and URL of \'%s\' was'
-       ' found.' % (report_info['reportId'], report_info['status']['name'],
-                    report_info['url']))
+  # Display information on the report.
+  print ('Report with ID \'%s\', status of \'%s\', and URL of \'%s\' was'
+         ' found.' % (report_info['reportId'], report_info['status']['name'],
+                      report_info['url']))
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, REPORT_ID)

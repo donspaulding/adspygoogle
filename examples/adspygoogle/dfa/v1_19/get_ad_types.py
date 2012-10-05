@@ -31,20 +31,24 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  ad_service = client.GetAdService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-ad_service = client.GetAdService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Get ad types.
+  results = ad_service.GetAdTypes()
 
-# Get ad types.
-results = ad_service.GetAdTypes()
+  # Display ad type names and IDs.
+  if results:
+    for ad_type in results:
+      print ('Ad type with name \'%s\' and ID \'%s\' was found.'
+             % (ad_type['name'], ad_type['id']))
+  else:
+    print 'No activity types found.'
 
-# Display ad type names and IDs.
-if results:
-  for ad_type in results:
-    print ('Ad type with name \'%s\' and ID \'%s\' was found.'
-           % (ad_type['name'], ad_type['id']))
-else:
-  print 'No activity types found.'
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

@@ -132,6 +132,8 @@ External Dependencies:
     - oauth2client         -- http://code.google.com/p/google-api-python-client/downloads/list
                            (only if using oauth2)
     - Google Account       -- https://www.google.com/accounts/NewAccount
+    - mock                 -- http://pypi.python.org/pypi/mock
+                              [Only needed to run unit tests]
 
 
 Author:

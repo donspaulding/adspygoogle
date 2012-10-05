@@ -31,31 +31,32 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  advertiser_group_service = client.GetAdvertiserGroupService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-advertiser_group_service = client.GetAdvertiserGroupService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Create advertiser group search criteria structure.
+  advertiser_group_search_criteria = {
+      'pageSize': '10'
+  }
 
-search_string = 'INSERT_SEARCH_STRING_CRITERIA_HERE'
+  # Get advertiser group record set.
+  results = advertiser_group_service.GetAdvertiserGroups(
+      advertiser_group_search_criteria)[0]
 
-# Create advertiser group search criteria structure.
-advertiser_group_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+  # Display advertiser group names, IDs and advertiser count.
+  if results['records']:
+    for advertiser_group in results['records']:
+      print ('Advertiser group with name \'%s\', ID \'%s\', containing %s'
+             ' advertisers was found.' % (advertiser_group['name'],
+                                          advertiser_group['id'],
+                                          advertiser_group['advertiserCount']))
+  else:
+    print 'No advertiser groups found for your criteria.'
 
-# Get advertiser group record set.
-results = advertiser_group_service.GetAdvertiserGroups(
-    advertiser_group_search_criteria)[0]
 
-# Display advertiser group names, IDs and advertiser count.
-if results['records']:
-  for advertiser_group in results['records']:
-    print ('Advertiser group with name \'%s\', ID \'%s\', containing %s'
-           ' advertisers was found.' % (advertiser_group['name'],
-                                        advertiser_group['id'],
-                                        advertiser_group['advertiserCount']))
-else:
-  print 'No advertiser groups found for your criteria.'
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

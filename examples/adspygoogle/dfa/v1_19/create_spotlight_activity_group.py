@@ -31,26 +31,30 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+SPOTLIGHT_CONFIGURATION_ID = 'INSERT_SPOTLIGHT_CONFIGURATION_ID_HERE'
+ACTIVITY_TYPE = 'INSERT_ACTIVITY_TYPE_HERE'
+GROUP_NAME = 'INSERT_GROUP_NAME_HERE'
 
-# Initialize appropriate service.
-spotlight_service = client.GetSpotlightService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-spotlight_configuration_id = 'INSERT_SPOTLIGHT_CONFIGURATION_ID_HERE'
-activity_type = 'INSERT_ACTIVITY_TYPE_HERE'
-group_name = 'INSERT_GROUP_NAME_HERE'
+def main(client, spotlight_configuration_id, activity_type, group_name):
+  # Initialize appropriate service.
+  spotlight_service = client.GetSpotlightService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct and save spotlight activity group.
-spotlight_activity_group = {
-    'name': group_name,
-    'spotlightConfigurationId': spotlight_configuration_id,
-    'groupType': activity_type
-}
-result = spotlight_service.SaveSpotlightActivityGroup(
-    spotlight_activity_group)[0]
+  # Construct and save spotlight activity group.
+  spotlight_activity_group = {
+      'name': group_name,
+      'spotlightConfigurationId': spotlight_configuration_id,
+      'groupType': activity_type
+  }
+  result = spotlight_service.SaveSpotlightActivityGroup(
+      spotlight_activity_group)[0]
 
-# Display results.
-print 'Spotlight activity group with ID \'%s\' was created.' % result['id']
+  # Display results.
+  print 'Spotlight activity group with ID \'%s\' was created.' % result['id']
 
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, SPOTLIGHT_CONFIGURATION_ID, ACTIVITY_TYPE, GROUP_NAME)

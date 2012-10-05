@@ -27,22 +27,25 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle import DfaClient
+from adspygoogle.common import Utils
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  advertiser_group_service = client.GetAdvertiserGroupService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-advertiser_group_service = client.GetAdvertiserGroupService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Construct and save advertiser.
+  advertiser_group = {
+      'name': 'AdvertiserGroup %s' % Utils.GetUniqueName()
+  }
+  result = advertiser_group_service.SaveAdvertiserGroup(advertiser_group)[0]
 
-advertiser_group_name = 'INSERT_ADVERTISER_GROUP_NAME_HERE'
+  # Display results.
+  print 'Advertiser group with ID \'%s\' was created.' % result['id']
 
-# Construct and save advertiser.
-advertiser_group = {
-    'name': advertiser_group_name
-}
-result = advertiser_group_service.SaveAdvertiserGroup(advertiser_group)[0]
 
-# Display results.
-print 'Advertiser group with ID \'%s\' was created.' % result['id']
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

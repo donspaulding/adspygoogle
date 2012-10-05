@@ -62,11 +62,7 @@ def main(client):
               'optIn': 'false'
           }],
           'networkSetting': {
-              'targetGoogleSearch': 'false',
-              'targetSearchNetwork': 'false',
               'targetContentNetwork': 'true',
-              'targetContentContextual': 'false',
-              'targetPartnerSearchNetwork': 'false'
           },
           # Optional fields
           'startDate': (datetime.datetime.now() +
@@ -103,11 +99,7 @@ def main(client):
               'optIn': 'false'
           }],
           'networkSetting': {
-              'targetGoogleSearch': 'false',
-              'targetSearchNetwork': 'false',
               'targetContentNetwork': 'true',
-              'targetContentContextual': 'false',
-              'targetPartnerSearchNetwork': 'false'
           }
       }
   }]

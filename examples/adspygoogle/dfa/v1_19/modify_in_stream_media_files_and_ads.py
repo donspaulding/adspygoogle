@@ -37,37 +37,42 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
-
-# Initialize appropriate service.
-creative_service = client.GetCreativeService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
-
 # Set the ID of the In-Stream video creative whose components will be updated.
-creative_id = 'INSERT_IN_STREAM_VIDEO_CREATIVE_ID_HERE'
+CREATIVE_ID = 'INSERT_IN_STREAM_VIDEO_CREATIVE_ID_HERE'
 
-# Fetch the In-Stream video creative which contains the asset to modify.
-in_stream_video_creative = creative_service.GetCreative(creative_id)
 
-if in_stream_video_creative['typeId'] != '29':
-  print ('Unable to update creative with ID \'%s\': not an In-Stream video '
-         'creative.' % creative_id)
-else:
-  # Modify the media files, companion ads, and/or non-linear ads.
-  if in_stream_video_creative['mediaFiles']:
-    for media_file in in_stream_video_creative['mediaFiles']:
-      media_file['pickedToServe'] = not media_file['pickedToServe']
+def main(client, creative_id):
+  # Initialize appropriate service.
+  creative_service = client.GetCreativeService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-  if in_stream_video_creative['companionAds']:
-    for companion_ad in in_stream_video_creative['companionAds']:
-      companion_ad['altText'] += ' Updated.'
+  # Fetch the In-Stream video creative which contains the asset to modify.
+  in_stream_video_creative = creative_service.GetCreative(creative_id)
 
-  if in_stream_video_creative['linearAds']:
-    for non_linear_ad in in_stream_video_creative['linearAds']:
-      non_linear_ad['scalable'] = not non_linear_ad['scalable']
+  if in_stream_video_creative['typeId'] != '29':
+    print ('Unable to update creative with ID \'%s\': not an In-Stream video '
+           'creative.' % creative_id)
+  else:
+    # Modify the media files, companion ads, and/or non-linear ads.
+    if in_stream_video_creative['mediaFiles']:
+      for media_file in in_stream_video_creative['mediaFiles']:
+        media_file['pickedToServe'] = not media_file['pickedToServe']
 
-  result = creative_service.SaveCreative(in_stream_video_creative, 0)
+    if in_stream_video_creative['companionAds']:
+      for companion_ad in in_stream_video_creative['companionAds']:
+        companion_ad['altText'] += ' Updated.'
 
-  print ('Updated the In-Stream assets of In-Stream video creative with ID '
-         '\'%s\'.' % result['id'])
+    if in_stream_video_creative['linearAds']:
+      for non_linear_ad in in_stream_video_creative['linearAds']:
+        non_linear_ad['scalable'] = not non_linear_ad['scalable']
+
+    result = creative_service.SaveCreative(in_stream_video_creative, 0)
+
+    print ('Updated the In-Stream assets of In-Stream video creative with ID '
+           '\'%s\'.' % result['id'])
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, CREATIVE_ID)

@@ -30,29 +30,30 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  placement_service = client.GetPlacementService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-placement_service = client.GetPlacementService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Set placement search criteria.
+  placement_search_criteria = {
+      'pageSize': '10'
+  }
 
-search_string = 'INSERT_SEARCH_STRING_HERE'
+  # Get placement types.
+  results = placement_service.GetPlacementsByCriteria(
+      placement_search_criteria)[0]
 
-# Set placement search criteria.
-placement_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+  # Display placement names and IDs.
+  if results['records']:
+    for placement in results['records']:
+      print ('Placement with name \'%s\' and ID \'%s\' was found.'
+             % (placement['name'], placement['id']))
+  else:
+    print 'No placements found for your criteria.'
 
-# Get placement types.
-results = placement_service.GetPlacementsByCriteria(
-    placement_search_criteria)[0]
 
-# Display placement names and IDs.
-if results['records']:
-  for placement in results['records']:
-    print ('Placement with name \'%s\' and ID \'%s\' was found.'
-           % (placement['name'], placement['id']))
-else:
-  print 'No placements found for your criteria.'
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

@@ -30,6 +30,7 @@ from adspygoogle.adwords import AUTH_TOKEN_EXPIRE
 from adspygoogle.adwords import AUTH_TOKEN_SERVICE
 from adspygoogle.adwords import LIB_SIG
 from adspygoogle.adwords.AdWordsErrors import AdWordsError
+from adspygoogle.adwords.AdWordsErrors import AdWordsReportError
 from adspygoogle.adwords.util import XsdToWsdl
 from adspygoogle.common import MessageHandler
 from adspygoogle.common import SanityCheck
@@ -44,6 +45,9 @@ REPORT_ID='?__rd=%s'
 VERSIONED='/%s'
 OLD_ERROR_REGEX = r'^!!!([-\d]+)\|\|\|([-\d]+)\|\|\|(.*)\?\?\?'
 ATTRIBUTES_REGEX = r'( )?[\w:-]+="[\w:\[\]-]+"'
+ERROR_TYPE_REGEX = r'(?s)<type>(.*?)</type>'
+ERROR_TRIGGER_REGEX = r'(?s)<trigger>(.*?)</trigger>'
+ERROR_FIELD_PATH_REGEX = r'(?s)<fieldPath>(.*?)</fieldPath>'
 BUF_SIZE = 4096
 
 
@@ -351,9 +355,12 @@ class ReportDownloader(object):
           response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
                                    mode='rb')
         error = response.read()
-        match = re.search(OLD_ERROR_REGEX, error)
-        if match:
-          error = match.group(3)
+        if self._op_config['version'] <= 'v201206':
+          match = re.search(OLD_ERROR_REGEX, error)
+          if match:
+            error = match.group(3)
+        else:
+          self.__CheckForXmlError(response_code, error)
         raise AdWordsError('%s %s' % (str(e), error))
     finally:
       end_time = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -361,6 +368,16 @@ class ReportDownloader(object):
                                              headers, orig_payload,
                                              response_code, response_headers)
       self.__LogRequest(xml_log_data)
+
+  def __CheckForXmlError(self, response_code, response):
+    if 'reportDownloadError' in response:
+      error_type = re.search(ERROR_TYPE_REGEX, response)
+      if error_type: error_type = error_type.group(1)
+      trigger = re.search(ERROR_TRIGGER_REGEX, response)
+      if trigger: trigger = trigger.group(1)
+      field_path = re.search(ERROR_FIELD_PATH_REGEX, response)
+      if field_path: field_path = field_path.group(1)
+      raise AdWordsReportError(response_code, error_type, trigger, field_path)
 
   def __ReloadAuthToken(self):
     """Ensures we have a valid auth_token in our headers."""

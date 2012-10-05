@@ -30,45 +30,52 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
-
-# Initialize appropriate service.
-campaign_service = client.GetCampaignService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
-
-advertiser_id = 'INSERT_ADVERTISER_ID_HERE'
-campaign_name = 'INSERT_CAMPAIGN_NAME_HERE'
-url = 'INSERT_LANDING_PAGE_URL_HERE'
-landing_page_name = 'INSERT_LANDING_PAGE_NAME_HERE'
-start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
+ADVERTISER_ID = 'INSERT_ADVERTISER_ID_HERE'
+CAMPAIGN_NAME = 'INSERT_CAMPAIGN_NAME_HERE'
+URL = 'INSERT_LANDING_PAGE_URL_HERE'
+LANDING_PAGE_NAME = 'INSERT_LANDING_PAGE_NAME_HERE'
+START_DATE = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
     'year': 'INSERT_START_YEAR_HERE',
     'month': int('INSERT_START_MONTH_HERE'),
     'day': int('INSERT_START_DAY_HERE')}
-end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
+END_DATE = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
     'year': 'INSERT_END_YEAR_HERE',
     'month': int('INSERT_END_MONTH_HERE'),
     'day': int('INSERT_END_DAY_HERE')}
 
-# Create a default landing page for the campaign and save it.
-default_landing_page = {
-    'url': url,
-    'name': landing_page_name
-}
 
-default_landing_page_id = campaign_service.SaveLandingPage(
-    default_landing_page)[0]['id']
+def main(client, advertiser_id, campaign_name, url, landing_page_name,
+         start_date, end_date):
+  # Initialize appropriate service.
+  campaign_service = client.GetCampaignService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct and save the campaign.
-campaign = {
-    'name': campaign_name,
-    'advertiserId': advertiser_id,
-    'defaultLandingPageId': default_landing_page_id,
-    'archived': 'false',
-    'startDate': start_date,
-    'endDate': end_date
-}
-result = campaign_service.SaveCampaign(campaign)[0]
+  # Create a default landing page for the campaign and save it.
+  default_landing_page = {
+      'url': url,
+      'name': landing_page_name
+  }
 
-# Display results.
-print 'Campaign with ID \'%s\' was created.' % result['id']
+  default_landing_page_id = campaign_service.SaveLandingPage(
+      default_landing_page)[0]['id']
+
+  # Construct and save the campaign.
+  campaign = {
+      'name': campaign_name,
+      'advertiserId': advertiser_id,
+      'defaultLandingPageId': default_landing_page_id,
+      'archived': 'false',
+      'startDate': start_date,
+      'endDate': end_date
+  }
+  result = campaign_service.SaveCampaign(campaign)[0]
+
+  # Display results.
+  print 'Campaign with ID \'%s\' was created.' % result['id']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ADVERTISER_ID, CAMPAIGN_NAME, URL, LANDING_PAGE_NAME, START_DATE,
+       END_DATE)

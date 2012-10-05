@@ -32,28 +32,35 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+ACTIVITY_GROUP_ID = 'INSERT_ACTIVITY_GROUP_ID_HERE'
+ACTIVITY_TYPE_ID = 'INSERT_ACTIVITY_TYPE_ID_HERE'
+TAG_METHOD_TYPE_ID = 'INSERT_TAG_METHOD_TYPE_ID_HERE'
+URL = 'INSERT_EXPECTED_URL_HERE'
+ACTIVITY_NAME = 'INSERT_ACTIVITY_NAME_HERE'
 
-# Initialize appropriate service.
-spotlight_service = client.GetSpotlightService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-activity_group_id = 'INSERT_ACTIVITY_GROUP_ID_HERE'
-activity_type_id = 'INSERT_ACTIVITY_TYPE_ID_HERE'
-tag_method_type_id = 'INSERT_TAG_METHOD_TYPE_ID_HERE'
-url = 'INSERT_EXPECTED_URL_HERE'
-activity_name = 'INSERT_ACTIVITY_NAME_HERE'
+def main(client, activity_group_id, activity_type_id, tag_method_type_id, url,
+         activity_name):
+  # Initialize appropriate service.
+  spotlight_service = client.GetSpotlightService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct and save spotlight activity.
-spotlight_activity = {
-    'name': activity_name,
-    'activityGroupId': activity_group_id,
-    'activityTypeId': activity_type_id,
-    'tagMethodTypeId': tag_method_type_id,
-    'expectedUrl': url
-}
-result = spotlight_service.SaveSpotlightActivity(spotlight_activity)[0]
+  # Construct and save spotlight activity.
+  spotlight_activity = {
+      'name': activity_name,
+      'activityGroupId': activity_group_id,
+      'activityTypeId': activity_type_id,
+      'tagMethodTypeId': tag_method_type_id,
+      'expectedUrl': url
+  }
+  result = spotlight_service.SaveSpotlightActivity(spotlight_activity)[0]
 
-# Display results.
-print 'Spotlight activity with ID \'%s\' was created.' % result['id']
+  # Display results.
+  print 'Spotlight activity with ID \'%s\' was created.' % result['id']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ACTIVITY_GROUP_ID, ACTIVITY_TYPE_ID, TAG_METHOD_TYPE_ID, URL,
+       ACTIVITY_NAME)

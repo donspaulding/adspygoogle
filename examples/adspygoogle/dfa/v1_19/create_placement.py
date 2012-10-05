@@ -33,51 +33,58 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
-
-# Initialize appropriate service.
-placement_service = client.GetPlacementService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
-
-placement_name = 'INSERT_PLACEMENT_NAME_HERE'
-dfaSite_id = 'INSERT_DFA_SITE_ID_HERE'
-campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
-pricing_type = 'INSERT_PRICING_TYPE_HERE'
-placement_type = 'INSERT_PLACEMENT_TYPE_HERE'
-size_id = 'INSERT_SIZE_ID_HERE'
-start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
+PLACEMENT_NAME = 'INSERT_PLACEMENT_NAME_HERE'
+DFA_SITE_ID = 'INSERT_DFA_SITE_ID_HERE'
+CAMPAIGN_ID = 'INSERT_CAMPAIGN_ID_HERE'
+PRICING_TYPE = 'INSERT_PRICING_TYPE_HERE'
+PLACEMENT_TYPE = 'INSERT_PLACEMENT_TYPE_HERE'
+SIZE_ID = 'INSERT_SIZE_ID_HERE'
+START_DATE = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
     'year': 'INSERT_START_YEAR_HERE',
     'month': int('INSERT_START_MONTH_HERE'),
     'day': int('INSERT_START_DAY_HERE')}
-end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
+END_DATE = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
     'year': 'INSERT_END_YEAR_HERE',
     'month': int('INSERT_END_MONTH_HERE'),
     'day': int('INSERT_END_DAY_HERE')}
 
-# Construct and save placement.
-placement = {
-    'name': placement_name,
-    'campaignId': campaign_id,
-    'dfaSiteId': dfaSite_id,
-    'sizeId': size_id,
-    'placementType': placement_type,
-    'pricingSchedule': {
-        'startDate': start_date,
-        'endDate': end_date,
-        'pricingType': pricing_type
-    }
-}
 
-# Set placement tag settings.
-tag_options = placement_service.GetRegularPlacementTagOptions()
-tag_types = []
-for tag_listing in tag_options:
-  tag_types.append(tag_listing['id'])
+def main(client, placement_name, dfa_site_id, campaign_id, pricing_type,
+         placement_type, size_id, start_date, end_date):
+  # Initialize appropriate service.
+  placement_service = client.GetPlacementService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-placement['tagSettings'] =  { 'tagTypes': tag_types }
+  # Construct and save placement.
+  placement = {
+      'name': placement_name,
+      'campaignId': campaign_id,
+      'dfaSiteId': dfa_site_id,
+      'sizeId': size_id,
+      'placementType': placement_type,
+      'pricingSchedule': {
+          'startDate': start_date,
+          'endDate': end_date,
+          'pricingType': pricing_type
+      }
+  }
 
-result = placement_service.SavePlacement(placement)[0]
+  # Set placement tag settings.
+  tag_options = placement_service.GetRegularPlacementTagOptions()
+  tag_types = []
+  for tag_listing in tag_options:
+    tag_types.append(tag_listing['id'])
 
-# Display results.
-print 'Placement with ID \'%s\' was created.' % result['id']
+  placement['tagSettings'] = {'tagTypes': tag_types}
+
+  result = placement_service.SavePlacement(placement)[0]
+
+  # Display results.
+  print 'Placement with ID \'%s\' was created.' % result['id']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, PLACEMENT_NAME, DFA_SITE_ID, CAMPAIGN_ID, PRICING_TYPE,
+       PLACEMENT_TYPE, SIZE_ID, START_DATE, END_DATE)

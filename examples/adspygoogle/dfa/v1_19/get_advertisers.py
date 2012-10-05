@@ -30,29 +30,37 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  advertiser_service = client.GetAdvertiserService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-advertiser_service = client.GetAdvertiserService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Create advertiser search criteria structure.
+  page_number = 1
+  advertiser_search_criteria = {
+      'pageSize': '100',
+      'pageNumber': str(page_number)
+  }
 
-search_string = 'INSERT_SEARCH_STRING_CRITERIA_HERE'
+  while True:
+    # Get advertiser record set.
+    results = advertiser_service.GetAdvertisers(advertiser_search_criteria)[0]
 
-# Create advertiser search criteria structure.
-advertiser_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+    # Display advertiser names, IDs and spotlight configuration IDs.
+    if results['records']:
+      for advertiser in results['records']:
+        print ('Advertiser with name \'%s\', ID \'%s\', and spotlight '
+               'configuration id \'%s\' was found.'
+               % (advertiser['name'], advertiser['id'], advertiser['spotId']))
+    page_number += 1
+    advertiser_search_criteria['pageNumber'] = str(page_number)
+    if page_number > int(results['totalNumberOfPages']):
+      break
 
-# Get advertiser record set.
-results = advertiser_service.GetAdvertisers(advertiser_search_criteria)[0]
+  print 'Number of results found: %s' % results['totalNumberOfRecords']
 
-# Display advertiser names, IDs and spotlight configuration IDs.
-if results['records']:
-  for advertiser in results['records']:
-    print ('Advertiser with name \'%s\', ID \'%s\', and spotlight configuration'
-           ' id \'%s\' was found.' % (advertiser['name'], advertiser['id'],
-                                      advertiser['spotId']))
-else:
-  print 'No advertisers found for your criteria.'
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

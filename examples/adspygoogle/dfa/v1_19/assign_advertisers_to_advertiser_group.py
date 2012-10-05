@@ -32,19 +32,23 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
-client.debug = False
-
-# Initialize appropriate service.
-advertiser_group_service = client.GetAdvertiserGroupService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
-
-advertiser_ids = ['INSERT_FIRST_ADVERTISER_ID_HERE',
+ADVERTISER_IDS = ['INSERT_FIRST_ADVERTISER_ID_HERE',
                   'INSERT_SECOND_ADVERTISER_ID_HERE']
-advertiser_group_id = 'INSERT_ADVERTISER_GROUP_ID_HERE'
+ADVERTISER_GROUP_IDS = 'INSERT_ADVERTISER_GROUP_ID_HERE'
 
-# Assign the advertisers to the advertiser group.
-advertiser_group_service.AssignAdvertisersToAdvertiserGroup(advertiser_group_id,
-                                                            advertiser_ids)
-print 'Advertisers have been updated.'
+
+def main(client, advertiser_ids, advertiser_group_id):
+  # Initialize appropriate service.
+  advertiser_group_service = client.GetAdvertiserGroupService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
+
+  # Assign the advertisers to the advertiser group.
+  advertiser_group_service.AssignAdvertisersToAdvertiserGroup(
+      advertiser_group_id, advertiser_ids)
+  print 'Advertisers have been updated.'
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ADVERTISER_IDS, ADVERTISER_GROUP_IDS)

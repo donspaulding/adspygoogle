@@ -1,3 +1,6 @@
+15.5.0:
+- Adding support for v201209.
+
 15.4.1:
 - Addressing issue #42, making the installer handle new adwords.util package.
 

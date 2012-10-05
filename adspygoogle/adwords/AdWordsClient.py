@@ -647,6 +647,40 @@ class AdWordsClient(Client):
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'BidLandscapeService')
 
+  def GetBudgetService(self, server='https://adwords.google.com',
+                       version=None, http_proxy=None):
+    """Call API method in BudgetOrderService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. Possible
+              values are: 'https://adwords.google.com' for live site and
+              'https://adwords-sandbox.google.com' for sandbox. The default
+              behavior is to access live site.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of BudgetService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'cm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'BudgetService')
+
   def GetBudgetOrderService(self, server='https://adwords.google.com',
                             version=None, http_proxy=None):
     """Call API method in BudgetOrderService.
@@ -703,6 +737,7 @@ class AdWordsClient(Client):
       version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       AdWordsSanityCheck.ValidateServer(server, version)
+    AdWordsSanityCheck.ValidateService('BulkMutateJobService', version)
 
     # Load additional configuration data.
     op_config = {

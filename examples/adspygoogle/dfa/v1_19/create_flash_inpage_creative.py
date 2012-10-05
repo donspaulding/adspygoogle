@@ -30,50 +30,52 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
-from adspygoogle.dfa import DfaUtils
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+CAMPAIGN_ID = 'INSERT_CAMPAIGN_ID_HERE'
+ADVERTISER_ID = 'INSERT_ADVERTISER_ID_HERE'
+CREATIVE_NAME = 'INSERT_CREATIVE_NAME_HERE'
+SWF_ASSET_FILE_NAME = 'INSERT_SWF_ASSET_FILE_NAME_HERE'
+IMG_ASSET_FILE_NAME = 'INSERT_IMG_ASSET_FILE_NAME_HERE'
+SIZE_ID = 'INSERT_SIZE_ID_HERE'
 
-# Initialize appropriate service.
-creative_service = client.GetCreativeService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
-advertiser_id = 'INSERT_ADVERTISER_ID_HERE'
-creative_name = 'INSERT_CREATIVE_NAME_HERE'
-swf_asset_file_name = 'INSERT_SWF_ASSET_FILE_NAME_HERE'
-img_asset_file_name = 'INSERT_IMG_ASSET_FILE_NAME_HERE'
-size_id = 'INSERT_SIZE_ID_HERE'
+def main(client, campaign_id, advertiser_id, creative_name, swf_asset_file_name,
+         img_asset_file_name, size_id):
+  # Initialize appropriate service.
+  creative_service = client.GetCreativeService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct and save flash inpage creative structure.
-flash_inpage_creative = {
-    'name': creative_name,
-    'id': '0',
-    'advertiserId': advertiser_id,
-    'typeId': '24',
-    'sizeId': size_id,
-    'codeLocked': 'true',
-    'active': 'true',
-    'parentFlashAsset': {
-        'assetFilename': swf_asset_file_name
-    },
-    'wmode': 'opaque',
-    'backupImageAsset': {
-        'assetFilename': img_asset_file_name
-    },
-    'backupImageTargetWindow': {
-        'option': '_blank'
-    }
-}
+  # Construct and save flash inpage creative structure.
+  flash_inpage_creative = {
+      'name': creative_name,
+      'id': '0',
+      'advertiserId': advertiser_id,
+      'typeId': '24',
+      'sizeId': size_id,
+      'codeLocked': 'true',
+      'active': 'true',
+      'parentFlashAsset': {
+          'assetFilename': swf_asset_file_name
+      },
+      'wmode': 'opaque',
+      'backupImageAsset': {
+          'assetFilename': img_asset_file_name
+      },
+      'backupImageTargetWindow': {
+          'option': '_blank'
+      }
+  }
 
-# Add an xsi_type before saving this creative.
-flash_inpage_creative['xsi_type'] = \
-    DfaUtils.GetCreativeXsiTypes()[flash_inpage_creative['typeId']]
+  result = creative_service.SaveCreative(flash_inpage_creative, campaign_id)[0]
 
-result = creative_service.SaveCreative(flash_inpage_creative, campaign_id)[0]
+  # Display results.
+  print 'Flash inpage creative with ID \'%s\' was created.' % result['id']
 
-# Display results.
-print 'Flash inpage creative with ID \'%s\' was created.' % result['id']
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, CAMPAIGN_ID, ADVERTISER_ID, CREATIVE_NAME, SWF_ASSET_FILE_NAME,
+       IMG_ASSET_FILE_NAME, SIZE_ID)

@@ -30,28 +30,37 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  campaign_service = client.GetCampaignService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-campaign_service = client.GetCampaignService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Create campaign search criteria structure.
+  page_number = 1
+  campaign_search_criteria = {
+      'pageSize': '100',
+      'pageNumber': str(page_number)
+  }
 
-search_string = 'INSERT_CAMPAIGN_SEARCH_STRING_HERE'
+  while True:
+    # Get campaign record set.
+    results = campaign_service.GetCampaignsByCriteria(
+        campaign_search_criteria)[0]
 
-# Create campaign search criteria structure.
-campaign_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+    # Display campaign names and IDs.
+    if results['records']:
+      for campaign in results['records']:
+        print ('Campaign with name \'%s\' and ID \'%s\' was found.'
+               % (campaign['name'], campaign['id']))
+    page_number += 1
+    campaign_search_criteria['pageNumber'] = str(page_number)
+    if page_number > int(results['totalNumberOfPages']):
+      break
 
-# Get campaign record set.
-results = campaign_service.GetCampaignsByCriteria(campaign_search_criteria)[0]
+  print 'Number of results found: %s' % results['totalNumberOfRecords']
 
-# Display campaign names and IDs.
-if results['records']:
-  for campaign in results['records']:
-    print ('Campaign with name \'%s\' and ID \'%s\' was found.'
-           % (campaign['name'], campaign['id']))
-else:
-  print 'No campaigns found for your criteria.'
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

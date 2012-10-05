@@ -32,39 +32,46 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+USER_ROLE_NAME = 'INSERT_USER_ROLE_NAME_HERE'
+SUBNETWORK_ID = 'INSERT_SUBNETWORK_ID_HERE'
+PARENT_USER_ROLE_ID = 'INSERT_PARENT_USER_ROLE_ID_HERE'
+PERMISSION1_ID = 'INSERT_FIRST_PERMISSION_ID_HERE'
+PERMISSION2_ID = 'INSERT_SECOND_PERMISSION_ID_HERE'
 
-# Initialize appropriate service.
-user_role_service = client.GetUserRoleService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-user_role_name = 'INSERT_USER_ROLE_NAME_HERE'
-subnetwork_id = 'INSERT_SUBNETWORK_ID_HERE'
-parent_user_role_id = 'INSERT_PARENT_USER_ROLE_ID_HERE'
-permission1_id = 'INSERT_FIRST_PERMISSION_ID_HERE'
-permission2_id = 'INSERT_SECOND_PERMISSION_ID_HERE'
+def main(client, user_role_name, subnetwork_id, parent_user_role_id,
+         permission1_id, permission2_id):
+  # Initialize appropriate service.
+  user_role_service = client.GetUserRoleService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct and the basic user role structure.
-user_role = {
-    'name': user_role_name,
-    'subnetworkId': subnetwork_id,
-    'parentUserRoleId': parent_user_role_id
-}
+  # Construct and the basic user role structure.
+  user_role = {
+      'name': user_role_name,
+      'subnetworkId': subnetwork_id,
+      'parentUserRoleId': parent_user_role_id
+  }
 
-# Create an array of all permissions assigned to this user role and add it to
-# the user role structure. To get a list of available permissions, run
-# get_available_permissions.py.
-permission1 = {
-    'id': permission1_id
-}
-permission2 = {
-    'id': permission2_id
-}
-user_role['permissions'] = [permission1, permission2]
+  # Create an array of all permissions assigned to this user role and add it to
+  # the user role structure. To get a list of available permissions, run
+  # get_available_permissions.py.
+  permission1 = {
+      'id': permission1_id
+  }
+  permission2 = {
+      'id': permission2_id
+  }
+  user_role['permissions'] = [permission1, permission2]
 
-# Save the user role.
-result = user_role_service.SaveUserRole(user_role)[0]
+  # Save the user role.
+  result = user_role_service.SaveUserRole(user_role)[0]
 
-# Display results.
-print 'User role with ID \'%s\' was created.' % result['id']
+  # Display results.
+  print 'User role with ID \'%s\' was created.' % result['id']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, USER_ROLE_NAME, SUBNETWORK_ID, PARENT_USER_ROLE_ID,
+       PERMISSION1_ID, PERMISSION2_ID)

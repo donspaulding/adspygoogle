@@ -31,29 +31,40 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+ADVERTISER_ID = 'INSERT_ADVERTISER_ID_HERE'
 
-# Initialize appropriate service.
-creative_service = client.GetCreativeService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-advertiser_id = 'INSERT_ADVERTISER_ID_HERE'
+def main(client, advertiser_id):
+  # Initialize appropriate service.
+  creative_service = client.GetCreativeService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Set up creative search criteria structure.
-creative_search_criteria = {
-    'advertiserId': advertiser_id,
-    'pageSize': '10'
-}
+  # Set up creative search criteria structure.
+  page_number = 1
+  creative_search_criteria = {
+      'advertiserId': advertiser_id,
+      'pageSize': '100',
+      'pageNumber': str(page_number)
+  }
 
-# Get creatives for the selected criteria.
-results = creative_service.GetCreatives(creative_search_criteria)[0]
+  while True:
+    # Get creatives for the selected criteria.
+    results = creative_service.GetCreatives(creative_search_criteria)[0]
 
-# Display creative name and its ID.
-if results['records']:
-  for creative in results['records']:
-    print ('Creative with name \'%s\' and ID \'%s\' was found.'
-           % (creative['name'], creative['id']))
-else:
-  print 'No creatives found for your criteria.'
+    # Display creative name and its ID.
+    if results['records']:
+      for creative in results['records']:
+        print ('Creative with name \'%s\' and ID \'%s\' was found.'
+               % (creative['name'], creative['id']))
+    page_number += 1
+    creative_search_criteria['pageNumber'] = str(page_number)
+    if page_number > int(results['totalNumberOfPages']):
+      break
 
+  print 'Number of results found: %s' % results['totalNumberOfRecords']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ADVERTISER_ID)

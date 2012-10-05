@@ -33,22 +33,27 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle.dfa.DfaClient import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+QUERY_ID = 'INSERT_QUERY_ID_HERE'
 
-# Initialize appropriate service.
-report_service = client.GetReportService(
-    'http://advertisersapitest.doubleclick.net', 'v1.19')
 
-query_id = 'INSERT_QUERY_ID_HERE'
+def main(client, query_id):
+  # Initialize appropriate service.
+  report_service = client.GetReportService(
+      'http://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Create report search criteria structure.
-report_request = {
-    'queryId': query_id
-}
+  # Create report search criteria structure.
+  report_request = {
+      'queryId': query_id
+  }
 
-# Request generation of a report for your query.
-report_info = report_service.RunDeferredReport(report_request)[0]
+  # Request generation of a report for your query.
+  report_info = report_service.RunDeferredReport(report_request)[0]
 
-# Display success message.
-print 'Report with ID \'%s\' has been scheduled.' % (report_info['reportId'])
+  # Display success message.
+  print 'Report with ID \'%s\' has been scheduled.' % (report_info['reportId'])
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, QUERY_ID)

@@ -30,28 +30,29 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  site_service = client.GetSiteService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-site_service = client.GetSiteService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Create DFA site search criteria structure.
+  dfa_site_search_criteria = {
+      'pageSize': '10'
+  }
 
-search_string = 'INSERT_DFA_SITE_SEARCH_STRING_HERE'
+  # Get the sites.
+  results = site_service.GetDfaSites(dfa_site_search_criteria)[0]
 
-# Create DFA site search criteria structure.
-dfa_site_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+  # Display DFA site names and IDs.
+  if results['records']:
+    for dfa_site in results['records']:
+      print ('DFA site with name \'%s\' and ID \'%s\' was found.'
+             % (dfa_site['name'], dfa_site['id']))
+  else:
+    print 'No DFA sites found for your criteria.'
 
-# Get the sites.
-results = site_service.GetDfaSites(dfa_site_search_criteria)[0]
 
-# Display DFA site names and IDs.
-if results['records']:
-  for dfa_site in results['records']:
-    print ('DFA site with name \'%s\' and ID \'%s\' was found.'
-           % (dfa_site['name'], dfa_site['id']))
-else:
-  print 'No DFA sites found for your criteria.'
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

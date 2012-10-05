@@ -17,6 +17,9 @@
 """This example authenticates using your DFA user name and password, and
 displays the user profile token, DFA account name and ID.
 
+This method of authentication is now discouraged in favor of using OAuth2. See
+the example "use_oauth2.py".
+
 Tags: login.authenticate
 """
 
@@ -30,21 +33,26 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+USERNAME = 'INSERT_USER_NAME_HERE'
+PASSWORD = 'INSERT_PASSWORD_HERE'
 
-# Initialize appropriate service.
-login_service = client.GetLoginService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-username = 'INSERT_USER_NAME_HERE'
-password = 'INSERT_PASSWORD_HERE'
+def main(client, username, password):
+  # Initialize appropriate service.
+  login_service = client.GetLoginService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Authenticate.
-user_profile = login_service.Authenticate(username, password)[0]
+  # Authenticate.
+  user_profile = login_service.Authenticate(username, password)[0]
 
-# Display user profile token, DFA account name and ID.
-print ('User profile token is \'%s\', DFA account name is \'%s\', and DFA'
-       ' account ID is \'%s\'.' % (user_profile['token'],
-                                   user_profile['networkName'],
-                                   user_profile['networkId']))
+  # Display user profile token, DFA account name and ID.
+  print ('User profile token is \'%s\', DFA account name is \'%s\', and DFA'
+         ' account ID is \'%s\'.' % (user_profile['token'],
+                                     user_profile['networkName'],
+                                     user_profile['networkId']))
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, USERNAME, PASSWORD)

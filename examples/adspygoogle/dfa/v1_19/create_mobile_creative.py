@@ -33,32 +33,39 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+CAMPAIGN_ID = 'INSERT_CAMPAIGN_ID_HERE'
+ADVERTISER_ID = 'INSERT_ADVERTISER_ID_HERE'
+CREATIVE_NAME = 'INSERT_CREATIVE_NAME_HERE'
+MOBILE_ASSET_FILE_NAME = 'INSERT_MOBILE_ASSET_FILE_NAME_HERE'
 
-# Initialize appropriate service.
-creative_service = client.GetCreativeService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
-advertiser_id = 'INSERT_ADVERTISER_ID_HERE'
-creative_name = 'INSERT_CREATIVE_NAME_HERE'
-mobile_asset_file_name = 'INSERT_MOBILE_ASSET_FILE_NAME_HERE'
+def main(client, campaign_id, advertiser_id, creative_name,
+         mobile_asset_file_name):
+  # Initialize appropriate service.
+  creative_service = client.GetCreativeService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct and save mobile creative.
-mobile_creative = {
-    'name': creative_name,
-    'advertiserId': advertiser_id,
-    'typeId': '30',
-    'archived': 'false',
-    'creativeAssets': [{
-        'assetFilename': mobile_asset_file_name
-    }]
-}
+  # Construct and save mobile creative.
+  mobile_creative = {
+      'name': creative_name,
+      'advertiserId': advertiser_id,
+      'typeId': '30',
+      'archived': 'false',
+      'creativeAssets': [{
+          'assetFilename': mobile_asset_file_name
+      }]
+  }
 
-# If you don't specify an xsi_type for a creative, the client library will try
-# to infer it from the typeId.
-result = creative_service.SaveCreative(mobile_creative, campaign_id)[0]
+  # If you don't specify an xsi_type for a creative, the client library will try
+  # to infer it from the typeId.
+  result = creative_service.SaveCreative(mobile_creative, campaign_id)[0]
 
-# Display results.
-print 'Mobile creative with ID \'%s\' was created.' % result['id']
+  # Display results.
+  print 'Mobile creative with ID \'%s\' was created.' % result['id']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, CAMPAIGN_ID, ADVERTISER_ID, CREATIVE_NAME,
+       MOBILE_ASSET_FILE_NAME)

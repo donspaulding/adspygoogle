@@ -31,32 +31,37 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+ADVERTISER_ID = 'INSERT_ADVERTISER_ID_HERE'
 
-# Initialize appropriate service.
-creative_field_service = client.GetCreativeFieldService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-advertiser_id = 'INSERT_ADVERTISER_ID_HERE'
+def main(client, advertiser_id):
+  # Initialize appropriate service.
+  creative_field_service = client.GetCreativeFieldService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Set up creative field search criteria structure.
-creative_field_search_criteria = {
-    'advertiserIds': [advertiser_id],
-    'pageSize': '10'
-}
+  # Set up creative field search criteria structure.
+  creative_field_search_criteria = {
+      'advertiserIds': [advertiser_id],
+      'pageSize': '10'
+  }
 
-# Get creative fields for the selected criteria.
-results = creative_field_service.GetCreativeFields(
-    creative_field_search_criteria)[0]
+  # Get creative fields for the selected criteria.
+  results = creative_field_service.GetCreativeFields(
+      creative_field_search_criteria)[0]
 
-# Display creative field names, IDs, advertiser IDs, and number of values.
-if results['records']:
-  for creative_field in results['records']:
-    print ('Creative field with name \'%s\', ID \'%s\', advertiser ID \'%s\','
-           ' and containing \'%s\' values was found.'
-           % (creative_field['name'], creative_field['id'],
-              creative_field['advertiserId'],
-              creative_field['totalNumberOfValues']))
-else:
-  print 'No creative fields found for your criteria.'
+  # Display creative field names, IDs, advertiser IDs, and number of values.
+  if results['records']:
+    for creative_field in results['records']:
+      print ('Creative field with name \'%s\', ID \'%s\', advertiser ID \'%s\','
+             ' and containing \'%s\' values was found.'
+             % (creative_field['name'], creative_field['id'],
+                creative_field['advertiserId'],
+                creative_field['totalNumberOfValues']))
+  else:
+    print 'No creative fields found for your criteria.'
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ADVERTISER_ID)

@@ -40,41 +40,48 @@ from adspygoogle import DfaClient
 from adspygoogle.common import Utils
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
-
-# Initialize appropriate service.
-creative_service = client.GetCreativeService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
-
 # Set the parameters for the In-Stream video asset.
-asset_name = 'INSERT_ASSET_NAME_HERE'
-path_to_file = 'INSERT_PATH_TO_FILE_HERE'
-in_stream_video_creative_id = 'INSERT_IN_STREAM_VIDEO_CREATIVE_ID_HERE'
-asset_to_replace = 'INSERT_ASSET_TO_REPLACE_HERE'
+ASSET_NAME = 'INSERT_ASSET_NAME_HERE'
+PATH_TO_FILE = 'INSERT_PATH_TO_FILE_HERE'
+IN_STREAM_VIDEO_CREATIVE_ID = 'INSERT_IN_STREAM_VIDEO_CREATIVE_ID_HERE'
+ASSET_TO_REPLACE = 'INSERT_ASSET_TO_REPLACE_HERE'
 
-# Convert file into format that can be sent in SOAP messages.
-content = Utils.ReadFile(path_to_file)
-content = base64.encodestring(content)
 
-# Create the In-Stream video creative asset.
-in_stream_video_asset = {
-    'name': asset_name,
-    'content': content,
-}
+def main(client, asset_name, path_to_file, in_stream_video_creative_id,
+         asset_to_replace):
+  # Initialize appropriate service.
+  creative_service = client.GetCreativeService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Create an upload request to make this asset a media file for an existing
-# In-Stream creative.
-in_stream_asset_upload_request = {
-    'companion': 'true',
-    'inStreamAsset': in_stream_video_asset,
-    'creativeId': in_stream_video_creative_id
-}
+  # Convert file into format that can be sent in SOAP messages.
+  content = Utils.ReadFile(path_to_file)
+  content = base64.encodestring(content)
 
-# Replace the existing asset with a newly uploaded asset.
-result = creative_service.ReplaceInStreamAsset(
-    asset_to_replace, in_stream_asset_upload_request)[0]
+  # Create the In-Stream video creative asset.
+  in_stream_video_asset = {
+      'name': asset_name,
+      'content': content,
+  }
 
-# Display a success message.
-print ('Replaced companion ad asset \'%s\' in In-Stream video creative with ID '
-       '\'%s\'.' % (asset_to_replace, result['id']))
+  # Create an upload request to make this asset a media file for an existing
+  # In-Stream creative.
+  in_stream_asset_upload_request = {
+      'companion': 'true',
+      'inStreamAsset': in_stream_video_asset,
+      'creativeId': in_stream_video_creative_id
+  }
+
+  # Replace the existing asset with a newly uploaded asset.
+  result = creative_service.ReplaceInStreamAsset(
+      asset_to_replace, in_stream_asset_upload_request)[0]
+
+  # Display a success message.
+  print ('Replaced companion ad asset \'%s\' in In-Stream video creative with '
+         'ID \'%s\'.' % (asset_to_replace, result['id']))
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ASSET_NAME, PATH_TO_FILE, IN_STREAM_VIDEO_CREATIVE_ID,
+       ASSET_TO_REPLACE)

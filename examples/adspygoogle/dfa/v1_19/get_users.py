@@ -31,30 +31,31 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  user_service = client.GetUserService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-user_service = client.GetUserService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Set user search criteria.
+  user_search_criteria = {
+      'pageSize': '10'
+  }
 
-search_string = 'INSERT_SEARCH_STRING_HERE'
+  # Get users that match the search criteria.
+  results = user_service.GetUsersByCriteria(user_search_criteria)[0]
 
-# Set user search criteria.
-user_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+  # Display user names, IDs, network IDs, subnetwork IDs, and group IDs.
+  if results['records']:
+    for user in results['records']:
+      print ('User with name \'%s\', ID \'%s\', network ID \'%s\', '
+             'subnetwork ID \'%s\', and user role id \'%s\' was found.'
+             % (user['name'], user['id'], user['networkId'],
+                user['subnetworkId'], user['userGroupId']))
+  else:
+    print 'No users found for your criteria.'
 
-# Get users that match the search criteria.
-results = user_service.GetUsersByCriteria(user_search_criteria)[0]
 
-# Display user names, IDs, network IDs, subnetwork IDs, and group IDs.
-if results['records']:
-  for user in results['records']:
-    print ('User with name \'%s\', ID \'%s\', network ID \'%s\', subnetwork ID'
-           ' \'%s\', and user role id \'%s\' was found.'
-           % (user['name'], user['id'], user['networkId'], user['subnetworkId'],
-              user['userGroupId']))
-else:
-  print 'No users found for your criteria.'
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

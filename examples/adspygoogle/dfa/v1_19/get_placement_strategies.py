@@ -30,29 +30,30 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  placement_strategy_service = client.GetStrategyService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-placement_strategy_service = client.GetStrategyService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Create placement strategy search criteria structure.
+  placement_strategy_search_criteria = {
+      'pageSize': '10'
+  }
 
-search_string = 'INSERT_SEARCH_STRING_HERE'
+  # Get placement strategy record set.
+  results = placement_strategy_service.GetPlacementStrategiesByCriteria(
+      placement_strategy_search_criteria)[0]
 
-# Create placement strategy search criteria structure.
-placement_strategy_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+  # Display placement strategy names, IDs and descriptions.
+  if results['records']:
+    for placement in results['records']:
+      print ('Placement strategy with name \'%s\' and ID \'%s\' was found.'
+             % (placement['name'], placement['id']))
+  else:
+    print 'No placement strategies found for your criteria.'
 
-# Get placement strategy record set.
-results = placement_strategy_service.GetPlacementStrategiesByCriteria(
-    placement_strategy_search_criteria)[0]
 
-# Display placement strategy names, IDs and descriptions.
-if results['records']:
-  for placement in results['records']:
-    print ('Placement strategy with name \'%s\' and ID \'%s\' was found.'
-           % (placement['name'], placement['id']))
-else:
-  print 'No placement strategies found for your criteria.'
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

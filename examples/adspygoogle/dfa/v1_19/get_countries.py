@@ -30,26 +30,30 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  spotlight_service = client.GetSpotlightService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-spotlight_service = client.GetSpotlightService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Set search criteria.
+  country_search_criteria = {
+      'secure': 'false'
+  }
 
-# Set search criteria.
-country_search_criteria = {
-    'secure': 'false'
-}
+  # Get countries.
+  results = spotlight_service.GetCountriesByCriteria(country_search_criteria)[0]
 
-# Get countries.
-results = spotlight_service.GetCountriesByCriteria(country_search_criteria)[0]
+  # Display country names, codes and secure server support information.
+  if results:
+    for country in results:
+      print ('Country with name \'%s\', country code \'%s\', and supports a'
+             ' secure server? \'%s\'.'
+             % (country['name'], country['countryCode'], country['secure']))
+  else:
+    print 'No countries found for your criteria.'
 
-# Display country names, codes and secure server support information.
-if results:
-  for country in results:
-    print ('Country with name \'%s\', country code \'%s\', and supports a'
-           ' secure server? \'%s\'.' % (country['name'], country['countryCode'],
-                                        country['secure']))
-else:
-  print 'No countries found for your criteria.'
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

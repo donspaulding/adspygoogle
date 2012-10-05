@@ -29,20 +29,24 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  user_service = client.GetUserService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-user_service = client.GetUserService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Get user filter criteria types.
+  results = user_service.GetAvailableUserFilterCriteriaTypes()
 
-# Get user filter criteria types.
-results = user_service.GetAvailableUserFilterCriteriaTypes()
+  # Display user filter criteria types.
+  if results:
+    for filter_type in results:
+      print ('User filter criteria type with name \'%s\' and ID \'%s\' was '
+             'found.' % (filter_type['name'], filter_type['id']))
+  else:
+    print 'No user filter criteria types found.'
 
-# Display user filter criteria types.
-if results:
-  for filter_type in results:
-    print ('User filter criteria type with name \'%s\' and ID \'%s\' was found.'
-           % (filter_type['name'], filter_type['id']))
-else:
-  print 'No user filter criteria types found.'
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

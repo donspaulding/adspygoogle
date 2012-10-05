@@ -31,47 +31,52 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+CAMPAIGN_ID = 'INSERT_CAMPAIGN_ID_HERE'
+PLACEMENT_ID = 'INSERT_PLACEMENT_ID_HERE'
 
-# Initialize appropriate service.
-placement_service = client.GetPlacementService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
-placement_id = 'INSERT_PLACEMENT_ID_HERE'
+def main(client, campaign_id, placement_id):
+  # Initialize appropriate service.
+  placement_service = client.GetPlacementService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Set placement tag search criteria.
-placement_tag_criteria = {
-    'id': placement_id
-}
+  # Set placement tag search criteria.
+  placement_tag_criteria = {
+      'id': placement_id
+  }
 
-# Get placement tag options.
-tag_options = placement_service.GetRegularPlacementTagOptions()
-tag_types = map(lambda tag_listing: tag_listing['id'], tag_options)
+  # Get placement tag options.
+  tag_options = placement_service.GetRegularPlacementTagOptions()
+  tag_types = map(lambda tag_listing: tag_listing['id'], tag_options)
 
-# Add all types of tag options to the search criteria.
-placement_tag_criteria['tagOptionIds'] = tag_types
+  # Add all types of tag options to the search criteria.
+  placement_tag_criteria['tagOptionIds'] = tag_types
 
-# Create a list of placement tag search criterias.
-placement_tag_criterias = [placement_tag_criteria]
+  # Create a list of placement tag search criterias.
+  placement_tag_criterias = [placement_tag_criteria]
 
-# Get HTML tags for the placements.
-results = placement_service.GetPlacementTagData(campaign_id,
-                                                placement_tag_criterias)
+  # Get HTML tags for the placements.
+  results = placement_service.GetPlacementTagData(campaign_id,
+                                                  placement_tag_criterias)
 
-# Display tags for the placement ID used as criteria.
-for result in results:
-  for placement_tag_info in result['placementTagInfos']:
-    print 'Iframe/JavaScript tag for placement \'%s\' is \n%s\n' % (
-        placement_tag_info['placement']['name'],
-        placement_tag_info['iframeJavaScriptTag'])
-    print 'JavaScript tag for placement \'%s\' is \n%s\n' % (
-        placement_tag_info['placement']['name'],
-        placement_tag_info['javaScriptTag'])
-    print 'Standard tag for placement \'%s\' is \n%s\n' % (
-        placement_tag_info['placement']['name'],
-        placement_tag_info['standardTag'])
-    print 'Internal Redirect tag for placement \'%s\' is \n%s\n' % (
-        placement_tag_info['placement']['name'],
-        placement_tag_info['internalRedirectTag'])
+  # Display tags for the placement ID used as criteria.
+  for result in results:
+    for placement_tag_info in result['placementTagInfos']:
+      print 'Iframe/JavaScript tag for placement \'%s\' is \n%s\n' % (
+          placement_tag_info['placement']['name'],
+          placement_tag_info['iframeJavaScriptTag'])
+      print 'JavaScript tag for placement \'%s\' is \n%s\n' % (
+          placement_tag_info['placement']['name'],
+          placement_tag_info['javaScriptTag'])
+      print 'Standard tag for placement \'%s\' is \n%s\n' % (
+          placement_tag_info['placement']['name'],
+          placement_tag_info['standardTag'])
+      print 'Internal Redirect tag for placement \'%s\' is \n%s\n' % (
+          placement_tag_info['placement']['name'],
+          placement_tag_info['internalRedirectTag'])
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, CAMPAIGN_ID, PLACEMENT_ID)

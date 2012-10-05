@@ -29,22 +29,26 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object. This example shows you how to put authentication
-# information into a client at initialization.
-client = DfaClient({'Username': 'INSERT_USER_NAME_HERE',
-                    'Password': 'INSERT_PASSWORD_HERE'})
+def main(client):
+  # Initialize appropriate service.
+  spotlight_service = client.GetSpotlightService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-spotlight_service = client.GetSpotlightService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Get method types.
+  results = spotlight_service.GetSpotlightTagMethodTypes()
 
-# Get method types.
-results = spotlight_service.GetSpotlightTagMethodTypes()
+  # Display method type names and IDs.
+  if results:
+    for method_type in results:
+      print ('Method type with name \'%s\' and ID \'%s\' was found.'
+             % (method_type['name'], method_type['id']))
+  else:
+    print 'No method types found.'
 
-# Display method type names and IDs.
-if results:
-  for method_type in results:
-    print ('Method type with name \'%s\' and ID \'%s\' was found.'
-           % (method_type['name'], method_type['id']))
-else:
-  print 'No method types found.'
+
+if __name__ == '__main__':
+  # Initialize client object. This example shows you how to put authentication
+  # information into a client at initialization.
+  client = DfaClient({'Username': 'INSERT_USER_NAME_HERE',
+                      'Password': 'INSERT_PASSWORD_HERE'})
+  main(client)

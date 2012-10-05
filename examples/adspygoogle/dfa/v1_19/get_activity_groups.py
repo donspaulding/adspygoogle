@@ -30,29 +30,34 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+ADVERTISER_ID = 'INSERT_ADVERTISER_ID_HERE'
 
-# Initialize appropriate service.
-spotlight_service = client.GetSpotlightService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-advertiser_id = 'INSERT_ADVERTISER_ID_HERE'
+def main(client, advertiser_id):
+  # Initialize appropriate service.
+  spotlight_service = client.GetSpotlightService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Set activity group search criteria structure and use advertiser ID as search
-# criteria.
-spotlight_activity_group_search_criteria = {
-    'advertiserId': advertiser_id
-}
+  # Set activity group search criteria structure and use advertiser ID as search
+  # criteria.
+  spotlight_activity_group_search_criteria = {
+      'advertiserId': advertiser_id
+  }
 
-# Get activity groups.
-results = spotlight_service.GetSpotlightActivityGroups(
-    spotlight_activity_group_search_criteria)[0]
+  # Get activity groups.
+  results = spotlight_service.GetSpotlightActivityGroups(
+      spotlight_activity_group_search_criteria)[0]
 
-# Display activity group names and IDs.
-if results['records']:
-  for activity_group in results['records']:
-    print ('Activity group with name \'%s\' and ID \'%s\' was found.'
-           % (activity_group['name'], activity_group['id']))
-else:
-  print 'No activity groups found for your criteria.'
+  # Display activity group names and IDs.
+  if results['records']:
+    for activity_group in results['records']:
+      print ('Activity group with name \'%s\' and ID \'%s\' was found.'
+             % (activity_group['name'], activity_group['id']))
+  else:
+    print 'No activity groups found for your criteria.'
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ADVERTISER_ID)

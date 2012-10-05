@@ -27,22 +27,26 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle import DfaClient
+from adspygoogle.common import Utils
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  placement_strategy_service = client.GetStrategyService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-placement_strategy_service = client.GetStrategyService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Construct and save placement strategy.
+  placement_strategy = {
+      'name': 'Strategy %s' % Utils.GetUniqueName()
+  }
+  result = placement_strategy_service.SavePlacementStrategy(
+      placement_strategy)[0]
 
-placement_strategy_name = 'INSERT_PLACEMENT_STRATEGY_NAME_HERE'
+  # Display results.
+  print 'Placement strategy with ID \'%s\' was created.' % result['id']
 
-# Construct and save placement strategy.
-placement_strategy = {
-    'name': placement_strategy_name,
-}
-result = placement_strategy_service.SavePlacementStrategy(placement_strategy)[0]
 
-# Display results.
-print 'Placement strategy with ID \'%s\' was created.' % result['id']
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

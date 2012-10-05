@@ -29,20 +29,24 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  change_log_service = client.GetChangeLogService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-change_log_service = client.GetChangeLogService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Get change log object types.
+  results = change_log_service.GetChangeLogObjectTypes()
 
-# Get change log object types.
-results = change_log_service.GetChangeLogObjectTypes()
+  # Display change log object type names and IDs.
+  if results:
+    for object_type in results:
+      print ('Change log object type with name \'%s\' and ID \'%s\' was found.'
+             % (object_type['name'], object_type['id']))
+  else:
+    print 'No change log object types found.'
 
-# Display change log object type names and IDs.
-if results:
-  for object_type in results:
-    print ('Change log object type with name \'%s\' and ID \'%s\' was found.'
-           % (object_type['name'], object_type['id']))
-else:
-  print 'No change log object types found.'
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

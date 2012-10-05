@@ -34,29 +34,30 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  subnetwork_service = client.GetSubnetworkService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-subnetwork_service = client.GetSubnetworkService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Set subnetwork search criteria.
+  subnetwork_search_criteria = {
+      'pageSize': '10'
+  }
 
-search_string = 'INSERT_SEARCH_STRING_HERE'
+  # Get subnetworks.
+  results = subnetwork_service.GetSubnetworks(subnetwork_search_criteria)[0]
 
-# Set subnetwork search criteria.
-subnetwork_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+  # Display subnetwork names, IDs, and subnetwork IDs.
+  if results['records']:
+    for subnetwork in results['records']:
+      print ('Subnetwork with name \'%s\', ID \'%s\', part of network ID \'%s\''
+             ' was found.' % (subnetwork['name'], subnetwork['id'],
+                              subnetwork['networkId']))
+  else:
+    print 'No subnetworks found for your criteria.'
 
-# Get subnetworks.
-results = subnetwork_service.GetSubnetworks(subnetwork_search_criteria)[0]
 
-# Display subnetwork names, IDs, and subnetwork IDs.
-if results['records']:
-  for subnetwork in results['records']:
-    print ('Subnetwork with name \'%s\', ID \'%s\', part of network ID \'%s\''
-           ' was found.' % (subnetwork['name'], subnetwork['id'],
-                            subnetwork['networkId']))
-else:
-  print 'No subnetworks found for your criteria.'
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

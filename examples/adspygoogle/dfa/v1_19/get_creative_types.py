@@ -30,21 +30,24 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
-client.debug = True
+def main(client):
+  # Initialize appropriate service.
+  creative_service = client.GetCreativeService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-creative_service = client.GetCreativeService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Get creative types.
+  results = creative_service.GetCreativeTypes()
 
-# Get creative types.
-results = creative_service.GetCreativeTypes()
+  # Display creative types and IDs.
+  if results:
+    for creative_type in results:
+      print ('Creative type with name \'%s\' and ID \'%s\' was found.'
+             % (creative_type['name'], creative_type['id']))
+  else:
+    print 'No creative types found.'
 
-# Display creative types and IDs.
-if results:
-  for creative_type in results:
-    print ('Creative type with name \'%s\' and ID \'%s\' was found.'
-           % (creative_type['name'], creative_type['id']))
-else:
-  print 'No creative types found.'
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

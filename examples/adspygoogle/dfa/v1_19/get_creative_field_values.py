@@ -30,29 +30,34 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+CREATIVE_FIELD_ID = 'INSERT_CREATIVE_FIELD_ID_HERE'
 
-# Initialize appropriate service.
-creative_field_service = client.GetCreativeFieldService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-creative_field_id = 'INSERT_CREATIVE_FIELD_ID_HERE'
+def main(client, creative_field_id):
+  # Initialize appropriate service.
+  creative_field_service = client.GetCreativeFieldService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Set up creative field value search criteria structure.
-creative_field_value_search_criteria = {
-    'creativeFieldIds': [creative_field_id],
-    'pageSize': '10'
-}
+  # Set up creative field value search criteria structure.
+  creative_field_value_search_criteria = {
+      'creativeFieldIds': [creative_field_id],
+      'pageSize': '10'
+  }
 
-# Get creative field values for the selected criteria.
-results = creative_field_service.GetCreativeFieldValues(
-    creative_field_value_search_criteria)[0]
+  # Get creative field values for the selected criteria.
+  results = creative_field_service.GetCreativeFieldValues(
+      creative_field_value_search_criteria)[0]
 
-# Display creative field value names and IDs.
-if results['records']:
-  for creative_field_value in results['records']:
-    print ('Creative field value with name \'%s\' and ID \'%s\' was found.'
-           % (creative_field_value['name'], creative_field_value['id']))
-else:
-  print 'No creative field values found for your criteria.'
+  # Display creative field value names and IDs.
+  if results['records']:
+    for creative_field_value in results['records']:
+      print ('Creative field value with name \'%s\' and ID \'%s\' was found.'
+             % (creative_field_value['name'], creative_field_value['id']))
+  else:
+    print 'No creative field values found for your criteria.'
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, CREATIVE_FIELD_ID)

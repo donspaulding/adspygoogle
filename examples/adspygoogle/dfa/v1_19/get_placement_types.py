@@ -29,20 +29,24 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  placement_service = client.GetPlacementService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-placement_service = client.GetPlacementService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Get placement types.
+  results = placement_service.GetPlacementTypes()
 
-# Get placement types.
-results = placement_service.GetPlacementTypes()
+  # Display placement type names and IDs.
+  if results:
+    for placement_type in results:
+      print ('Placement type with name \'%s\' and ID \'%s\' was found.'
+             % (placement_type['name'], placement_type['id']))
+  else:
+    print 'No placement types found.'
 
-# Display placement type names and IDs.
-if results:
-  for placement_type in results:
-    print ('Placement type with name \'%s\' and ID \'%s\' was found.'
-           % (placement_type['name'], placement_type['id']))
-else:
-  print 'No placement types found.'
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

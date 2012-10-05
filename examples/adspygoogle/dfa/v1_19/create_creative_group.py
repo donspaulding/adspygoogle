@@ -31,25 +31,30 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+ADVERTISER_ID = 'INSERT_ADVERTISER_ID_HERE'
+GROUP_NUMBER = 'INSERT_GROUP_NUMBER_HERE'
+CREATIVE_GROUP_NAME = 'INSERT_CREATIVE_GROUP_NAME_HERE'
 
-# Initialize appropriate service.
-creative_group_service = client.GetCreativeGroupService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-advertiser_id = 'INSERT_ADVERTISER_ID_HERE'
-group_number = 'INSERT_GROUP_NUMBER_HERE'
-creative_group_name = 'INSERT_CREATIVE_GROUP_NAME_HERE'
+def main(client, advertiser_id, group_number, creative_group_name):
+  # Initialize appropriate service.
+  creative_group_service = client.GetCreativeGroupService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct and save creative group.
-creative_group = {
-    'name': creative_group_name,
-    'id': '-1',
-    'advertiserId': advertiser_id,
-    'groupNumber': group_number
-}
-result = creative_group_service.SaveCreativeGroup(creative_group)[0]
+  # Construct and save creative group.
+  creative_group = {
+      'name': creative_group_name,
+      'id': '-1',
+      'advertiserId': advertiser_id,
+      'groupNumber': group_number
+  }
+  result = creative_group_service.SaveCreativeGroup(creative_group)[0]
 
-# Display results.
-print 'Creative group with ID \'%s\' was created.' % result['id']
+  # Display results.
+  print 'Creative group with ID \'%s\' was created.' % result['id']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ADVERTISER_ID, GROUP_NUMBER, CREATIVE_GROUP_NAME)

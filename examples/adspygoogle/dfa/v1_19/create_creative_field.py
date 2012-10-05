@@ -30,23 +30,28 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+ADVERTISER_ID = 'INSERT_ADVERTISER_ID_HERE'
+CREATIVE_FIELD_NAME = 'INSERT_CREATIVE_FIELD_NAME_HERE'
 
-# Initialize appropriate service.
-creative_field_service = client.GetCreativeFieldService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-advertiser_id = 'INSERT_ADVERTISER_ID_HERE'
-creative_field_name = 'INSERT_CREATIVE_FIELD_NAME_HERE'
+def main(client, advertiser_id, creative_field_name):
+  # Initialize appropriate service.
+  creative_field_service = client.GetCreativeFieldService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct and save creative field.
-creative_field = {
-    'name': creative_field_name,
-    'advertiserId': advertiser_id,
-    'id': '-1'
-}
-result = creative_field_service.SaveCreativeField(creative_field)[0]
+  # Construct and save creative field.
+  creative_field = {
+      'name': creative_field_name,
+      'advertiserId': advertiser_id,
+      'id': '-1'
+  }
+  result = creative_field_service.SaveCreativeField(creative_field)[0]
 
-# Display results.
-print 'Creative field with ID \'%s\' was created.' % result['id']
+  # Display results.
+  print 'Creative field with ID \'%s\' was created.' % result['id']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ADVERTISER_ID, CREATIVE_FIELD_NAME)

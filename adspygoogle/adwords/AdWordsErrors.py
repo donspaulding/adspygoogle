@@ -149,6 +149,19 @@ class AdWordsBillingError(AdWordsApiError):
   pass
 
 
+class AdWordsReportError(AdWordsError):
+
+  def __init__(self, http_code, error_type, trigger, field_path):
+    self.http_code = http_code
+    self.type = error_type
+    self.trigger = trigger
+    self.field_path = field_path
+    message = ('HTTP code: %s, type: \'%s\', trigger: \'%s\', '
+               'field path: \'%s\'' %
+               (http_code, error_type, trigger, field_path))
+    super(AdWordsReportError, self).__init__(message)
+
+
 # Map error codes and types to their corresponding classes.
 ERRORS = {}
 ERROR_CODES = [x for x in xrange(0, 208)]

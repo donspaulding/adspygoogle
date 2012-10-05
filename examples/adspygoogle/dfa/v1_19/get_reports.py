@@ -33,29 +33,33 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+QUERY_ID = 'INSERT_QUERY_ID_HERE'
 
-# Initialize appropriate service.
-report_service = client.GetReportService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-query_id = 'INSERT_QUERY_ID_HERE'
+def main(client, query_id):
+  # Initialize appropriate service.
+  report_service = client.GetReportService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Create report search criteria structure.
-report_search_criteria = {
-    'queryId': query_id
-}
+  # Create report search criteria structure.
+  report_search_criteria = {
+      'queryId': query_id
+  }
 
-# Fetch report information.
-results = report_service.GetReportsByCriteria(report_search_criteria)[0]
+  # Fetch report information.
+  results = report_service.GetReportsByCriteria(report_search_criteria)[0]
 
-# Display information on reports.
-if results['records']:
-  for report_info in results['records']:
-    print ('Report with ID \'%s\', status of \'%s\', and URL of \'%s\' was'
-           ' found.' % (report_info['reportId'], report_info['status']['name'],
-                        report_info['url']))
-else:
-  print 'No reports found for your criteria.'
+  # Display information on reports.
+  if results['records']:
+    for report_info in results['records']:
+      print ('Report with ID \'%s\', status of \'%s\', and URL of \'%s\' was'
+             ' found.' % (report_info['reportId'],
+                          report_info['status']['name'], report_info['url']))
+  else:
+    print 'No reports found for your criteria.'
 
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, QUERY_ID)

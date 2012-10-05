@@ -29,28 +29,33 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+WIDTH = 'INSERT_WIDTH_HERE'
+HEIGHT = 'INSERT_HEIGHT_HERE'
 
-# Initialize appropriate service.
-size_service = client.GetSizeService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-width = 'INSERT_WIDTH_HERE'
-height = 'INSERT_HEIGHT_HERE'
+def main(client, width, height):
+  # Initialize appropriate service.
+  size_service = client.GetSizeService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Create size search criteria.
-size_search_criteria = {
-    'width': width,
-    'height': height
-}
+  # Create size search criteria.
+  size_search_criteria = {
+      'width': width,
+      'height': height
+  }
 
-# Get size.
-size_record_set = size_service.GetSizes(size_search_criteria)[0]
+  # Get size.
+  size_record_set = size_service.GetSizes(size_search_criteria)[0]
 
-# Display size ID.
-if len(size_record_set['records']):
-  for size in size_record_set['records']:
-    print 'Size id for \'%sx%s\' is \'%s\'.' % (width, height, size['id'])
-else:
-  print 'No sizes found for your criteria.'
+  # Display size ID.
+  if size_record_set['records']:
+    for size in size_record_set['records']:
+      print 'Size id for \'%sx%s\' is \'%s\'.' % (width, height, size['id'])
+  else:
+    print 'No sizes found for your criteria.'
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, WIDTH, HEIGHT)

@@ -33,64 +33,70 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
-
-# Initialize appropriate service.
-ad_service = client.GetAdService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
-
-campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
-size_id = 'INSERT_SIZE_ID_HERE'
-creative_id = 'INSERT_CREATIVE_ID_HERE'
-placement_id = 'INSERT_PLACEMENT_ID_HERE'
-ad_name = 'INSERT_AD_NAME_HERE'
-start_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
+CAMPAIGN_ID = 'INSERT_CAMPAIGN_ID_HERE'
+SIZE_ID = 'INSERT_SIZE_ID_HERE'
+CREATIVE_ID = 'INSERT_CREATIVE_ID_HERE'
+PLACEMENT_ID = 'INSERT_PLACEMENT_ID_HERE'
+AD_NAME = 'INSERT_AD_NAME_HERE'
+START_DATE = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
     'year': 'INSERT_START_YEAR_HERE',
     'month': int('INSERT_START_MONTH_HERE'),
     'day': int('INSERT_START_DAY_HERE')}
-end_date = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
+END_DATE = '%(year)s-%(month)02d-%(day)02dT12:00:00' % {
     'year': 'INSERT_END_YEAR_HERE',
     'month': int('INSERT_END_MONTH_HERE'),
     'day': int('INSERT_END_DAY_HERE')}
 
 
-# Construct basic rotation group structure.
-rotation_group = {
-    'xsi_type': 'RotationGroup',
-    'name': ad_name,
-    'active': 'true',
-    'archived': 'false',
-    'campaignId': campaign_id,
-    'sizeId': size_id,
-    'typeId': '1',
-    'priority': '12',
-    'ratio': '1',
-    'rotationType': '1',
-    'startTime': start_date,
-    'endTime': end_date,
-}
+def main(client, campaign_id, size_id, creative_id, placement_id, ad_name,
+         start_date, end_date):
+  # Initialize appropriate service.
+  ad_service = client.GetAdService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct creative assignments and add them to the rotation group.
-creative_assignment = {
-    'active': 'true',
-    'creativeId': creative_id,
-    'clickThroughUrl': {
-        'defaultLandingPageUsed': 'true',
-        'landingPageId': '0'
-    }
-}
-rotation_group['creativeAssignments'] = [creative_assignment]
+  # Construct basic rotation group structure.
+  rotation_group = {
+      'xsi_type': 'RotationGroup',
+      'name': ad_name,
+      'active': 'true',
+      'archived': 'false',
+      'campaignId': campaign_id,
+      'sizeId': size_id,
+      'typeId': '1',
+      'priority': '12',
+      'ratio': '1',
+      'rotationType': '1',
+      'startTime': start_date,
+      'endTime': end_date,
+  }
 
-# Construct placement assignments and add them to the rotation group.
-placement_assignment = {
-    'active': 'true',
-    'placementId': placement_id
-}
-rotation_group['placementAssignments'] = [placement_assignment]
+  # Construct creative assignments and add them to the rotation group.
+  creative_assignment = {
+      'active': 'true',
+      'creativeId': creative_id,
+      'clickThroughUrl': {
+          'defaultLandingPageUsed': 'true',
+          'landingPageId': '0'
+      }
+  }
+  rotation_group['creativeAssignments'] = [creative_assignment]
 
-# Save the rotation group.
-result = ad_service.SaveAd(rotation_group)[0]
+  # Construct placement assignments and add them to the rotation group.
+  placement_assignment = {
+      'active': 'true',
+      'placementId': placement_id
+  }
+  rotation_group['placementAssignments'] = [placement_assignment]
 
-# Display results.
-print 'Ad with ID \'%s\' was created.' % result['id']
+  # Save the rotation group.
+  result = ad_service.SaveAd(rotation_group)[0]
+
+  # Display results.
+  print 'Ad with ID \'%s\' was created.' % result['id']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, CAMPAIGN_ID, SIZE_ID, CREATIVE_ID, PLACEMENT_ID, AD_NAME,
+       START_DATE, END_DATE)

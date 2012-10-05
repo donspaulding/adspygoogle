@@ -39,39 +39,45 @@ from adspygoogle import DfaClient
 from adspygoogle.common import Utils
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
-
-# Initialize appropriate service.
-creative_service = client.GetCreativeService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
-
 # Set the parameters for the In-Stream video asset.
-asset_name = 'INSERT_ASSET_NAME_HERE'
-path_to_file = 'INSERT_PATH_TO_FILE_HERE'
-in_stream_video_creative_id = 'INSERT_IN_STREAM_VIDEO_CREATIVE_ID_HERE'
+ASSET_NAME = 'INSERT_ASSET_NAME_HERE'
+PATH_TO_FILE = 'INSERT_PATH_TO_FILE_HERE'
+IN_STREAM_VIDEO_CREATIVE_ID = 'INSERT_IN_STREAM_VIDEO_CREATIVE_ID_HERE'
 
-# Convert file into format that can be sent in SOAP messages.
-content = Utils.ReadFile(path_to_file)
-content = base64.encodestring(content)
 
-# Create the In-Stream video creative asset.
-in_stream_video_asset = {
-    'name': asset_name,
-    'content': content,
-}
+def main(client, asset_name, path_to_file, in_stream_video_creative_id):
+  # Initialize appropriate service.
+  creative_service = client.GetCreativeService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Create an upload request to make this asset a media file for an existing
-# In-Stream creative.
-in_stream_asset_upload_request = {
-    'mediaFile': 'true',
-    'inStreamAsset': in_stream_video_asset,
-    'creativeId': in_stream_video_creative_id
-}
+  # Convert file into format that can be sent in SOAP messages.
+  content = Utils.ReadFile(path_to_file)
+  content = base64.encodestring(content)
 
-# Save the media file.
-result = creative_service.UploadInStreamAsset(in_stream_asset_upload_request)[0]
+  # Create the In-Stream video creative asset.
+  in_stream_video_asset = {
+      'name': asset_name,
+      'content': content,
+  }
 
-# Display a success message.
-print ('Added a media file to In-Stream video creative with ID \'%s\'.'
-       % result['Id'])
+  # Create an upload request to make this asset a media file for an existing
+  # In-Stream creative.
+  in_stream_asset_upload_request = {
+      'mediaFile': 'true',
+      'inStreamAsset': in_stream_video_asset,
+      'creativeId': in_stream_video_creative_id
+  }
+
+  # Save the media file.
+  result = creative_service.UploadInStreamAsset(
+      in_stream_asset_upload_request)[0]
+
+  # Display a success message.
+  print ('Added a media file to In-Stream video creative with ID \'%s\'.'
+         % result['Id'])
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, ASSET_NAME, PATH_TO_FILE, IN_STREAM_VIDEO_CREATIVE_ID)

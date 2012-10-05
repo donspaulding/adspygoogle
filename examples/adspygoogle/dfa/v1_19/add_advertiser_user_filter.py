@@ -35,46 +35,51 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
-client.debug = False
+USER_ID = 'INSERT_USER_ID_HERE'
+ADVERTISER_ID = 'INSERT_ADVERTISER_ID_HERE'
 
-# Initialize appropriate service.
-user_service = client.GetUserService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-user_id = 'INSERT_USER_ID_HERE'
-advertiser_id = 'INSERT_ADVERTISER_ID_HERE'
+def main(client, user_id, advertiser_id):
+  # Initialize appropriate service.
+  user_service = client.GetUserService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Retrieve the user who is to be modified.
-user = user_service.GetUser(user_id)[0]
+  # Retrieve the user who is to be modified.
+  user = user_service.GetUser(user_id)[0]
 
-# Create and configure a user filter.
-advertiser_filter = {
-    # The following field has been filled in to make a filter that allows a
-    # user to access only the assigned objects.
-    # This value was determined using get_user_filter_types.py.
-    'userFilterCriteriaId': '2',
-    # Because this filter used the criteria type "Assigned" it is necessary
-    # to specify what advertisers this user has access to. This next step
-    # would be skipped for the criteria types "All" and "None".
+  # Create and configure a user filter.
+  advertiser_filter = {
+      # The following field has been filled in to make a filter that allows a
+      # user to access only the assigned objects.
+      # This value was determined using get_user_filter_types.py.
+      'userFilterCriteriaId': '2',
+      # Because this filter used the criteria type "Assigned" it is necessary
+      # to specify what advertisers this user has access to. This next step
+      # would be skipped for the criteria types "All" and "None".
 
-    # Create a list of object filters to represent each object the user has
-    # access to. Since this is an advertiser filter, the list elements represent
-    # an advertiser each. The size of the list will need to match the total
-    # number of advertisers the user is assigned.
-    'objectFilters': [{
-        'id': advertiser_id
-    }]
-}
+      # Create a list of object filters to represent each object the user has
+      # access to. Since this is an advertiser filter, the list elements
+      # represent an advertiser each. The size of the list will need to match
+      # the total number of advertisers the user is assigned.
+      'objectFilters': [{
+          'id': advertiser_id
+      }]
+  }
 
-# Add the filter to the user.
-user['advertiserUserFilter'] = advertiser_filter
+  # Add the filter to the user.
+  user['advertiserUserFilter'] = advertiser_filter
 
-# Save the changes made and display a success message.
-result = user_service.SaveUser(user)
+  # Save the changes made and display a success message.
+  result = user_service.SaveUser(user)
 
-if result:
-  print 'User with ID \'%s\' was modified.' % result[0]['id']
-else:
-  print 'No user was modified.'
+  if result:
+    print 'User with ID \'%s\' was modified.' % result[0]['id']
+  else:
+    print 'No user was modified.'
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, USER_ID, ADVERTISER_ID)
+

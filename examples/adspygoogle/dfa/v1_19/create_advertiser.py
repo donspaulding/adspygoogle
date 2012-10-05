@@ -28,29 +28,30 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle import DfaClient
+from adspygoogle.common import Utils
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  advertiser_service = client.GetAdvertiserService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-advertiser_service = client.GetAdvertiserService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Construct and save advertiser.
+  advertiser = {
+      'name': 'Advertiser %s' % Utils.GetUniqueName(),
+      'approved': 'true'
+  }
 
-network_id = 'INSERT_NETWORK_ID_HERE'
-advertiser_name = 'INSERT_ADVERTISER_NAME_HERE'
+  result = advertiser_service.SaveAdvertiser(advertiser)[0]
 
-# Construct and save advertiser.
-advertiser = {
-    'name': advertiser_name,
-    'networkId': network_id,
-    'approved': 'true'
-}
+  # Display results.
+  if result:
+    print 'Advertiser with ID \'%s\' was created.' % result['id']
+  else:
+    print 'No advertiser was created.'
 
-result = advertiser_service.SaveAdvertiser(advertiser)[0]
 
-# Display results.
-if result:
-  print 'Advertiser with ID \'%s\' was created.' % result['id']
-else:
-  print 'No advertiser was created.'
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

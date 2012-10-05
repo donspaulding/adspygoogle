@@ -31,41 +31,46 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+CREATIVE_IDS = ['INSERT_FIRST_CREATIVE_ID', 'INSERT_SECOND_CREATIVE_ID']
+PLACEMENT_IDS = ['INSERT_FIRST_PLACEMENT_ID', 'INSERT_SECOND_PLACEMENT_ID']
 
-# Initialize appropriate service.
-creative_service = client.GetCreativeService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-creative_ids = ['INSERT_FIRST_CREATIVE_ID', 'INSERT_SECOND_CREATIVE_ID']
-placement_ids = ['INSERT_FIRST_PLACEMENT_ID', 'INSERT_SECOND_PLACEMENT_ID']
+def main(client, creative_ids, placement_ids):
+  # Initialize appropriate service.
+  creative_service = client.GetCreativeService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Create creative placement assignment structure.
-creative_placement_assignments = []
-for index in range(len(creative_ids)):
-  creative_placement_assignments.append({
-      'xsi_type': 'CreativePlacementAssignment',
-      'creativeId': creative_ids[index],
-      'placementId': placement_ids[index],
-      'placementIds': placement_ids
-  })
+  # Create creative placement assignment structure.
+  creative_placement_assignments = []
+  for index in range(len(creative_ids)):
+    creative_placement_assignments.append({
+        'xsi_type': 'CreativePlacementAssignment',
+        'creativeId': creative_ids[index],
+        'placementId': placement_ids[index],
+        'placementIds': placement_ids
+    })
 
-# Submit the request.
-results = creative_service.AssignCreativesToPlacements(
-    creative_placement_assignments)
+  # Submit the request.
+  results = creative_service.AssignCreativesToPlacements(
+      creative_placement_assignments)
 
-# Display results.
-if results:
-  for assignment_result in results:
-    if assignment_result['errorMessage'] is None:
-      print ('Ad with name \'%s\' and ID \'%s\' was created.' %
-             (assignment_result['adName'], assignment_result['adId']))
-    else:
-      print ('Assignment unsuccessful for creative ID \'%s\' and placementID'
-             ' \'%s\'. Error message says \'%s\'.'
-             % (assignment_result['creativeId'],
-                assignment_result['placementId'],
-                assignment_result['errorMessage']))
-else:
-  print 'No ads were created.'
+  # Display results.
+  if results:
+    for assignment_result in results:
+      if assignment_result['errorMessage'] is None:
+        print ('Ad with name \'%s\' and ID \'%s\' was created.' %
+               (assignment_result['adName'], assignment_result['adId']))
+      else:
+        print ('Assignment unsuccessful for creative ID \'%s\' and placementID'
+               ' \'%s\'. Error message says \'%s\'.'
+               % (assignment_result['creativeId'],
+                  assignment_result['placementId'],
+                  assignment_result['errorMessage']))
+  else:
+    print 'No ads were created.'
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, CREATIVE_IDS, PLACEMENT_IDS)

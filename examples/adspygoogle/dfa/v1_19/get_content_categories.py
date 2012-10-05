@@ -30,29 +30,30 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  content_category_service = client.GetContentCategoryService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-content_category_service = client.GetContentCategoryService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Create content category search criteria structure.
+  content_category_search_criteria = {
+      'pageSize': '10'
+  }
 
-search_string = 'INSERT_SEARCH_STRING_HERE'
+  # Get content category record set.
+  results = content_category_service.GetContentCategories(
+      content_category_search_criteria)[0]
 
-# Create content category search criteria structure.
-content_category_search_criteria = {
-    'searchString': search_string,
-    'pageSize': '10'
-}
+  # Display content category names, IDs and descriptions.
+  if results['records']:
+    for content_category in results['records']:
+      print ('Content category with name \'%s\' and ID \'%s\' was found.'
+             % (content_category['name'], content_category['id']))
+  else:
+    print 'No content categories found for your criteria.'
 
-# Get content category record set.
-results = content_category_service.GetContentCategories(
-    content_category_search_criteria)[0]
 
-# Display content category names, IDs and descriptions.
-if results['records']:
-  for content_category in results['records']:
-    print ('Content category with name \'%s\' and ID \'%s\' was found.'
-           % (content_category['name'], content_category['id']))
-else:
-  print 'No content categories found for your criteria.'
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)

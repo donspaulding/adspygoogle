@@ -31,31 +31,36 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 from adspygoogle import DfaClient
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+NETWORK_ID = 'INSERT_NETWORK_ID_HERE'
+SUBNETWORK_NAME = 'INSERT_SUBNETWORK_NAME_HERE'
+PERMISSION1 = 'INSERT_FIRST_PERMISSION_ID_HERE'
+PERMISSION2 = 'INSERT_SECOND_PERMISSION_ID_HERE'
 
-# Initialize appropriate service.
-subnetwork_service = client.GetSubnetworkService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-network_id = 'INSERT_NETWORK_ID_HERE'
-subnetwork_name = 'INSERT_SUBNETWORK_NAME_HERE'
-permission1 = 'INSERT_FIRST_PERMISSION_ID_HERE'
-permission2 = 'INSERT_SECOND_PERMISSION_ID_HERE'
+def main(client, network_id, subnetwork_name, permission1, permission2):
+  # Initialize appropriate service.
+  subnetwork_service = client.GetSubnetworkService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Construct and the basic subnetwork structure.
-subnetwork = {
-    'name': subnetwork_name,
-    'networkId': network_id
-}
+  # Construct and the basic subnetwork structure.
+  subnetwork = {
+      'name': subnetwork_name,
+      'networkId': network_id
+  }
 
-# Create an array of all permissions assigned to this subnetwork and add it to
-# the subnetwork structure. To get a list of available permissions, run
-# get_available_permissions.py.
-subnetwork['availablePermissions'] = [permission1, permission2]
+  # Create an array of all permissions assigned to this subnetwork and add it to
+  # the subnetwork structure. To get a list of available permissions, run
+  # get_available_permissions.py.
+  subnetwork['availablePermissions'] = [permission1, permission2]
 
-# Save the subnetwork.
-result = subnetwork_service.SaveSubnetwork(subnetwork)[0]
+  # Save the subnetwork.
+  result = subnetwork_service.SaveSubnetwork(subnetwork)[0]
 
-# Display results.
-print 'Subnetwork with ID \'%s\' was created.' % result['id']
+  # Display results.
+  print 'Subnetwork with ID \'%s\' was created.' % result['id']
+
+
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client, NETWORK_ID, SUBNETWORK_NAME, PERMISSION1, PERMISSION2)

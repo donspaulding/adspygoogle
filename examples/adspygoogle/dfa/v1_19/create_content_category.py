@@ -27,22 +27,25 @@ sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 
 # Import appropriate classes from the client library.
 from adspygoogle import DfaClient
+from adspygoogle.common import Utils
 
 
-# Initialize client object.
-client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+def main(client):
+  # Initialize appropriate service.
+  content_category_service = client.GetContentCategoryService(
+      'https://advertisersapitest.doubleclick.net', 'v1.19')
 
-# Initialize appropriate service.
-content_category_service = client.GetContentCategoryService(
-    'https://advertisersapitest.doubleclick.net', 'v1.19')
+  # Construct and save content category.
+  content_category = {
+      'name': 'Category %s' % Utils.GetUniqueName()
+  }
+  result = content_category_service.SaveContentCategory(content_category)[0]
 
-content_category_name = 'INSERT_CONTENT_CATEGORY_NAME_HERE'
+  # Display results.
+  print 'Content category with ID \'%s\' was created.' % result['id']
 
-# Construct and save content category.
-content_category = {
-    'name': content_category_name,
-}
-result = content_category_service.SaveContentCategory(content_category)[0]
 
-# Display results.
-print 'Content category with ID \'%s\' was created.' % result['id']
+if __name__ == '__main__':
+  # Initialize client object.
+  client = DfaClient(path=os.path.join('..', '..', '..', '..'))
+  main(client)
