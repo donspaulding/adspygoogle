@@ -16,16 +16,18 @@
 
 """Unit tests to cover AdWordsClient."""
 
-__author__ = 'api.kwinter@gmail.com (Kevin Winter)'
+__author__ = ('api.kwinter@gmail.com (Kevin Winter)',
+              'api.jdilallo@gmail.com (Joseph DiLallo)')
 
 import os
 import StringIO
 import sys
 import unittest
-import urllib2
 sys.path.insert(0, os.path.join('..', '..', '..'))
+
+import mock
+
 from adspygoogle.adwords.AdWordsClient import AdWordsClient
-from adspygoogle.common import Utils
 from adspygoogle.common.Errors import ValidationError
 
 
@@ -39,34 +41,33 @@ class AdWordsClientValidationTest(unittest.TestCase):
 
   """Tests the validation logic when instantiating AdWordsClient."""
 
-  def setUp(self):
-    """Monkey patch AuthToken retrieval."""
-
-    def FakeGetAuthToken(a, b, c, d, e, f, g):
-      return 'FooBar'
-    self.__old_GetAuthToken = Utils.GetAuthToken
-    Utils.GetAuthToken = FakeGetAuthToken
-
-  def tearDown(self):
-    Utils.GetAuthToken = self.__old_GetAuthToken
-
   def testEmailPassOnly(self):
     """Tests that specifying solely email & password works."""
-    headers = DEFAULT_HEADERS.copy()
-    headers['email'] = 'email@example.com'
-    headers['password'] = 'password'
-    client = AdWordsClient(headers=headers)
-    self.assertEquals(client._headers['authToken'], 'FooBar')
+    with mock.patch('adspygoogle.common.Utils.GetAuthToken') as mock_get_token:
+      mock_get_token.return_value = 'FooBar'
+      headers = DEFAULT_HEADERS.copy()
+      headers['email'] = 'email@example.com'
+      headers['password'] = 'password'
+      client = AdWordsClient(headers=headers)
+      self.assertEquals(client._headers['authToken'], 'FooBar')
+      mock_get_token.assert_called_once_with(
+          'email@example.com', 'password', mock.ANY, mock.ANY, mock.ANY,
+          mock.ANY, mock.ANY)
 
   def testEmailPassOthersBlank(self):
     """Tests that email and password with other auth blank works."""
-    headers = DEFAULT_HEADERS.copy()
-    headers['email'] = 'email@example.com'
-    headers['password'] = 'password'
-    headers['authToken'] = ''
-    headers['oauth_credentials'] = None
-    client = AdWordsClient(headers=headers)
-    self.assertEquals(client._headers['authToken'], 'FooBar')
+    with mock.patch('adspygoogle.common.Utils.GetAuthToken') as mock_get_token:
+      mock_get_token.return_value = 'FooBar'
+      headers = DEFAULT_HEADERS.copy()
+      headers['email'] = 'email@example.com'
+      headers['password'] = 'password'
+      headers['authToken'] = ''
+      headers['oauth_credentials'] = None
+      client = AdWordsClient(headers=headers)
+      self.assertEquals(client._headers['authToken'], 'FooBar')
+      mock_get_token.assert_called_once_with(
+          'email@example.com', 'password', mock.ANY, mock.ANY, mock.ANY,
+          mock.ANY, mock.ANY)
 
   def testAuthTokenOnly(self):
     """Tests that specifying solely authtoken works."""
@@ -130,49 +131,48 @@ CaptchaUrl=Captcha?ctoken=HiteT4b0Bk5Xg18_AcVoP6-yFkHPibe7O9EqxeiI7lUSN'''
 LSID=DQAAAGsA...lk8BBbG
 Auth=DQAAAGgA...dk3fA5N'''
 
-
-  def setUp(self):
-    """Monkey patch AuthToken retrieval."""
-
-    def FakeUrlOpen(a, b):
-      # If we don't see a captcha response, initiate challenge
-      if b.find('logincaptcha') == -1:
-        return StringIO.StringIO(self.__class__.CAPTCHA_CHALLENGE)
-      else:
-        return StringIO.StringIO(self.__class__.SUCCESS)
-    self.__old_urlopen = urllib2.urlopen
-    urllib2.urlopen = FakeUrlOpen
-
-  def tearDown(self):
-    urllib2.urlopen = self.__old_urlopen
-
   def testCaptchaHandling(self):
     headers = DEFAULT_HEADERS.copy()
     headers['email'] = 'email@example.com'
     headers['password'] = 'password'
     client = None
     try:
-      client = AdWordsClient(headers=headers)
+      with mock.patch('urllib.urlopen') as mock_urlopen:
+        mock_urlopen.return_value = StringIO.StringIO(self.CAPTCHA_CHALLENGE)
+        client = AdWordsClient(headers=headers)
       self.fail('Expected a CaptchaError to be thrown')
     except ValidationError, e:
-      client = AdWordsClient(headers=headers,
-                             login_token=e.root_cause.captcha_token,
-                             login_captcha='foo bar')
-      self.assertEquals(client._headers['authToken'], 'DQAAAGgA...dk3fA5N')
+      with mock.patch('urllib.urlopen') as mock_urlopen:
+        mock_urlopen.return_value = StringIO.StringIO(self.SUCCESS)
+        client = AdWordsClient(headers=headers,
+                               login_token=e.root_cause.captcha_token,
+                               login_captcha='foo bar')
+        self.assertEquals(client._headers['authToken'], 'DQAAAGgA...dk3fA5N')
 
-def MakeTestSuite():
-  """Set up test suite.
 
-  Returns:
-    TestSuite test suite.
-  """
-  suite = unittest.TestSuite()
-  suite.addTests(unittest.makeSuite(AdWordsClientValidationTest))
-  suite.addTests(unittest.makeSuite(AdWordsClientCaptchaHandlingTest))
-  return suite
+class AdWordsClientServiceTest(unittest.TestCase):
+  """Tests for retrieving SOAP services via AdWordsClient."""
+
+  def setUp(self):
+    """Prepare unittest."""
+    self.client = AdWordsClient(headers={'authToken': ' ',
+                                         'userAgent': ' ',
+                                         'developerToken': ' '})
+
+  def testGetBulkMutateJobService_notAllowed(self):
+    self.assertRaises(ValidationError, self.client.GetBulkMutateJobService,
+                      version='v201209')
+
+  def testGetBulkMutateJobService_allowed(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetBulkMutateJobService(version='v201206')
+      self.assertEquals('BulkMutateJobService', service._service_name)
+
+  def testGetBudgetService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetBudgetService()
+      self.assertEquals('BudgetService', service._service_name)
 
 
 if __name__ == '__main__':
-  suites = [MakeTestSuite()]
-  alltests = unittest.TestSuite(suites)
-  unittest.main(defaultTest='alltests')
+  unittest.main()

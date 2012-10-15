@@ -1,3 +1,7 @@
+3.0.9:
+- The library will no longer fail to parse SOAP messages containing 72 or more
+  asterisks in the same line. This fixes Issue 48.
+
 3.0.8:
 - Added shortcuts for importing Client classes into the adspygoogle module.
   Where you previous had to use the following import -

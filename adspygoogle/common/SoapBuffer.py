@@ -196,7 +196,7 @@ class SoapBuffer(Buffer):
             ('Incoming HTTP headers', 'dumpHeadersIn'),
             ('Incoming SOAP', 'dumpSoapIn'))
     # The HTTP and SOAP messages were delivered via SOAPpy or httplib.HTTPS.
-    xml_dumps = self.GetBufferAsStr().split('*' * 72)
+    xml_dumps = self.GetBufferAsStr().split('\n' + ('*' * 72) + '\n')
     for xml_part in xml_dumps:
       xml_part = xml_part.lstrip('\n').rstrip('\n')
       for name, tag in tags:

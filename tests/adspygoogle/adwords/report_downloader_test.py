@@ -27,10 +27,10 @@ import urllib2
 
 import mock
 
+from adspygoogle import AdWordsClient
 from adspygoogle.adwords.AdWordsErrors import AdWordsError
 from adspygoogle.adwords.AdWordsErrors import AdWordsReportError
 from adspygoogle.adwords.util import XsdToWsdl
-from tests.adspygoogle.adwords import client
 
 
 class ReportDownloaderTest(unittest.TestCase):
@@ -39,6 +39,9 @@ class ReportDownloaderTest(unittest.TestCase):
   def setUp(self):
     """Prepare unittest."""
     XsdToWsdl.CreateWsdlFromXsdUrl = mock.Mock()
+    client = AdWordsClient(headers={'authToken': ' ',
+                                    'userAgent': ' ',
+                                    'developerToken': ' '})
     self.service = client.GetReportDownloader(
         'https://adwords-sandbox.google.com', 'v201209')
 

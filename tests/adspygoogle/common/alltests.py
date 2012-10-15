@@ -33,10 +33,9 @@ LOGGER = Logger(LIB_SIG, os.path.join('..', '..', '..', 'logs'))
 
 
 suite = unittest.TestSuite()
-tests = [test[:-3] for test in glob.glob('*_unittest.py')]
+tests = [test[:-3] for test in glob.glob('*_test.py')]
 for test in tests:
-  module = __import__(test)
-  suite.addTest(unittest.TestLoader().loadTestsFromModule(module))
+  suite.addTest(unittest.TestLoader().loadTestsFromModule(__import__(test)))
 
 
 if __name__ == '__main__':

@@ -19,7 +19,6 @@
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
 import glob
-import inspect
 import os
 import sys
 sys.path.insert(0, os.path.join('..', '..', '..'))
@@ -27,7 +26,6 @@ import unittest
 
 from adspygoogle.adwords import LIB_SIG
 from adspygoogle.common.Logger import Logger
-from tests.adspygoogle.adwords import TEST_VERSION_V201109
 
 
 LOG_NAME = 'adwords_api_lib'
@@ -35,14 +33,9 @@ LOGGER = Logger(LIB_SIG, os.path.join('..', '..', '..', 'logs'))
 
 
 suite = unittest.TestSuite()
-tests = [test[:-3] for test in glob.glob('*_unittest.py')]
+tests = [test[:-3] for test in glob.glob('*_test.py')]
 for test in tests:
-  module = __import__(test)
-  for name, obj in inspect.getmembers(module):
-    if inspect.isclass(obj):
-      if name.endswith('201109') and TEST_VERSION_V201109:
-        suite.addTest(unittest.makeSuite(obj))
-
+  suite.addTest(unittest.TestLoader().loadTestsFromModule(__import__(test)))
 
 if __name__ == '__main__':
   LOGGER.Log(LOG_NAME, 'Start all unit tests.', log_level=Logger.DEBUG)
