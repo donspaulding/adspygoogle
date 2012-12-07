@@ -32,28 +32,23 @@ def ValidateServer(server, version):
     ValidationError: if the given API server or version is not valid.
   """
   # Map of supported API servers and versions.
-  prod = {'v201108': 'https://www.google.com',
-          'v201111': 'https://www.google.com',
-          'v201201': 'https://www.google.com',
-          'v201203': 'https://www.google.com',
-          'v201204': 'https://www.google.com',
-          'v201206': 'https://www.google.com',
-          'v201208': 'https://www.google.com'}
-  sandbox = {'v201108': 'https://sandbox.google.com',
-             'v201111': 'https://sandbox.google.com',
-             'v201201': 'https://sandbox.google.com'}
+  servers = {'v201203': 'https://www.google.com',
+             'v201204': 'https://www.google.com',
+             'v201206': 'https://www.google.com',
+             'v201208': 'https://www.google.com',
+             'v201211': 'https://www.google.com'}
 
-  if server not in prod.values() and server not in sandbox.values():
-    msg = ('Given API server, \'%s\', is not valid. Expecting one of %s.'
-           % (server, sorted(prod.values() + sandbox.values())[1:]))
+  if server not in servers.values():
+    msg = ('Given API server, \'%s\', is not valid. Expecting '
+           '\'https://www.google.com\'.' % server)
     raise ValidationError(msg)
 
-  if version not in prod.keys() and version not in sandbox.keys():
+  if version not in servers.keys():
     msg = ('Given API version, \'%s\', is not valid. Expecting one of %s.'
-           % (version, sorted(set(prod.keys() + sandbox.keys()))))
+           % (version, sorted(set(servers.keys()))))
     raise ValidationError(msg)
 
-  if server != prod[version] and server != sandbox[version]:
+  if server != servers[version]:
     msg = ('Given API version, \'%s\', is not compatible with given server, '
            '\'%s\'.' % (version, server))
     raise ValidationError(msg)

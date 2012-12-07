@@ -44,7 +44,7 @@ pql_service = client.GetService(
 # For criteria that do not have a "targetable" property, that predicate
 # may be left off, i.e. just "SELECT * FROM Browser_Groups LIMIT 500"
 select_statement = {'query':
-                    'SELECT * FROM City WHERE targetable = true LIMIT 500'}
+                    'SELECT * FROM Country WHERE targetable = true LIMIT 500'}
 
 # Get cities by statement.
 result_set = pql_service.Select(select_statement)[0]

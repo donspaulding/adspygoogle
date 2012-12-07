@@ -379,3 +379,55 @@ def CreateTestCreativeSet(client, server, version, master_creative_id,
   creative_sets = creative_set_service.CreateCreativeSet(creative_sets)
   return creative_sets[0]['id']
 
+
+def CreateTestLabel(client, server, version):
+  """Create a test label of type creative wrapper.
+
+  Args:
+    client: DfpClient used for service creation.
+    server: str the API server.
+    version: str the API version.
+
+  Returns:
+    The ID of the test label.
+  """
+  label_service = client.GetService('LabelService', server, version)
+
+  # Create label object.
+  label = {
+      'name': 'Test creative wrapper label #%s' % Utils.GetUniqueName(),
+      'isActive': 'True',
+      'types': ['CREATIVE_WRAPPER']
+  }
+
+  # Add the label.
+  labels = label_service.CreateLabels([label])
+  return labels[0]['id']
+
+
+def CreateTestCreativeWrapper(client, server, version, label_id):
+  """Create a test creative wrapper.
+
+  Args:
+    client: DfpClient used for service creation.
+    server: str the API server.
+    version: str the API version.
+    label_id: str the id of the label the creative wrapper applies to.
+
+  Returns:
+    The ID of the test creative wrapper.
+  """
+  creative_wrapper_service = client.GetService('CreativeWrapperService', server,
+                                               version)
+
+  # Create creative wrapper object.
+  creative_wrapper = {
+      'labelId': label_id,
+      'ordering': 'INNER',
+      'header': {'htmlSnippet': '<b>My creative wrapper header</b>'}
+  }
+
+  # Add creative wrapper.
+  creative_wrappers = creative_wrapper_service.CreateCreativeWrappers(
+      [creative_wrapper])
+  return creative_wrappers[0]['id']

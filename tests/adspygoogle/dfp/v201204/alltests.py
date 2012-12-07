@@ -25,7 +25,7 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 import unittest
 
-from adspygoogle.adwords import LIB_SIG
+from adspygoogle.dfp import LIB_SIG
 from adspygoogle.common.Logger import Logger
 
 

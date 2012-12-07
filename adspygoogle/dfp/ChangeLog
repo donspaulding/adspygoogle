@@ -1,3 +1,7 @@
+9.6.0:
+- Added support for v201211.
+- Sunset versions v201108, v201111, v201201.
+
 9.5.1:
 - Added new examples for v201208.
 

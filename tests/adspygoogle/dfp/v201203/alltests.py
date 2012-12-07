@@ -25,11 +25,11 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 import unittest
 
-from adspygoogle.adwords import LIB_SIG
+from adspygoogle.dfp import LIB_SIG
 from adspygoogle.common.Logger import Logger
 
 
-LOG_NAME = 'adwords_api_lib'
+LOG_NAME = 'dfp_api_lib'
 LOGGER = Logger(LIB_SIG, os.path.join('..', '..', '..', 'logs'))
 
 

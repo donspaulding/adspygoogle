@@ -1,3 +1,6 @@
+15.6.0:
+- Removing support for v201109 and v201109_1.
+
 15.5.0:
 - Adding support for v201209.
 

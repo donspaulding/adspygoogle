@@ -27,12 +27,13 @@ from adspygoogle.dfp.DfpClient import DfpClient
 
 
 HTTP_PROXY = None
-SERVER_V201108 = 'https://sandbox.google.com'
-SERVER_V201111 = 'https://sandbox.google.com'
+SERVER_V201108 = 'https://www.google.com'
+SERVER_V201111 = 'https://www.google.com'
 SERVER_V201203 = 'https://www.google.com'
 SERVER_V201204 = 'https://www.google.com'
 SERVER_V201206 = 'https://www.google.com'
 SERVER_V201208 = 'https://www.google.com'
+SERVER_V201211 = 'https://www.google.com'
 
 TEST_VERSION_V201108 = True
 TEST_VERSION_V201111 = True
@@ -40,6 +41,7 @@ TEST_VERSION_V201203 = True
 TEST_VERSION_V201204 = True
 TEST_VERSION_V201206 = True
 TEST_VERSION_V201208 = True
+TEST_VERSION_V201211 = True
 
 VERSION_V201108 = 'v201108'
 VERSION_V201111 = 'v201111'
@@ -47,5 +49,6 @@ VERSION_V201203 = 'v201203'
 VERSION_V201204 = 'v201204'
 VERSION_V201206 = 'v201206'
 VERSION_V201208 = 'v201208'
+VERSION_V201211 = 'v201211'
 
 client = DfpClient(path=os.path.join('..', '..', '..'))
