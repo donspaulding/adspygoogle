@@ -1,3 +1,9 @@
+3.0.11:
+- The library now enforces the argument ordering specified in the schema for all
+  RPC calls. This resolves issues 56 and 57.
+- The SoapBuffer class should now be able to parse un-pretty-printed error
+  responses from AdWords. This resolves issue 51.
+
 3.0.10:
 - Fixed an issue where the library may incorrectly use the 'type' key as the
   xsi:type rather than 'xsi_type' in instances where the API takes a super type.

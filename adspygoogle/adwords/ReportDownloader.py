@@ -362,6 +362,11 @@ class ReportDownloader(object):
         else:
           self.__CheckForXmlError(response_code, error)
         raise AdWordsError('%s %s' % (str(e), error))
+      except urllib2.URLError, e:
+        response = e
+        response_code = '---'
+        response_headers = []
+        raise AdWordsError(str(e))
     finally:
       end_time = time.strftime('%Y-%m-%d %H:%M:%S')
       xml_log_data = self.__CreateXmlLogData(start_time, end_time, request_url,

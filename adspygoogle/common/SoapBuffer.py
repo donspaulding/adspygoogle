@@ -588,8 +588,8 @@ class SoapBuffer(Buffer):
         # Rename type elements that have a dot in them: ApiError.Type => type.
         if tag.find('.') > -1: tag = tag.split('.')[1].lower()
         value = eval('item.%s' % nodes[self.__xml_parser][2])
-        if value is not None:
-          if not value.rstrip():
+        if value is not None or tag == 'detail':
+          if value is None or not value.rstrip():
             tmp_dct = self.GetFaultAsDict(item)
             if tag in dct:
               if isinstance(dct[tag], list):

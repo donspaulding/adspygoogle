@@ -497,6 +497,7 @@ class LicaServiceTestV201111(unittest.TestCase):
       self.assertEqual(lica['destinationUrl'], destination_url)
 
 
+def makeTestSuiteV201108():
   """Set up test suite using v201108.
 
   Returns:

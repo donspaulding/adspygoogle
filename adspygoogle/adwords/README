@@ -48,11 +48,11 @@ Useful scripts are located in "scripts/" directory.
 The documentation was generated using Epydoc, a nice tool for generating API
 documentation for Python modules, and is located in "docs/".
 
-The client library includes a set of unit tests located in "tests/". All unit
-tests are (and should be) executed against the Sandbox environment. Whenever
-changes are made to the client library, the appropriate unit test should be
-executed to make sure that everything is working as intended and no new bugs
-were introduced.
+The client library includes a set of unit tests and integration tests located in
+"tests/". All integration tests should be executed using test accounts if
+possible. Whenever changes are made to the client library, the appropriate unit
+test should be executed to make sure that everything is working as intended and
+no new bugs were introduced.
 
 
 How do I start?
@@ -64,7 +64,7 @@ https://www.google.com/accounts/NewAccount. Once that's taken care of, proceed
 to the step-by-step guide below. Write some code and enjoy!
 
 
-Step-by-step guide for accessing the sandbox:
+Step-by-step guide for accessing the API using test accounts:
 -----------------------------------------
 
 1) Make sure you have Python v2.4 or above installed. The latest stable version
@@ -73,8 +73,8 @@ Step-by-step guide for accessing the sandbox:
 2) If using PyXML, fetch the latest version of PyXML module from
    http://sourceforge.net/projects/pyxml/.
 
-3) Sign up for a Google Account. In later steps, we'll assume that the new login
-   is joe.shmoe@gmail.com.
+3) Follow the directions for creating an AdWords test account located at:
+   https://developers.google.com/adwords/api/docs/test-accounts
 
 4) Navigate to the directory that contains your downloaded unzipped client
    library and run the "setup.py" script to install the "adspygoogle.adwords"
@@ -84,29 +84,23 @@ Step-by-step guide for accessing the sandbox:
 
 5) From the same directory, run the "config.py" script to set authentication
    headers. More information about the format of each header is
-   at http://code.google.com/apis/adwords/docs/developer/adwords_api_sandbox.html#requestheaders.
+   at: https://developers.google.com/adwords/api/docs/headers
    Example,
 
    Your AdWords account's login email: joe.shmoe@gmail.com
    Login password: secret
-   Login client customer id:
+   Login client customer id: 123-456-7890
    User agent: GoogleTest
-   Developer token: joe.shmoe@gmail.com++USD
+   Developer token: ABcdeFGH93KL-NOPQ_STUv
 
    Select XML parser [1=PyXML, 2=ElementTree]: 1
    Enable debugging mode [y/n]: n
    Enable SOAP XML logging mode [y/n]: y
    Enable API request logging mode [y/n]: y
 
-6) Run "examples/adspygoogle/adwords/VERSION/basic_operations/get_campaigns.py",
-   which will set up your Sandbox with five client accounts. Please note that
-   starting with v201109 you must use a clientCustomerId (you can run the script
-   again to update the value). We have provided a code example to translate
-   between them:
-   "examples/adspygoogle/adwords/VERSION/basic_operations/get_client_customer_id.py"
-
-7) Read over the documentation in "docs/index.html" to familiarize yourself with
-   the API of the client library.
+6) Read over the documentation in
+   https://developers.google.com/adwords/api/docs/index to familiarize yourself
+   with the API of the client library.
 
 
 Where do I submit bug reports and/or feature requests?
@@ -141,4 +135,4 @@ Author:
     api.kwinter@gmail.com (Kevin Winter)
 
 Maintainer:
-    api.kwinter@gmail.com (Kevin Winter)
+    api.jdilallo@gmail.com (Joseph DiLallo)
