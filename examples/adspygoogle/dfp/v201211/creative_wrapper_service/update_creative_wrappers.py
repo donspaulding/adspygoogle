@@ -18,7 +18,8 @@
 
 To determine which creative wrappers exist, run get_all_creative_wrappers.py.
 
-Tags: Creative wrapperService.updateCompanies
+Tags: CreativeWrapperService.getCreativeWrapper
+Tags: CreativeWrapperService.updateCreativeWrappers
 """
 
 __author__ = 'api.shamjeff@gmail.com (Jeff Sham)'

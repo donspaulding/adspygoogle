@@ -21,15 +21,16 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 import os
 import pickle
 
+
 from adspygoogle.common import SanityCheck
 from adspygoogle.common.Errors import InvalidInputError
 from adspygoogle.common.Logger import Logger
 from adspygoogle.dfp import REQUIRED_SOAP_HEADERS
 
 
-HOME = os.getcwd()
-AUTH_PKL = os.path.join(os.path.expanduser('~'), 'dfp_api_auth.pkl')
-CONFIG_PKL = os.path.join(os.path.expanduser('~'), 'dfp_api_config.pkl')
+HOME = os.path.expanduser('~')
+AUTH_PKL = os.path.join(HOME, 'dfp_api_auth.pkl')
+CONFIG_PKL = os.path.join(HOME, 'dfp_api_config.pkl')
 LOG_HOME = os.path.join(HOME, 'logs')
 LOG_NAME = 'dfp_api_lib'
 

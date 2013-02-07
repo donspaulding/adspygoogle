@@ -39,7 +39,7 @@ def main(client):
   creative_wrapper_service = client.GetService('CreativeWrapperService',
                                                version='v201211')
 
-  # Create statement object to only select companies that are advertisers.
+  # Create statement object to only select active creative wrappers.
   values = [{
       'key': 'status',
       'value': {

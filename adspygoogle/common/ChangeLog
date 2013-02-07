@@ -1,3 +1,8 @@
+3.0.10:
+- Fixed an issue where the library may incorrectly use the 'type' key as the
+  xsi:type rather than 'xsi_type' in instances where the API takes a super type.
+  This primarily affected Rich Media creatives in the DFA API.
+
 3.0.9:
 - The library will no longer fail to parse SOAP messages containing 72 or more
   asterisks in the same line. This fixes Issue 48.

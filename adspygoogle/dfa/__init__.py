@@ -34,8 +34,8 @@ LIB_SHORT_NAME = 'DfaApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python/'
 LIB_AUTHOR = 'Joseph DiLallo'
 LIB_AUTHOR_EMAIL = 'api.jdilallo@gmail.com'
-LIB_VERSION = '2.3.1'
-LIB_MIN_COMMON_VERSION = '3.0.9'
+LIB_VERSION = '2.3.2'
+LIB_MIN_COMMON_VERSION = '3.0.10'
 LIB_SIG = GenerateLibSig(LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:

@@ -291,13 +291,13 @@ def GetExplicitType(obj, type_name, ns, soappy_service):
     object, followed by the key used to specify this type. If no type is set
     within the given object, returns the tuple (None, None).
   """
-  for item in obj:
-    if (item == 'xsi_type' or item == 'type' or item.find('.Type') > -1 or
-        item.find('_Type') > -1):
-      if item == 'type':
-        if not _HasNativeType(type_name, ns, soappy_service):
-          return (obj['type'], 'type')
-      else:
+  if 'xsi_type' in obj:
+    return (obj['xsi_type'], 'xsi_type')
+  elif 'type' in obj and not _HasNativeType(type_name, ns, soappy_service):
+    return (obj['type'], 'type')
+  else:
+    for item in obj:
+      if item.find('.Type') > -1 or item.find('_Type') > -1:
         return (obj[item], item)
   return (None, None)
 

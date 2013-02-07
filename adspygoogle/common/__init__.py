@@ -20,7 +20,7 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
 import sys
 
-VERSION = '3.0.9'
+VERSION = '3.0.10'
 
 MIN_PY_VERSION = '2.4.4'
 PYXML_NAME = 'PyXML'

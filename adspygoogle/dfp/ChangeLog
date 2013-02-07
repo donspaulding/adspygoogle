@@ -1,3 +1,6 @@
+9.6.1:
+- Bumped the common library version to 3.0.10.
+
 9.6.0:
 - Added support for v201211.
 - Sunset versions v201108, v201111, v201201.

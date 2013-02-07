@@ -40,7 +40,7 @@ def main(client, label_id):
   creative_wrapper_service = client.GetService('CreativeWrapperService',
                                                version='v201211')
 
-  # Create a query to select the active creative wrapper for the given label.
+  # Create a query to select the active creative wrappers for the given label.
   values = [{
       'key': 'labelId',
       'value': {

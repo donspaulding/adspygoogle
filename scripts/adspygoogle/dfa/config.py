@@ -21,13 +21,14 @@ __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 import os
 import pickle
 
+
 from adspygoogle.dfa import REQUIRED_SOAP_HEADERS
 from adspygoogle.common import SanityCheck
 from adspygoogle.common.Errors import InvalidInputError
 from adspygoogle.common.Logger import Logger
 
 
-HOME = os.getcwd()
+HOME = os.path.expanduser('~')
 AUTH_PKL = os.path.join(HOME, 'dfa_api_auth.pkl')
 CONFIG_PKL = os.path.join(HOME, 'dfa_api_config.pkl')
 LOG_HOME = os.path.join(HOME, 'logs')
@@ -100,7 +101,7 @@ for prompt_msg, header, source in prompts:
         msg = 'Possible values are \'1\' or \'2\'.'
         raise InvalidInputError(msg)
     elif header == 'app_name':
-      res = raw_input(prompt_msg).rstrip('\r')
+      res = raw_input('%s : ' % prompt_msg).rstrip('\r')
     else:
       res = raw_input('%s [y/n]: ' % prompt_msg).rstrip('\r')
       if not SanityCheck.IsConfigUserInputValid(res, ['y', 'n']):

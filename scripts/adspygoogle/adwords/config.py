@@ -21,12 +21,13 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 import os
 import pickle
 
+
 from adspygoogle.common import SanityCheck
 from adspygoogle.common.Errors import InvalidInputError
 from adspygoogle.common.Logger import Logger
 
 
-HOME = os.getcwd()
+HOME = os.path.expanduser('~')
 AUTH_PKL = os.path.join(HOME, 'adwords_api_auth.pkl')
 CONFIG_PKL = os.path.join(HOME, 'adwords_api_config.pkl')
 LOG_HOME = os.path.join(HOME, 'logs')

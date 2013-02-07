@@ -114,6 +114,7 @@ class GenericApiService(object):
       self._soappyservice.soapproxy.config.dumpHeadersOut = 1
       self._soappyservice.soapproxy.config.dumpSOAPIn = 1
       self._soappyservice.soapproxy.config.dumpSOAPOut = 1
+      self._soappyservice.soapproxy.config.argsOrdering = {}
 
   def __getattr__(self, name):
     """Takes an attribute name and tries to create a SOAP call proxy around it.
@@ -257,6 +258,11 @@ class GenericApiService(object):
         args = self._TakeActionOnSoapCall(method_name, args)
         method_info = self._GetMethodInfo(method_name)
         method_attrs_holder = None
+
+        if len(method_info[MethodInfoKeys.INPUTS]) > 1:
+          self._ConfigureArgOrder(method_name,
+                                  method_info[MethodInfoKeys.INPUTS])
+
         if not method_info[MethodInfoKeys.INPUTS]:
           # Don't put any namespaces other than this service's namespace on
           # calls with no input params.
@@ -379,6 +385,20 @@ class GenericApiService(object):
         self._lock.release()
 
     return CallMethod
+
+  def _ConfigureArgOrder(self, method_name, inputs):
+    """Ensure that SOAPpy knows what order in which to pack operation arguments.
+
+    Even though we're pulling this information out of SOAPpy in the first place,
+    it doesn't know to look there for argument ordering on its own...
+
+    Args:
+      method_name: str The name of the method to configure.
+      inputs: list The input arguments for the given method.
+    """
+    if method_name not in self._soappyservice.soapproxy.config.argsOrdering:
+      self._soappyservice.soapproxy.config.argsOrdering[method_name] = [
+          argument[MethodInfoKeys.ELEMENT_NAME] for argument in inputs]
 
   def _ManageSoap(self, buf, log_handlers, lib_url, start_time, stop_time,
                   error=None):

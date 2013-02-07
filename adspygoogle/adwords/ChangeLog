@@ -1,3 +1,7 @@
+15.6.1:
+- Bumped the common library version to 3.0.10.
+- Added examples for enhanced campaigns.
+
 15.6.0:
 - Removing support for v201109 and v201109_1.
 
