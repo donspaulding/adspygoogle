@@ -37,10 +37,9 @@ campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
 
 def main(client, campaign_id):
   # Initialize appropriate service.
-  geo_location_service = client.GetGeoLocationService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  geo_location_service = client.GetGeoLocationService(version='v201206')
   campaign_ad_extension_service = client.GetCampaignAdExtensionService(
-      'https://adwords-sandbox.google.com', 'v201206')
+      version='v201206')
 
   # Construct selector and get geo location info for given addresses.
   selector = {

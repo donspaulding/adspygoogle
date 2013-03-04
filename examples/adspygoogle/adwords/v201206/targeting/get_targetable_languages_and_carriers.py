@@ -33,8 +33,7 @@ from adspygoogle import AdWordsClient
 
 def main(client):
   # Initialize appropriate service.
-  constant_data_service = client.GetConstantDataService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  constant_data_service = client.GetConstantDataService(version='v201206')
 
   # Get all languages.
   languages = constant_data_service.GetLanguageCriterion()

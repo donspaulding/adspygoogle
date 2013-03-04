@@ -36,8 +36,7 @@ PAGE_SIZE = 100
 
 def main(client):
   # Initialize appropriate service.
-  campaign_service = client.GetCampaignService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  campaign_service = client.GetCampaignService(version='v201206')
 
   # Construct query and get all campaigns.
   offset = 0

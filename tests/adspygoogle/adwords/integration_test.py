@@ -156,7 +156,7 @@ class AdWordsIntegrationTest(unittest.TestCase):
       adspygoogle.adwords.GenericAdWordsService.GenericAdWordsService A service
       proxy for the CampaignService.
     """
-    wsdl_data = open(WSDL_FILE_LOCATION).read()
+    wsdl_data = open(WSDL_FILE_LOCATION).read() % {'version': DEFAULT_API_VERSION}
     with mock.patch('urllib.urlopen') as mock_urlopen:
       mock_urlopen.return_value = StringIO.StringIO(wsdl_data)
       return client.GetCampaignService()

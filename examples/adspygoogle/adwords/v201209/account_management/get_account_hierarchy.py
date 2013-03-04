@@ -16,6 +16,9 @@
 
 """This example gets the account hierarchy under the current account.
 
+Note: this code example won't work with test accounts. See
+https://developers.google.com/adwords/api/docs/test-accounts
+
 Tags: ServicedAccountService.get
 Api: AdWordsOnly
 """
@@ -51,8 +54,7 @@ def DisplayAccountTree(account, link, accounts, links, depth=0):
 
 def main(client):
   # Initialize appropriate service.
-  managed_customer_service = client.GetManagedCustomerService(
-      'https://adwords.google.com', 'v201209')
+  managed_customer_service = client.GetManagedCustomerService(version='v201209')
 
   # Construct selector to get all accounts.
   selector = {

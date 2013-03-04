@@ -42,12 +42,10 @@ ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
 
 def main(client, campaign_id, ad_group_id):
   # Initialize appropriate service.
-  experiment_service = client.GetExperimentService(
-      'https://adwords-sandbox.google.com', 'v201209')
-  ad_group_service = client.GetAdGroupService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  experiment_service = client.GetExperimentService(version='v201209')
+  ad_group_service = client.GetAdGroupService(version='v201209')
   ad_group_criterion_service = client.GetAdGroupCriterionService(
-      'https://adwords-sandbox.google.com', 'v201209')
+      version='v201209')
 
   # Construct operations and add experiment.
   tomorrow = datetime.datetime.now() + datetime.timedelta(1)

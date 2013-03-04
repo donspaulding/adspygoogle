@@ -173,6 +173,50 @@ class AdWordsClientServiceTest(unittest.TestCase):
       service = self.client.GetBudgetService()
       self.assertEquals('BudgetService', service._service_name)
 
+  def testGetInfoService_notAllowed(self):
+    self.assertRaises(ValidationError, self.client.GetInfoService,
+                      version='v201302')
+
+  def testGetInfoService_allowed(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetInfoService(version='v201206')
+      self.assertEquals('InfoService', service._service_name)
+
+  def testGetAdGroupFeedService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetAdGroupFeedService()
+      self.assertEquals('AdGroupFeedService', service._service_name)
+
+  def testGetCampaignFeedService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetCampaignFeedService()
+      self.assertEquals('CampaignFeedService', service._service_name)
+
+  def testGetFeedItemService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetFeedItemService()
+      self.assertEquals('FeedItemService', service._service_name)
+
+  def testGetFeedMappingService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetFeedMappingService()
+      self.assertEquals('FeedMappingService', service._service_name)
+
+  def testGetFeedService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetFeedService()
+      self.assertEquals('FeedService', service._service_name)
+
+  def testGetCampaignSharedSetService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetCampaignSharedSetService()
+      self.assertEquals('CampaignSharedSetService', service._service_name)
+
+  def testGetSharedSetService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetSharedSetService()
+      self.assertEquals('SharedSetService', service._service_name)
+
 
 if __name__ == '__main__':
   unittest.main()

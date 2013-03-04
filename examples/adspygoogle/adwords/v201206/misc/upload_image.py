@@ -36,8 +36,7 @@ image_filename = 'INSERT_IMAGE_PATH_HERE'
 
 def main(client, image_filename):
   # Initialize appropriate service.
-  media_service = client.GetMediaService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  media_service = client.GetMediaService(version='v201206')
 
   image_data = Utils.ReadFile(image_filename)
   image_data = base64.encodestring(image_data)

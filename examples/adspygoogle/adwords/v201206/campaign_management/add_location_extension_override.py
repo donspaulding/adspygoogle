@@ -38,10 +38,9 @@ ad_extension_id = 'INSERT_AD_EXTENSION_ID_HERE'
 
 def main(client, ad_id, ad_extension_id):
   # Initialize appropriate service.
-  geo_location_service = client.GetGeoLocationService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  geo_location_service = client.GetGeoLocationService(version='v201206')
   ad_extension_override_service = client.GetAdExtensionOverrideService(
-      'https://adwords-sandbox.google.com', 'v201206')
+      version='v201206')
 
   # Construct selector and get geo location info for a given address.
   selector = {

@@ -37,8 +37,7 @@ experiment_id = 'INSERT_EXPERIMENT_ID_HERE'
 
 def main(client, experiment_id):
   # Initialize appropriate service.
-  experiment_service = client.GetExperimentService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  experiment_service = client.GetExperimentService(version='v201206')
 
   # Construct operations and promote experiment.
   operations = [{

@@ -47,8 +47,7 @@ ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
 
 def main(client, ad_group_id):
   # Initialize appropriate service.
-  mutate_job_service = client.GetMutateJobService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  mutate_job_service = client.GetMutateJobService(version='v201209')
 
   # Create list of all operations for the job.
   operations = []

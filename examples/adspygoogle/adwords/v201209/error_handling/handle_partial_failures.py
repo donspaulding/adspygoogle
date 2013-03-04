@@ -40,7 +40,7 @@ def main(client, ad_group_id):
 
   # Initialize appropriate service.
   ad_group_criterion_service = client.GetAdGroupCriterionService(
-      'https://adwords-sandbox.google.com', 'v201209')
+      version='v201209')
 
   # Construct keyword ad group criteria objects.
   keywords = [

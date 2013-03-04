@@ -61,6 +61,52 @@ def CreateTestCampaign(client):
       operations)[0]['value'][0]['id']
 
 
+def CreateTestEnhancedCampaign(client):
+  """Creates an enhanced campaign to run tests with.
+
+  While both legacy and enhanced campaigns exist, use this to test enhanced-only
+  features. Eventually, this method won't be needed.
+
+  Args:
+    client: AdWordsClient client to obtain services from.
+
+  Returns:
+    int CampaignId
+  """
+  campaign_service = client.GetCampaignService(SERVER, VERSION, HTTP_PROXY)
+  operations = [{
+      'operator': 'ADD',
+      'operand': {
+          'name': 'Campaign #%s' % Utils.GetUniqueName(),
+          'status': 'PAUSED',
+          'forwardCompatibilityMap': [
+              {
+                  'key': 'Campaign.enhanced',
+                  'value': 'true'
+              }
+          ],
+          'biddingStrategy': {
+              'type': 'ManualCPC'
+          },
+          'budget': {
+              'period': 'DAILY',
+              'amount': {
+                  'microAmount': '10000000'
+              },
+              'deliveryMethod': 'STANDARD'
+          },
+          'settings': [
+              {
+                  'xsi_type': 'KeywordMatchSetting',
+                  'optIn': 'false'
+              }
+          ]
+      }
+  }]
+  return campaign_service.Mutate(
+      operations)[0]['value'][0]['id']
+
+
 def CreateTestRTBCampaign(client):
   """Creates a CPM campaign to run tests with.
 

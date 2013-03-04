@@ -37,7 +37,7 @@ PAGE_SIZE = 500
 def main(client):
   # Initialize appropriate service.
   ad_group_criterion_service = client.GetAdGroupCriterionService(
-      'https://adwords-sandbox.google.com', 'v201209')
+      version='v201209')
 
   # Construct selector and get all ad group criteria.
   offset = 0

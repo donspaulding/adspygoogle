@@ -36,8 +36,7 @@ class Issue22(unittest.TestCase):
   def testRegenerateTokenInReportDownload(self):
     """Tests if the report download token regeneration logic works.."""
     client = AdWordsClient(path=os.path.join('..', '..', '..'))
-    report_downloader = client.GetReportDownloader(
-        'https://adwords-sandbox.google.com', 'v201109')
+    report_downloader = client.GetReportDownloader()
     report_downloader._config['auth_token_epoch'] = 0
 
     report = {

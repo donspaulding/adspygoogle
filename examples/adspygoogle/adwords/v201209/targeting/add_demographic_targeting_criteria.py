@@ -40,7 +40,7 @@ ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
 def main(client, ad_group_id):
   # Initialize appropriate service.
   ad_group_criterion_service = client.GetAdGroupCriterionService(
-      'https://adwords-sandbox.google.com', 'v201209')
+      version='v201209')
 
   # Create the ad group criteria.
   ad_group_criteria = [

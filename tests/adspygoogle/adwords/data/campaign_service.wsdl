@@ -3,15 +3,15 @@
 <!-- Generated file, do not edit -->
 <!-- Copyright 2012 Google Inc. All Rights Reserved -->
 <wsdl:definitions
-  targetNamespace="https://adwords.google.com/api/adwords/cm/v201209"
-  xmlns:tns="https://adwords.google.com/api/adwords/cm/v201209"
+  targetNamespace="https://adwords.google.com/api/adwords/cm/%(version)s"
+  xmlns:tns="https://adwords.google.com/api/adwords/cm/%(version)s"
   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
   xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <wsdl:types>
     <schema elementFormDefault="qualified" jaxb:version="1.0"
-      targetNamespace="https://adwords.google.com/api/adwords/cm/v201209"
+      targetNamespace="https://adwords.google.com/api/adwords/cm/%(version)s"
       xmlns="http://www.w3.org/2001/XMLSchema"
-      xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="https://adwords.google.com/api/adwords/cm/v201209">
+      xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="https://adwords.google.com/api/adwords/cm/%(version)s">
       <annotation>
         <appinfo>
           <jaxb:globalBindings typesafeEnumMaxMembers="999999"/>
@@ -5250,7 +5250,7 @@
   </wsdl:binding>
   <wsdl:service name="CampaignService">
     <wsdl:port binding="tns:CampaignServiceSoapBinding" name="CampaignServiceInterfacePort">
-      <wsdlsoap:address location="https://adwords.google.com/api/adwords/cm/v201209/CampaignService"/>
+      <wsdlsoap:address location="https://adwords.google.com/api/adwords/cm/%(version)s/CampaignService"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

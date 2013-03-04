@@ -414,10 +414,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -448,10 +446,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -482,10 +478,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -510,17 +504,46 @@ class AdWordsClient(Client):
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'AdGroupCriterionService')
 
+  def GetAdGroupFeedService(self, server='https://adwords.google.com',
+                            version=None, http_proxy=None):
+    """Creates an object used to call methods in the AdGroupFeedService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of AdGroupFeedService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'cm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'AdGroupFeedService')
+
   def GetAdGroupService(self, server='https://adwords.google.com',
                         version=None, http_proxy=None):
     """Call API method in AdGroupService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' or
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -551,10 +574,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -585,10 +606,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -613,50 +632,14 @@ class AdWordsClient(Client):
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'AlertService')
 
-  def GetBidLandscapeService(self, server='https://adwords.google.com',
-                             version=None, http_proxy=None):
-    """Call API method in BidLandscapeService.
-
-    Args:
-      [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
-      version: str API version to use.
-      http_proxy: str HTTP proxy to use.
-
-    Returns:
-      GenericAdWordsService New instance of BidLandscapeService object.
-    """
-    headers = self.__GetAuthCredentialsForAccessLevel()
-
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      AdWordsSanityCheck.ValidateServer(server, version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'group': 'cm',
-        'default_group': 'cm',
-        'http_proxy': http_proxy
-    }
-    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
-                                 self.__logger, 'BidLandscapeService')
-
   def GetBudgetService(self, server='https://adwords.google.com',
                        version=None, http_proxy=None):
     """Call API method in BudgetOrderService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -687,10 +670,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -721,10 +702,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -756,10 +735,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -790,10 +767,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -824,10 +799,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -852,17 +825,78 @@ class AdWordsClient(Client):
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'CampaignCriterionService')
 
+  def GetCampaignFeedService(self, server='https://adwords.google.com',
+                             version=None, http_proxy=None):
+    """Creates an object used to call methods in the CampaignFeedService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of CampaignFeedService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'cm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'CampaignFeedService')
+
+  def GetCampaignSharedSetService(self, server='https://adwords.google.com',
+                                  version=None, http_proxy=None):
+    """Creates an object used to call methods in the CampaignSharedSetService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of CampaignSharedSetService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'cm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'CampaignSharedSetService')
+
   def GetCampaignService(self, server='https://adwords.google.com',
                          version=None, http_proxy=None):
     """Call API method in CampaignService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' or
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -887,86 +921,14 @@ class AdWordsClient(Client):
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'CampaignService')
 
-  def GetCampaignTargetService(self, server='https://adwords.google.com',
-                               version=None, http_proxy=None):
-    """Call API method in CampaignTargetService.
-
-    Args:
-      [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
-      version: str API version to use.
-      http_proxy: str HTTP proxy to use.
-
-    Returns:
-      GenericAdWordsService New instance of CampaignTargetService object.
-    """
-    headers = self.__GetAuthCredentialsForAccessLevel()
-
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      AdWordsSanityCheck.ValidateServer(server, version)
-    AdWordsSanityCheck.ValidateService('CampaignTargetService', version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'group': 'cm',
-        'default_group': 'cm',
-        'http_proxy': http_proxy
-    }
-    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
-                                 self.__logger, 'CampaignTargetService')
-
-  def GetCreateAccountService(self, server='https://adwords.google.com',
-                              version=None, http_proxy=None):
-    """Call API method in CreateAccountService.
-
-    Args:
-      [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
-      version: str API version to use.
-      http_proxy: str HTTP proxy to use.
-
-    Returns:
-      GenericAdWordsService New instance of CreateAccountService object.
-    """
-    headers = self.__GetAuthCredentialsForAccessLevel()
-
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      AdWordsSanityCheck.ValidateServer(server, version)
-    AdWordsSanityCheck.ValidateService('CreateAccountService', version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'group': 'mcm',
-        'default_group': 'cm',
-        'http_proxy': http_proxy
-    }
-    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
-                                 self.__logger, 'CreateAccountService')
-
   def GetConstantDataService(self, server='https://adwords.google.com',
                              version=None, http_proxy=None):
     """Call API method in ConstantDataService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -997,10 +959,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1031,10 +991,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1065,10 +1023,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1093,16 +1049,110 @@ class AdWordsClient(Client):
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'ExperimentService')
 
+  def GetFeedItemService(self, server='https://adwords.google.com',
+                         version=None, http_proxy=None):
+    """Creates an object used to call methods in the FeedItemService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of FeedItemService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'cm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'FeedItemService')
+
+  def GetFeedMappingService(self, server='https://adwords.google.com',
+                            version=None, http_proxy=None):
+    """Creates an object used to call methods in the FeedMappingService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of FeedMappingService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'cm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'FeedMappingService')
+
+  def GetFeedService(self, server='https://adwords.google.com',
+                     version=None, http_proxy=None):
+    """Creates an object used to call methods in the FeedService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of FeedService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'cm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'FeedService')
+
   def GetGeoLocationService(self, server='https://adwords.google.com',
                             version=None, http_proxy=None):
     """Call API method in GeoLocationService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1133,11 +1183,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' or
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1150,6 +1197,7 @@ class AdWordsClient(Client):
       version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       AdWordsSanityCheck.ValidateServer(server, version)
+    AdWordsSanityCheck.ValidateService('InfoService', version)
 
     # Load additional configuration data.
     op_config = {
@@ -1168,11 +1216,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' or
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1203,10 +1248,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1237,11 +1280,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' or
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1272,11 +1312,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' or
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1307,10 +1344,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://adwords-sandbox.google.com' for sandbox. The default
-              behavior is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1334,21 +1369,19 @@ class AdWordsClient(Client):
     }
     return ReportDownloader(headers, self._config, op_config, self.__logger)
 
-  def GetServicedAccountService(self, server='https://adwords.google.com',
-                                version=None, http_proxy=None):
-    """Call API method in ServicedAccountService.
+  def GetSharedSetService(self, server='https://adwords.google.com',
+                          version=None, http_proxy=None):
+    """Creates an object used to call methods in the SharedSetService.
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
     Returns:
-      GenericAdWordsService New instance of ServicedAccountService object.
+      GenericAdWordsService New instance of SharedSetService object.
     """
     headers = self.__GetAuthCredentialsForAccessLevel()
 
@@ -1356,18 +1389,17 @@ class AdWordsClient(Client):
       version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       AdWordsSanityCheck.ValidateServer(server, version)
-    AdWordsSanityCheck.ValidateService('ServicedAccountService', version)
 
     # Load additional configuration data.
     op_config = {
         'server': server,
         'version': version,
-        'group': 'mcm',
+        'group': 'cm',
         'default_group': 'cm',
         'http_proxy': http_proxy
     }
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
-                                 self.__logger, 'ServicedAccountService')
+                                 self.__logger, 'SharedSetService')
 
   def GetTargetingIdeaService(self, server='https://adwords.google.com',
                               version=None, http_proxy=None):
@@ -1375,10 +1407,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1409,10 +1439,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1443,10 +1471,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1477,10 +1503,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1511,10 +1535,8 @@ class AdWordsClient(Client):
 
     Args:
       [optional]
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
       version: str API version to use.
       http_proxy: str HTTP proxy to use.
 
@@ -1543,10 +1565,8 @@ class AdWordsClient(Client):
     """Retrieves the OAuth Scope to use.
 
     Args:
-      server: str API server to access for this API call. Possible
-              values are: 'https://adwords.google.com' for live site and
-              'https://sandbox.google.com' for sandbox. The default behavior
-              is to access live site.
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
     Returns:
       str Full scope to use for OAuth.
     """

@@ -35,8 +35,7 @@ PAGE_SIZE = 100
 
 def main(client):
   # Initialize appropriate service.
-  targeting_idea_service = client.GetTargetingIdeaService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  targeting_idea_service = client.GetTargetingIdeaService(version='v201209')
 
   # Construct selector object and retrieve related placements.
   offset = 0

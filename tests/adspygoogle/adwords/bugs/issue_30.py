@@ -37,8 +37,7 @@ class Issue30(unittest.TestCase):
     """Tests if we can download a report with request logging disabled."""
     client = AdWordsClient(path=os.path.join('..', '..', '..'))
     client._config['request_log'] = 'n'  # pylint: disable=W0212
-    report_downloader = client.GetReportDownloader(
-        'https://adwords-sandbox.google.com', 'v201109')
+    report_downloader = client.GetReportDownloader()
     report = {
         'reportName': 'Last 7 days CRITERIA_PERFORMANCE_REPORT',
         'dateRangeType': 'LAST_7_DAYS',

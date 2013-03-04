@@ -36,7 +36,7 @@ campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
 def main(client, campaign_id):
   # Initialize appropriate service.
   campaign_criterion_service = client.GetCampaignCriterionService(
-      'https://adwords-sandbox.google.com', 'v201206')
+      version='v201206')
 
   # Create locations. The IDs can be found in the documentation or retrieved
   # with the LocationCriterionService.

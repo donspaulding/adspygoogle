@@ -32,10 +32,9 @@ from adspygoogle.common import Utils
 
 def main(client):
   # Initialize appropriate service.
-  user_list_service = client.GetUserListService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  user_list_service = client.GetUserListService(version='v201206')
   conversion_tracker_service = client.GetConversionTrackerService(
-      'https://adwords-sandbox.google.com', 'v201206')
+      version='v201206')
 
   # Construct operations and add a user list.
   operations = [

@@ -39,7 +39,7 @@ bid_modifier = '1.5'
 def main(client, campaign_id, bid_modifier):
   # Initialize appropriate service.
   campaign_criterion_service = client.GetCampaignCriterionService(
-      'https://adwords.google.com', 'v201209')
+      version='v201209')
 
   # Create mobile platform.The ID can be found in the documentation.
   # https://developers.google.com/adwords/api/docs/appendix/platforms

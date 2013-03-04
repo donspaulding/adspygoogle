@@ -1,3 +1,6 @@
+15.7.0:
+- Adding support for v201302.
+
 15.6.2:
 - Bumped the common library version to 3.0.11. This fixes issues 51 and 56.
 - The ReportDownloader now raises a more useful error if it encounters a problem

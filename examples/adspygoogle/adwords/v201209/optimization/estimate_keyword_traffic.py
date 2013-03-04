@@ -33,7 +33,7 @@ from adspygoogle import AdWordsClient
 def main(client):
   # Initialize appropriate service.
   traffic_estimator_service = client.GetTrafficEstimatorService(
-      'https://adwords-sandbox.google.com', 'v201209')
+      version='v201209')
 
   # Construct selector object and retrieve traffic estimates.
   keywords = [

@@ -34,10 +34,8 @@ import datetime
 
 def main(client):
   # Initialize appropriate service.
-  campaign_service = client.GetCampaignService(
-      'https://adwords-sandbox.google.com', 'v201209')
-  budget_service = client.GetBudgetService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  campaign_service = client.GetCampaignService(version='v201209')
+  budget_service = client.GetBudgetService(version='v201209')
 
   # Create a budget, which can be shared by multiple campaigns.
   budget = {

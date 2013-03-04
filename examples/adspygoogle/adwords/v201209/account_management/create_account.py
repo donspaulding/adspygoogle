@@ -18,6 +18,9 @@
 
 Note by default this account will only be accessible via parent MCC.
 
+Note: this code example won't work with test accounts. See
+https://developers.google.com/adwords/api/docs/test-accounts
+
 Tags: CreateAccountService.mutate
 Api: AdWordsOnly
 """
@@ -35,8 +38,7 @@ from adspygoogle import AdWordsClient
 
 def main(client):
   # Initialize appropriate service.
-  managed_customer_service = client.GetManagedCustomerService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  managed_customer_service = client.GetManagedCustomerService(version='v201209')
 
   today = datetime.today().strftime('%Y%m%d %H:%M:%S')
   # Construct operations and add campaign.

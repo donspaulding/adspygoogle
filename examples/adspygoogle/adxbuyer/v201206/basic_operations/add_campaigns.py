@@ -33,8 +33,7 @@ import datetime
 
 def main(client):
   # Initialize appropriate service.
-  campaign_service = client.GetCampaignService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  campaign_service = client.GetCampaignService(version='v201206')
 
   # Construct operations and add campaigns.
   operations = [{

@@ -33,7 +33,7 @@ from adspygoogle.common import Utils
 def main(client):
   # Initialize appropriate service.
   conversion_tracker_service = client.GetConversionTrackerService(
-      'https://adwords-sandbox.google.com', 'v201209')
+      version='v201209')
 
   # Construct operations and add conversion_tracker.
   operations = [

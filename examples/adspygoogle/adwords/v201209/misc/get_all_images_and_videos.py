@@ -37,8 +37,7 @@ PAGE_SIZE = 500
 
 def main(client):
   # Initialize appropriate service.
-  media_service = client.GetMediaService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  media_service = client.GetMediaService(version='v201209')
 
   # Construct selector and get all images.
   offset = 0

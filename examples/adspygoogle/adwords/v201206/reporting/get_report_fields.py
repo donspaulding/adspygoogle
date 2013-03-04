@@ -35,7 +35,7 @@ report_type = 'INSERT_REPORT_TYPE_HERE'
 def main(client, report_type):
   # Initialize appropriate service.
   report_definition_service = client.GetReportDefinitionService(
-      'https://adwords-sandbox.google.com', 'v201206')
+      version='v201206')
 
   # Get report fields.
   fields = report_definition_service.GetReportFields(report_type)

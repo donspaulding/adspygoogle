@@ -40,7 +40,7 @@ def main(client, ad_group_id):
 
   # Initialize appropriate service.
   ad_group_criterion_service = client.GetAdGroupCriterionService(
-      'https://adwords-sandbox.google.com', 'v201206')
+      version='v201206')
 
   # Construct placement ad group criteria objects.
   placements = [

@@ -38,10 +38,8 @@ criterion_id = 'INSERT_KEYWORD_CRITERION_ID_HERE'
 
 def main(client, ad_group_id, criterion_id):
   # Initialize appropriate service.
-  ad_group_ad_service = client.GetAdGroupAdService(
-      'https://adwords-sandbox.google.com', 'v201206')
-  ad_param_service = client.GetAdParamService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  ad_group_ad_service = client.GetAdGroupAdService(version='v201206')
+  ad_param_service = client.GetAdParamService(version='v201206')
 
   # Construct operations for adding text ad object and add to an ad group.
   operations = [{

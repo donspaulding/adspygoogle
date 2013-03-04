@@ -42,8 +42,7 @@ class Issue52Test(unittest.TestCase):
     client = AdWordsClient(headers={'authToken': ' ',
                                     'userAgent': ' ',
                                     'developerToken': ' '})
-    self.service = client.GetReportDownloader(
-        'https://adwords-sandbox.google.com', 'v201209')
+    self.service = client.GetReportDownloader()
 
   def testHandleUrlError(self):
     """Tests that ReportDownloader handles a URLError properly."""

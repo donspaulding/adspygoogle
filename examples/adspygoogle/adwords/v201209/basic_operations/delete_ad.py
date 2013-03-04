@@ -36,8 +36,7 @@ ad_id = 'INSERT_AD_ID_HERE'
 
 def main(client, ad_group_id, ad_id):
   # Initialize appropriate service.
-  ad_group_ad_service = client.GetAdGroupAdService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  ad_group_ad_service = client.GetAdGroupAdService(version='v201209')
 
   # Construct operations and delete ad.
   operations = [{

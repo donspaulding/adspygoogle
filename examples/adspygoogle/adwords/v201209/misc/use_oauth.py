@@ -30,11 +30,11 @@ from adspygoogle import AdWordsClient
 from adspygoogle.common.oauth.PythonOAuth2OAuthHandler import PythonOAuth2OAuthHandler
 
 
-sandbox_email = 'INSERT_SANDBOX_EMAIL'
-client_customer_id = 'INSERT_SANDBOX_CLIENT_CUSTOMER_ID'
+email = 'INSERT_EMAIL'
+client_customer_id = 'INSERT_CLIENT_CUSTOMER_ID'
 
 
-def main(sandbox_email, client_customer_id):
+def main(email, client_customer_id):
   # Set the OAuth consumer key and secret. Anonymous values can be used for
   # testing, and real values can be obtained by registering your application:
   # http://code.google.com/apis/accounts/docs/RegistrationForWebAppsAuto.html
@@ -45,7 +45,7 @@ def main(sandbox_email, client_customer_id):
 
   # Create the AdWordsUser and set the OAuth credentials.
   client = AdWordsClient(headers={
-      'developerToken': '%s++USD' % sandbox_email,
+      'developerToken': '%s++USD' % email,
       'clientCustomerId': client_customer_id,
       'userAgent': 'OAuth Example',
       'oauth_credentials': credentials
@@ -56,7 +56,7 @@ def main(sandbox_email, client_customer_id):
 
   # Request a new OAuth token. Web applications should pass in a callback URL to
   # redirect the user to after authorizing the token.
-  client.RequestOAuthToken('https://adwords-sandbox.google.com',
+  client.RequestOAuthToken('https://adwords.google.com',
                            applicationname='OAuth Example')
 
   # Get the authorization URL for the OAuth token.
@@ -85,8 +85,7 @@ def main(sandbox_email, client_customer_id):
   # steps once access has been granted.
   client.oauth_credentials = credentials
 
-  campaign_service = client.GetCampaignService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  campaign_service = client.GetCampaignService(version='v201209')
 
   # Get all campaigns.
   # Construct selector and get all campaigns.
@@ -104,8 +103,7 @@ def main(sandbox_email, client_customer_id):
     print 'No campaigns were found.'
 
   # Initialize appropriate service.
-  report_downloader = client.GetReportDownloader(
-      'https://adwords-sandbox.google.com', 'v201209')
+  report_downloader = client.GetReportDownloader(version='v201209')
 
   # Create report definition.
   report = {
@@ -125,4 +123,4 @@ def main(sandbox_email, client_customer_id):
 
 
 if __name__ == '__main__':
-  main(sandbox_email, client_customer_id)
+  main(email, client_customer_id)

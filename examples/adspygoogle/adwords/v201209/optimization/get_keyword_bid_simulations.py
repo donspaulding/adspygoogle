@@ -38,8 +38,7 @@ criterion_id = 'INSERT_CRITERION_ID_HERE'
 
 def main(client, ad_group_id, criterion_id):
   # Initialize appropriate service.
-  data_service = client.GetDataService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  data_service = client.GetDataService(version='v201209')
 
   # Construct bid landscape selector object and retrieve bid landscape.
   selector = {

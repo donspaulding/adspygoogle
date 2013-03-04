@@ -36,7 +36,7 @@ PAGE_SIZE = 500
 def main(client):
   # Initialize appropriate service.
   campaign_criterion_service = client.GetCampaignCriterionService(
-      'https://adwords-sandbox.google.com', 'v201209')
+      version='v201209')
 
   # Construct selector and get all campaign targets.
   offset = 0

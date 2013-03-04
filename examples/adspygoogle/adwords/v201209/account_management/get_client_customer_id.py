@@ -18,6 +18,9 @@
 We recommend to use this script as a one off to convert your identifiers to IDs
 and store them for future use.
 
+Note: this code example won't work with test accounts. See
+https://developers.google.com/adwords/api/docs/test-accounts
+
 Tags: InfoService.get
 Api: AdWordsOnly
 """
@@ -39,8 +42,7 @@ client_email = 'INSERT_EMAIL_ADDRESS_HERE'
 
 def main(client, client_email):
   # Initialize appropriate service.
-  info_service = client.GetInfoService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  info_service = client.GetInfoService(version='v201209')
 
   today = datetime.datetime.today().strftime('%Y%m%d')
 

@@ -36,8 +36,7 @@ campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
 
 def main(client, campaign_id):
   # Initialize appropriate service.
-  campaign_service = client.GetCampaignService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  campaign_service = client.GetCampaignService(version='v201206')
 
   # Construct operations and delete campaign.
   operations = [{

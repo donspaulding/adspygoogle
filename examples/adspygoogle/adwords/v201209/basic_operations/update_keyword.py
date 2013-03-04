@@ -38,7 +38,7 @@ criterion_id = 'INSERT_KEYWORD_CRITERION_ID_HERE'
 def main(client, ad_group_id, criterion_id):
   # Initialize appropriate service.
   ad_group_criterion_service = client.GetAdGroupCriterionService(
-      'https://adwords-sandbox.google.com', 'v201209')
+      version='v201209')
 
   # Construct operations and update bids.
 

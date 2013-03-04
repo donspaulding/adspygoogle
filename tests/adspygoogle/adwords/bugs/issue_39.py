@@ -37,8 +37,7 @@ class Issue39(unittest.TestCase):
     """Tests if we can convert an integer clientCustomerId to string."""
     client = AdWordsClient({'authToken': 'abc', 'developerToken': 'abc',
                             'userAgent': 'foo', 'clientCustomerId': 123})
-    campaign_service = client.GetCampaignService(
-        'https://adwords-sandbox.google.com', 'v201206')
+    campaign_service = client.GetCampaignService()
     campaign_service._SetHeaders()
 
 

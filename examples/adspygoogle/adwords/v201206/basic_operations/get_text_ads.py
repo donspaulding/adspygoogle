@@ -37,8 +37,7 @@ ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
 
 def main(client, ad_group_id):
   # Initialize appropriate service.
-  ad_group_ad_service = client.GetAdGroupAdService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  ad_group_ad_service = client.GetAdGroupAdService(version='v201206')
 
   # Construct selector and get all ads for a given ad group.
   offset = 0

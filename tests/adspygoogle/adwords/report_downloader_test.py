@@ -42,8 +42,7 @@ class ReportDownloaderTest(unittest.TestCase):
     client = AdWordsClient(headers={'authToken': ' ',
                                     'userAgent': ' ',
                                     'developerToken': ' '})
-    self.service = client.GetReportDownloader(
-        'https://adwords-sandbox.google.com', 'v201209')
+    self.service = client.GetReportDownloader()
 
   def _ThrowErrorFromMakeRequest(self, payload_contents):
     """A test helper function to mock receiving an error during __MakeRequest.

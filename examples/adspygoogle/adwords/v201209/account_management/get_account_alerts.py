@@ -17,6 +17,9 @@
 """This example gets all alerts for all clients of an MCC account. This example
 assumes the email and password belong to an MCC.
 
+Note: this code example won't work with test accounts. See
+https://developers.google.com/adwords/api/docs/test-accounts
+
 Tags: AlertService.get
 Api: AdWordsOnly
 """
@@ -36,8 +39,7 @@ PAGE_SIZE = 500
 
 def main(client):
   # Initialize appropriate service.
-  alert_service = client.GetAlertService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  alert_service = client.GetAlertService(version='v201209')
 
   # Construct selector and get all alerts.
   offset = 0

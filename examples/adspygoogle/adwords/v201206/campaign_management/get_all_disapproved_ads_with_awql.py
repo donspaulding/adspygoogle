@@ -35,8 +35,7 @@ campaign_id = 'INSERT_CAMPAIGN_ID_HERE'
 
 def main(client, campaign_id):
   # Initialize appropriate service.
-  ad_group_ad_service = client.GetAdGroupAdService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  ad_group_ad_service = client.GetAdGroupAdService(version='v201206')
 
   # Construct query and get all ads for a given campaign.
   query = ('SELECT Id, DisapprovalReasons '

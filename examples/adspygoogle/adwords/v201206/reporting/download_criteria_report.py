@@ -37,8 +37,7 @@ path = '/tmp/report_download.csv'
 
 def main(client, path):
   # Initialize appropriate service.
-  report_downloader = client.GetReportDownloader(
-      'https://adwords-sandbox.google.com', 'v201206')
+  report_downloader = client.GetReportDownloader(version='v201206')
 
   # Create report definition.
   report = {

@@ -32,8 +32,8 @@ from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.client import FlowExchangeError
 
 
-sandbox_email = 'INSERT_SANDBOX_EMAIL'
-client_customer_id = 'INSERT_SANDBOX_CLIENT_CUSTOMER_ID'
+email = 'INSERT_EMAIL'
+client_customer_id = 'INSERT_CLIENT_CUSTOMER_ID'
 # Visit https://code.google.com/apis/console to generate your client_id,
 # client_secret and to register your redirect_uri.
 # See the oauth2client wiki for more information on performing the OAuth2 flow:
@@ -42,7 +42,7 @@ oauth2_client_id = 'INSERT_OAUTH2_CLIENT_ID'
 oauth2_client_secret = 'INSERT_OAUTH2_CLIENT_SECRET'
 
 
-def main(sandbox_email, client_customer_id, oauth2_client_id,
+def main(email, client_customer_id, oauth2_client_id,
          oauth2_client_secret):
   # We're using the oauth2client library:
   # http://code.google.com/p/google-api-python-client/downloads/list
@@ -50,7 +50,7 @@ def main(sandbox_email, client_customer_id, oauth2_client_id,
       client_id=oauth2_client_id,
       client_secret=oauth2_client_secret,
       # Scope is the server address with '/api/adwords' appended.
-      scope='https://adwords-sandbox.google.com/api/adwords',
+      scope='https://adwords.google.com/api/adwords',
       user_agent='oauth2 code example')
 
   # Get the authorization URL to direct the user to.
@@ -69,7 +69,7 @@ def main(sandbox_email, client_customer_id, oauth2_client_id,
 
   # Create the AdWordsUser and set the OAuth2 credentials.
   client = AdWordsClient(headers={
-      'developerToken': '%s++USD' % sandbox_email,
+      'developerToken': '%s++USD' % email,
       'clientCustomerId': client_customer_id,
       'userAgent': 'OAuth2 Example',
       'oauth2credentials': credential
@@ -87,8 +87,7 @@ def main(sandbox_email, client_customer_id, oauth2_client_id,
   # steps once access has been granted.
   client.oauth2credentials = credentials
 
-  campaign_service = client.GetCampaignService(
-      'https://adwords-sandbox.google.com', 'v201206')
+  campaign_service = client.GetCampaignService(version='v201206')
 
   # Get all campaigns.
   # Construct selector and get all campaigns.
@@ -106,8 +105,7 @@ def main(sandbox_email, client_customer_id, oauth2_client_id,
     print 'No campaigns were found.'
 
   # Initialize appropriate service.
-  report_downloader = client.GetReportDownloader(
-      'https://adwords-sandbox.google.com', 'v201206')
+  report_downloader = client.GetReportDownloader(version='v201206')
 
   # Create report definition.
   report = {
@@ -130,5 +128,5 @@ if __name__ == '__main__':
   # Initialize client object.
   client = AdWordsClient(path=os.path.join('..', '..', '..', '..', '..'))
 
-  main(sandbox_email, client_customer_id, oauth2_client_id,
+  main(email, client_customer_id, oauth2_client_id,
        oauth2_client_secret)

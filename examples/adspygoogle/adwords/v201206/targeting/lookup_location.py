@@ -36,7 +36,7 @@ def GetLocationString(location):
 def main(client):
   # Initialize appropriate service.
   location_criterion_service = client.GetLocationCriterionService(
-      'https://adwords-sandbox.google.com', 'v201206')
+      version='v201206')
 
   location_names = ['Paris', 'Quebec', 'Spain', 'Deutchland']
 

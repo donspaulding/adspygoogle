@@ -37,8 +37,7 @@ ad_group_id = 'INSERT_AD_GROUP_ID_HERE'
 def main(client, ad_group_id):
   # Initialize appropriate service with validate only flag enabled.
   client.validate_only = True
-  ad_group_ad_service = client.GetAdGroupAdService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  ad_group_ad_service = client.GetAdGroupAdService(version='v201209')
 
   # Construct operations to add a text ad.
   operations = [{

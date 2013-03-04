@@ -32,10 +32,8 @@ from adspygoogle import AdWordsClient
 
 def main(client):
   # Initialize appropriate service.
-  customer_sync_service = client.GetCustomerSyncService(
-      'https://adwords-sandbox.google.com', 'v201209')
-  campaign_service = client.GetCampaignService(
-      'https://adwords-sandbox.google.com', 'v201209')
+  customer_sync_service = client.GetCustomerSyncService(version='v201209')
+  campaign_service = client.GetCampaignService(version='v201209')
 
   # Construct selector and get all campaigns.
   selector = {

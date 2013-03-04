@@ -39,8 +39,7 @@ class Issue16(unittest.TestCase):
   def testSendReceiveUnicode(self):
     """Tests if we can send/receive unicode characters."""
     client = AdWordsClient(path=os.path.join('..', '..', '..'))
-    campaign_service = client.GetCampaignService(
-      'https://adwords-sandbox.google.com', 'v201109')
+    campaign_service = client.GetCampaignService()
 
     # Construct operations and add campaign.
     operations = [{
