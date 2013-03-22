@@ -22,7 +22,6 @@ import os
 from distutils.core import setup
 
 from adspygoogle.dfp import LIB_AUTHOR
-from adspygoogle.dfp import LIB_AUTHOR_EMAIL
 from adspygoogle.dfp import LIB_NAME
 from adspygoogle.dfp import LIB_URL
 from adspygoogle.dfp import LIB_VERSION
@@ -39,9 +38,7 @@ setup(name='adspygoogle.dfp',
       version=LIB_VERSION,
       description=LIB_NAME,
       author=LIB_AUTHOR,
-      author_email=LIB_AUTHOR_EMAIL,
       maintainer=LIB_AUTHOR,
-      maintainer_email=LIB_AUTHOR_EMAIL,
       url=LIB_URL,
       license='Apache License 2.0',
       long_description='For additional information, please see %s' % LIB_URL,
