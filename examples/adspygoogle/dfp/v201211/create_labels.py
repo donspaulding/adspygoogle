@@ -41,7 +41,7 @@ labels = []
 for i in xrange(5):
   label = {
       'name': 'Label #%d' % i,
-      'isActive': 'True',
+      'isActive': 'true',
       'types': ['COMPETITIVE_EXCLUSION']
   }
   labels.append(label)

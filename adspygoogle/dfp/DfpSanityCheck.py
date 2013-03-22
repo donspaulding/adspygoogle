@@ -36,7 +36,8 @@ def ValidateServer(server, version):
              'v201204': 'https://www.google.com',
              'v201206': 'https://www.google.com',
              'v201208': 'https://www.google.com',
-             'v201211': 'https://www.google.com'}
+             'v201211': 'https://www.google.com',
+             'v201302': 'https://www.google.com'}
 
   if server not in servers.values():
     msg = ('Given API server, \'%s\', is not valid. Expecting '

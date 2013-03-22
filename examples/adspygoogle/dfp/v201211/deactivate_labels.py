@@ -42,7 +42,7 @@ values = [{
     'key': 'isActive',
     'value': {
         'xsi_type': 'TextValue',
-        'value': 'True'
+        'value': 'true'
     }
 }]
 query = 'WHERE isActive = :isActive'

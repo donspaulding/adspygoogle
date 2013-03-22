@@ -2,15 +2,15 @@
 <!-- Generated file, do not edit -->
 <!-- Copyright 2013 Google Inc. All Rights Reserved -->
 <wsdl:definitions
-  targetNamespace="https://www.google.com/apis/ads/publisher/v201211"
-  xmlns:tns="https://www.google.com/apis/ads/publisher/v201211"
+  targetNamespace="https://www.google.com/apis/ads/publisher/v201302"
+  xmlns:tns="https://www.google.com/apis/ads/publisher/v201302"
   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
   xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <wsdl:types>
     <schema elementFormDefault="qualified" jaxb:version="1.0"
-      targetNamespace="https://www.google.com/apis/ads/publisher/v201211"
+      targetNamespace="https://www.google.com/apis/ads/publisher/v201302"
       xmlns="http://www.w3.org/2001/XMLSchema"
-      xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="https://www.google.com/apis/ads/publisher/v201211">
+      xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="https://www.google.com/apis/ads/publisher/v201302">
       <annotation>
         <appinfo>
           <jaxb:globalBindings typesafeEnumMaxMembers="999999"/>
@@ -59,7 +59,7 @@
           <documentation>
             The API error base class that provides details about an error that occurred
             while processing a service request.
-
+            
             &lt;p&gt;The OGNL field path is provided for parsers to identify the request data
             element that may have caused the error.&lt;/p&gt;
           </documentation>
@@ -588,7 +588,7 @@
         <annotation>
           <documentation>
             The credentials for the {@code ClientLogin} API authentication protocol.
-
+            
             See {@link http://code.google.com/apis/accounts/docs/AuthForInstalledApps.html}.
           </documentation>
         </annotation>
@@ -892,7 +892,7 @@
                     The value for this field. The appropriate type of {@code Value} is
                     determined by the {@link CustomField#dataType} of the {@code CustomField}
                     that this conforms to.
-
+                    
                     &lt;table&gt;
                     &lt;tr&gt;&lt;th&gt;{@link CustomFieldDataType}&lt;/th&gt;&lt;th&gt;{@link Value} type&lt;/th&gt;&lt;/tr&gt;
                     &lt;tr&gt;&lt;td&gt;{@link CustomFieldDataType#STRING STRING}&lt;/td&gt;&lt;td&gt;{@link TextValue}&lt;/td&gt;&lt;/tr&gt;
@@ -2022,7 +2022,7 @@
                 &lt;td&gt;16&lt;/td&gt;&lt;td&gt;15&lt;/td&gt;&lt;td&gt;16&lt;/td&gt;
                 &lt;/tr&gt;
                 &lt;/table&gt;
-
+                
                 This field can only be edited by certain networks, otherwise a
                 {@link PermissionError} will occur.
               </documentation>
@@ -2364,6 +2364,13 @@
               </documentation>
             </annotation>
           </element>
+          <element maxOccurs="1" minOccurs="0" name="creationDateTime" type="tns:DateTime">
+            <annotation>
+              <documentation>
+                This attribute may be {@code null} for line items created before this feature was introduced.
+              </documentation>
+            </annotation>
+          </element>
           <element maxOccurs="unbounded" minOccurs="0"
             name="customFieldValues" type="tns:BaseCustomFieldValue">
             <annotation>
@@ -2673,7 +2680,7 @@
         <annotation>
           <documentation>
             The credentials for the {@code OAuth} authentication protocol.
-
+            
             See {@link http://oauth.net/}.
           </documentation>
         </annotation>
@@ -3681,6 +3688,31 @@
           </element>
         </sequence>
       </complexType>
+      <complexType name="VideoPosition">
+        <annotation>
+          <documentation>
+            Represents a targetable position within a video. A video ad can be targeted
+            to a position (pre-roll, all mid-rolls, or post-roll), or to a specific mid-roll index.
+          </documentation>
+        </annotation>
+        <sequence>
+          <element maxOccurs="1" minOccurs="0" name="positionType" type="tns:VideoPosition.Type">
+            <annotation>
+              <documentation>
+                The type of video position (pre-roll, mid-roll, or post-roll).
+              </documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="1" minOccurs="0" name="midrollIndex" type="xsd:int">
+            <annotation>
+              <documentation>
+                The index of the mid-roll to target.  Only valid if the {@link positionType} is
+                {@link VideoPositionType#MIDROLL}, otherwise this field will be ignored.
+              </documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </complexType>
       <complexType name="VideoPositionTargeting">
         <annotation>
           <documentation>
@@ -3693,11 +3725,46 @@
         </annotation>
         <sequence>
           <element maxOccurs="unbounded" minOccurs="0"
-            name="targetedVideoPositions" type="tns:VideoPositionTargetingType">
+            name="targetedPositions" type="tns:VideoPositionTarget">
             <annotation>
               <documentation>
-                The {@link VideoPositionTargetingType}s being targeted by the
+                The {@link VideoTargetingPosition} objects being targeted by the
                 video {@link LineItem}.
+              </documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </complexType>
+      <complexType name="VideoPositionTarget">
+        <annotation>
+          <documentation>
+            Represents the options for targetable positions within a video.
+          </documentation>
+        </annotation>
+        <sequence>
+          <element maxOccurs="1" minOccurs="0" name="videoPosition" type="tns:VideoPosition">
+            <annotation>
+              <documentation>
+                The video position to target.  This attribute is required.
+              </documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="1" minOccurs="0" name="videoBumperType" type="tns:VideoBumperType">
+            <annotation>
+              <documentation>
+                The video bumper type to target.  To target a video position or a pod position,
+                this value must be null.  To target a bumper position this value must be populated
+                and the line item must have a bumper type.
+              </documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="1" minOccurs="0"
+            name="videoPodPositionType" type="tns:VideoPodPositionType">
+            <annotation>
+              <documentation>
+                The video pod position type to target.  To target a video position or a bumper
+                position, this value must be null.  To target a pod position this value must
+                be populated.
               </documentation>
             </annotation>
           </element>
@@ -3754,6 +3821,13 @@
             <annotation>
               <documentation>
                 Audience extension line items do not support {@link CreativeRotationType#SEQUENTIAL}.
+              </documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="INVALID_EXTERNAL_ENTITY_ID">
+            <annotation>
+              <documentation>
+                The given ID of the external entity is not valid
               </documentation>
             </annotation>
           </enumeration>
@@ -5731,6 +5805,13 @@
               </documentation>
             </annotation>
           </enumeration>
+          <enumeration value="TARGET_PLATOFRM_NOT_ALLOWED">
+            <annotation>
+              <documentation>
+                The specified target platform is not allowed.
+              </documentation>
+            </annotation>
+          </enumeration>
           <enumeration value="UNKNOWN">
             <annotation>
               <documentation>
@@ -6708,6 +6789,13 @@
               </documentation>
             </annotation>
           </enumeration>
+          <enumeration value="ANY">
+            <annotation>
+              <documentation>
+                An universal target platform that combines mobile and desktop features.
+              </documentation>
+            </annotation>
+          </enumeration>
         </restriction>
       </simpleType>
       <simpleType name="TeamError.Reason">
@@ -6885,10 +6973,67 @@
           </enumeration>
         </restriction>
       </simpleType>
-      <simpleType name="VideoPositionTargetingType">
+      <simpleType name="VideoBumperType">
         <annotation>
           <documentation>
-            Represents the options for targetable positions within a video.
+            Represents the options for targetable bumper positions, surrounding an ad
+            pod, within a video stream. This includes before and after the supported ad
+            pod positions, {@link VideoPositionType#PREROLL},
+            {@link VideoPositionType#MIDROLL}, and {@link VideoPositionType#POSTROLL}.
+          </documentation>
+        </annotation>
+        <restriction base="xsd:string">
+          <enumeration value="BEFORE">
+            <annotation>
+              <documentation>
+                Represents the bumper position before the ad pod.
+              </documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="AFTER">
+            <annotation>
+              <documentation>
+                Represents the bumper position after the ad pod.
+              </documentation>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType name="VideoPodPositionType">
+        <annotation>
+          <documentation>
+            Represents the options for targetable pod positions, which are the positions
+            within a pod (or group) of ads, within a video stream.
+          </documentation>
+        </annotation>
+        <restriction base="xsd:string">
+          <enumeration value="FIRST">
+            <annotation>
+              <documentation>
+                Represents the first position in an ad pod.
+              </documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="LAST">
+            <annotation>
+              <documentation>
+                Represents the last position in an ad pod.
+              </documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="UNKNOWN">
+            <annotation>
+              <documentation>
+                The pod position type is unknown, most likely due to an incompatible API version.
+              </documentation>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType name="VideoPosition.Type">
+        <annotation>
+          <documentation>
+            Represents a targetable position within a video.
           </documentation>
         </annotation>
         <restriction base="xsd:string">
@@ -6913,97 +7058,13 @@
               </documentation>
             </annotation>
           </enumeration>
-          <enumeration value="BEFORE_PREROLL_BUMPER">
-            <annotation>
-              <documentation>
-                The positions defined as showing before the pre-roll ad slot.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="AFTER_PREROLL_BUMPER">
-            <annotation>
-              <documentation>
-                The position defined as showing after the pre-roll ad slot.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="BEFORE_MIDROLL_BUMPERS">
-            <annotation>
-              <documentation>
-                The position defined as showing before each of the mid-roll ad slots.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="AFTER_MIDROLL_BUMPERS">
-            <annotation>
-              <documentation>
-                The position defined as showing after each of the mid-roll ad slots.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="BEFORE_POSTROLL_BUMPER">
-            <annotation>
-              <documentation>
-                The position defined as showing before the post-roll ad slot.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="AFTER_POSTROLL_BUMPER">
-            <annotation>
-              <documentation>
-                The position defined as showing after the post-roll ad slot.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="FIRST_IN_PREROLL">
-            <annotation>
-              <documentation>
-                The first position within the pre-roll ad slot.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="LAST_IN_PREROLL">
-            <annotation>
-              <documentation>
-                The last position within the pre-roll ad slot.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="FIRST_IN_MIDROLL">
-            <annotation>
-              <documentation>
-                The first position within each of the mid-roll ad slots.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="LAST_IN_MIDROLL">
-            <annotation>
-              <documentation>
-                The last position within each of the mid-roll ad slots.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="FIRST_IN_POSTROLL">
-            <annotation>
-              <documentation>
-                The first position within the post-roll ad slot.
-              </documentation>
-            </annotation>
-          </enumeration>
-          <enumeration value="LAST_IN_POSTROLL">
-            <annotation>
-              <documentation>
-                The last position within the post-roll ad slot.
-              </documentation>
-            </annotation>
-          </enumeration>
         </restriction>
       </simpleType>
       <element name="createLineItem">
         <annotation>
           <documentation>
             Creates a new {@link LineItem}.
-
+            
             These fields are required:
             &lt;ul&gt;
             &lt;li&gt;{@link LineItem#costPerUnit}&lt;/li&gt;
@@ -7017,7 +7078,7 @@
             &lt;li&gt;{@link LineItem#creativePlaceholders}&lt;/li&gt;
             &lt;li&gt;{@link LineItem#targeting}&lt;/li&gt;
             &lt;/ul&gt;
-
+            
             @param lineItem the line item to create
             @return the line item with its ID filled in
           </documentation>
@@ -7046,7 +7107,7 @@
         <annotation>
           <documentation>
             Creates new {@link LineItem} objects.
-
+            
             @param lineItems the line items to create
             @return the created line items with their IDs filled in
           </documentation>
@@ -7069,7 +7130,7 @@
         <annotation>
           <documentation>
             Returns the {@link LineItem} uniquely identified by the given ID.
-
+            
             @param lineItemId the ID of the line item, which must already exist
             @return the {@code LineItem} uniquely identified by the given ID
           </documentation>
@@ -7093,7 +7154,7 @@
             Gets a {@link LineItemPage} of {@link LineItem} objects that satisfy the
             given {@link Statement#query}. The following fields are supported for
             filtering:
-
+            
             &lt;table&gt;
             &lt;tr&gt;
             &lt;th scope="col"&gt;PQL Property&lt;/th&gt; &lt;th scope="col"&gt;Object Property&lt;/th&gt;
@@ -7134,8 +7195,12 @@
             &lt;td&gt;{@code lastModifiedDateTime}&lt;/td&gt;
             &lt;td&gt;{@link LineItem#lastModifiedDateTime}&lt;/td&gt;
             &lt;/tr&gt;
+            &lt;tr&gt;
+            &lt;td&gt;{@code creationDateTime}&lt;/td&gt;
+            &lt;td&gt;{@link LineItem#creationDateTime}&lt;/td&gt;
+            &lt;/tr&gt;
             &lt;/table&gt;
-
+            
             @param filterStatement a Publisher Query Language statement used to filter
             a set of line items.
             @return the line items that match the given filter
@@ -7159,7 +7224,7 @@
           <documentation>
             Performs actions on {@link LineItem} objects that match the given
             {@link Statement#query}.
-
+            
             @param lineItemAction the action to perform
             @param filterStatement a Publisher Query Language statement used to filter
             a set of line items
@@ -7184,7 +7249,7 @@
         <annotation>
           <documentation>
             Updates the specified {@link LineItem}.
-
+            
             @param lineItem the line item to update
             @return the updated line item
           </documentation>
@@ -7206,7 +7271,7 @@
         <annotation>
           <documentation>
             Updates the specified {@link LineItem} objects.
-
+            
             @param lineItems the line items to update
             @return the updated line items
           </documentation>
@@ -7284,16 +7349,16 @@
     <wsdl:documentation>
       Provides methods for creating, updating and retrieving {@link LineItem}
       objects.
-
+      
       &lt;p&gt;Line items define the campaign. For example, line items define:
       &lt;ul&gt;
       &lt;li&gt;a budget
       &lt;li&gt;a span of time to run
       &lt;li&gt;ad unit targeting
       &lt;/ul&gt;
-
+      
       &lt;p&gt;In short, line items connect all of the elements of an ad campaign.
-
+      
       &lt;p&gt;Line items and creatives can be associated with each other through
       {@link LineItemCreativeAssociation} objects. An ad unit will host a creative
       through both this association and the {@link LineItem#targeting} to it.
@@ -7301,7 +7366,7 @@
     <wsdl:operation name="createLineItem">
       <wsdl:documentation>
         Creates a new {@link LineItem}.
-
+        
         These fields are required:
         &lt;ul&gt;
         &lt;li&gt;{@link LineItem#costPerUnit}&lt;/li&gt;
@@ -7315,7 +7380,7 @@
         &lt;li&gt;{@link LineItem#creativePlaceholders}&lt;/li&gt;
         &lt;li&gt;{@link LineItem#targeting}&lt;/li&gt;
         &lt;/ul&gt;
-
+        
         @param lineItem the line item to create
         @return the line item with its ID filled in
       </wsdl:documentation>
@@ -7326,7 +7391,7 @@
     <wsdl:operation name="createLineItems">
       <wsdl:documentation>
         Creates new {@link LineItem} objects.
-
+        
         @param lineItems the line items to create
         @return the created line items with their IDs filled in
       </wsdl:documentation>
@@ -7337,7 +7402,7 @@
     <wsdl:operation name="getLineItem">
       <wsdl:documentation>
         Returns the {@link LineItem} uniquely identified by the given ID.
-
+        
         @param lineItemId the ID of the line item, which must already exist
         @return the {@code LineItem} uniquely identified by the given ID
       </wsdl:documentation>
@@ -7350,7 +7415,7 @@
         Gets a {@link LineItemPage} of {@link LineItem} objects that satisfy the
         given {@link Statement#query}. The following fields are supported for
         filtering:
-
+        
         &lt;table&gt;
         &lt;tr&gt;
         &lt;th scope="col"&gt;PQL Property&lt;/th&gt; &lt;th scope="col"&gt;Object Property&lt;/th&gt;
@@ -7391,8 +7456,12 @@
         &lt;td&gt;{@code lastModifiedDateTime}&lt;/td&gt;
         &lt;td&gt;{@link LineItem#lastModifiedDateTime}&lt;/td&gt;
         &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;{@code creationDateTime}&lt;/td&gt;
+        &lt;td&gt;{@link LineItem#creationDateTime}&lt;/td&gt;
+        &lt;/tr&gt;
         &lt;/table&gt;
-
+        
         @param filterStatement a Publisher Query Language statement used to filter
         a set of line items.
         @return the line items that match the given filter
@@ -7405,7 +7474,7 @@
       <wsdl:documentation>
         Performs actions on {@link LineItem} objects that match the given
         {@link Statement#query}.
-
+        
         @param lineItemAction the action to perform
         @param filterStatement a Publisher Query Language statement used to filter
         a set of line items
@@ -7418,7 +7487,7 @@
     <wsdl:operation name="updateLineItem">
       <wsdl:documentation>
         Updates the specified {@link LineItem}.
-
+        
         @param lineItem the line item to update
         @return the updated line item
       </wsdl:documentation>
@@ -7429,7 +7498,7 @@
     <wsdl:operation name="updateLineItems">
       <wsdl:documentation>
         Updates the specified {@link LineItem} objects.
-
+        
         @param lineItems the line items to update
         @return the updated line items
       </wsdl:documentation>
@@ -7555,7 +7624,7 @@
   </wsdl:binding>
   <wsdl:service name="LineItemService">
     <wsdl:port binding="tns:LineItemServiceSoapBinding" name="LineItemServiceInterfacePort">
-      <wsdlsoap:address location="https://www.google.com/apis/ads/publisher/v201211/LineItemService"/>
+      <wsdlsoap:address location="https://www.google.com/apis/ads/publisher/v201302/LineItemService"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

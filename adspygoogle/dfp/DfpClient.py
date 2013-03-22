@@ -564,3 +564,83 @@ class DfpClient(Client):
       GenericDfpService New object representing the UserService object.
     """
     return self.GetService('UserService', server, version, http_proxy)
+
+  def GetActivityService(self, server='https://www.google.com', version=None,
+                         http_proxy=None):
+    """Create an ActivityService.
+
+    Args:
+      [optional]
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericDfpService New object representing the ActivityService object.
+    """
+    return self.GetService('ActivityService', server, version, http_proxy)
+
+  def GetActivityGroupService(self, server='https://www.google.com',
+                              version=None, http_proxy=None):
+    """Create an ActivityGroupService.
+
+    Args:
+      [optional]
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericDfpService New object representing the ActivityGroupService object.
+    """
+    return self.GetService('ActivityGroupService', server, version, http_proxy)
+
+  def GetAdRuleService(self, server='https://www.google.com', version=None,
+                       http_proxy=None):
+    """Create an AdRuleService.
+
+    Args:
+      [optional]
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericDfpService New object representing the AdRuleService object.
+    """
+    return self.GetService('AdRuleService', server, version, http_proxy)
+
+  def GetContentBundleService(self, server='https://www.google.com',
+                              version=None, http_proxy=None):
+    """Create an ContentBundleService.
+
+    Args:
+      [optional]
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericDfpService New object representing the ContentBundleService object.
+    """
+    return self.GetService('ContentBundleService', server, version, http_proxy)
+
+  def GetContactService(self, server='https://www.google.com',
+                        version=None, http_proxy=None):
+    """Create an ContactService.
+
+    Args:
+      [optional]
+      server: str API server to access for API calls. The default value is
+              'https://www.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericDfpService New object representing the ContactService object.
+    """
+    return self.GetService('ContactService', server, version, http_proxy)

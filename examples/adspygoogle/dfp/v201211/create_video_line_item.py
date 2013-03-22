@@ -76,7 +76,7 @@ line_item = {
         'customTargeting': top_set,
         'inventoryTargeting': {
             'targetedAdUnits': [{'adUnitId': targeted_video_ad_unit_id,
-                                 'includeDescendants': 'True'}]
+                                 'includeDescendants': 'true'}]
         },
         'videoPositionTargeting': {
             'targetedVideoPositions': ['PREROLL']
@@ -127,7 +127,7 @@ line_item = {
     'discountType': 'PERCENTAGE',
     'unitsBought': '100',
     'unitType': 'IMPRESSIONS',
-    'allowOverbook': 'True'
+    'allowOverbook': 'true'
 }
 
 # Add line item.
