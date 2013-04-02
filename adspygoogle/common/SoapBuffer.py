@@ -470,81 +470,32 @@ class SoapBuffer(Buffer):
       value = self.__GetXmlNameByName(self._GetXmlOut(), 'Body/*')
     return value
 
-  def GetFaultAsDictWhenOtherFails(self):
-    ''' Since this is an ETREE, we have to parse through the whole thing '''
-    xml_obj = xml_obj = self._GetXmlIn()
-    fault_node = xml_obj.getchildren()[-1].getchildren()[0]
+  def _GetChildren(self, node):
+    """Gets the child nodes of the given XML node."""
+    if self.__xml_parser == PYXML:
+      return node.childNodes
+    elif self.__xml_parser == ETREE:
+      return node.getchildren()
+    else:
+      raise NotImplementedError()
 
-    fault_code_elem = None
-    fault_string_elem = None
-    detail_elem = None
-    fault_code = ''
-    fault_string = ''
+  def _GetTagName(self, node):
+    """Returns the tag name of an XML node."""
+    if self.__xml_parser == PYXML:
+      return node.localName
+    elif self.__xml_parser == ETREE:
+      return node.tag
+    else:
+      raise NotImplementedError()
 
-    for child in fault_node.getchildren():
-      if child.tag == 'faultcode':
-        fault_code_elem = child
-      elif child.tag == 'faultstring':
-        fault_string_elem = child
-      elif child.tag == 'detail':
-        detail_elem = child
-
-    detail = {'errors': []}
-
-    if fault_code_elem is not None:
-      fault_code = fault_code_elem.text
-    if fault_string_elem is not None:
-      fault_string = fault_string_elem.text
-    if detail_elem is not None:
-      detail_elem = detail_elem.getchildren()[0]
-      for child in detail_elem.getchildren():
-        if child.tag.endswith('message'):
-          detail['message'] = child.text
-        elif child.tag.endswith('errors'):
-          error_dict = dict()
-          for c in child.getchildren():
-            if c.tag.endswith('ApiError.Type'):
-              error_dict['type'] = c.text
-            elif c.tag.endswith('fieldPath'):
-              error_dict['fieldPath'] = c.text
-            elif c.tag.endswith('reason'):
-              error_dict['reason'] = c.text
-            elif c.tag.endswith('trigger'):
-              error_dict['trigger']  = c.text
-            elif c.tag.endswith('limit'):
-              error_dict['limit']  = c.text
-            elif c.tag.endswith('isExemptable'):
-              error_dict['isExemptable']  = c.text
-            elif c.tag.endswith('externalPolicyName'):
-              error_dict['externalPolicyName']  = c.text
-            elif c.tag.endswith('externalPolicyDescription'):
-              error_dict['externalPolicyDescription']  = c.text
-            elif c.tag.endswith('externalPolicyUrl'):
-              error_dict['externalPolicyUrl']  = c.text
-            elif c.tag.endswith('violatingParts'):
-              vp_dict = dict()
-              for c2 in c.getchildren():
-                if c2.tag.endswith('ApiError.Type'):
-                  vp_dict['type'] = c2.text
-                elif c2.tag.endswith('index'):
-                  vp_dict['index'] = c2.text
-                elif c2.tag.endswith('length'):
-                  vp_dict['length'] = c2.text
-              error_dict['violatingParts']  = vp_dict
-            elif c.tag.endswith('key'):
-              key_dict = dict()
-              for c2 in c.getchildren():
-                if c2.tag.endswith('ApiError.Type'):
-                  key_dict['type'] = c2.text
-                elif c2.tag.endswith('policyName'):
-                  key_dict['policyName'] = c2.text
-                elif c2.tag.endswith('violatingText'):
-                  key_dict['violatingText'] = c2.text
-              error_dict['key'] = key_dict
-          detail['errors'].append(error_dict)
-
-    return {'faultcode': fault_code, 'faultstring': fault_string,
-            'detail': detail}
+  def _GetText(self, node):
+    """Returns the text inside an XML node."""
+    if self.__xml_parser == PYXML:
+      return node.childNodes[0].nodeValue
+    elif self.__xml_parser == ETREE:
+      return node.text
+    else:
+      raise NotImplementedError()
 
   def GetFaultAsDict(self, obj=None):
     """Recursively parse SOAP fault and load all elements into a dictionary.
@@ -576,33 +527,34 @@ class SoapBuffer(Buffer):
               xml_obj.getchildren())-1].getchildren()[0]
 
     dct = {}
-    nodes = {PYXML: ['childNodes', 'localName', 'childNodes[0].nodeValue'],
-             ETREE: ['getchildren()', 'tag', 'text']}
     # Step through the Document or Element (depending on which XML parser is
     # used) and construct a dictionary representation of the fault.
-    for item in eval('obj.%s' % nodes[self.__xml_parser][0]):
-      if ((self.__xml_parser == PYXML and item.hasChildNodes()) or
-          self.__xml_parser == ETREE):
-        tag = self.__RemoveElemAttr(eval('item.%s'
-                                         % nodes[self.__xml_parser][1]))
-        # Rename type elements that have a dot in them: ApiError.Type => type.
-        if tag.find('.') > -1: tag = tag.split('.')[1].lower()
-        value = eval('item.%s' % nodes[self.__xml_parser][2])
-        if value is not None or tag == 'detail':
-          if value is None or not value.rstrip():
-            tmp_dct = self.GetFaultAsDict(item)
-            if tag in dct:
-              if isinstance(dct[tag], list):
-                tmp_dct = [elem for elem in dct[tag] + [tmp_dct]]
-              else:
-                tmp_dct = [dct[tag], tmp_dct]
-            if tag == 'ApiExceptionFault' or tag == 'fault': return tmp_dct
-            if tag == 'errors' and isinstance(tmp_dct, dict):
-              tmp_dct = [tmp_dct]
-            dct[tag] = tmp_dct
-          else:
-            dct[tag] = value.rstrip()
+    for item in self._GetChildren(obj):
+      tag = self._GetTagName(item)
+      if not tag: continue
+      # Rename type elements that have a dot in them: ApiError.Type => type.
+      tag = self.__RemoveElemAttr(tag)
+      if tag.find('.') > -1: tag = tag.split('.')[1].lower()
+      if self.__xml_parser == PYXML and not item.hasChildNodes():
+        # Keep empty but named nodes when using PyXML.
+        dct[tag] = None
+      else:
+        value = self._GetText(item)
+        if ((not value or
+             (isinstance(value, basestring) and not value.rstrip()))
+            and self._GetChildren(item)):
+          tmp_dct = self.GetFaultAsDict(item)
+          if tag in dct:
+            if isinstance(dct[tag], list):
+              tmp_dct = [elem for elem in dct[tag] + [tmp_dct]]
+            else:
+              tmp_dct = [dct[tag], tmp_dct]
+          if tag == 'ApiExceptionFault' or tag == 'fault': return tmp_dct
+          if tag == 'errors' and isinstance(tmp_dct, dict):
+            tmp_dct = [tmp_dct]
+          dct[tag] = tmp_dct
         else:
+          if value: value = value.rstrip()
           dct[tag] = value
     return dct
 

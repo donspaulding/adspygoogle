@@ -34,8 +34,8 @@ LIB_NAME = 'DFP API Python Client Library'
 LIB_SHORT_NAME = 'DfpApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python'
 LIB_AUTHOR = 'Vincent Tsao'
-LIB_VERSION = '9.7.0'
-LIB_MIN_COMMON_VERSION = '3.0.11'
+LIB_VERSION = '9.7.1'
+LIB_MIN_COMMON_VERSION = '3.0.12'
 LIB_SIG = GenerateLibSig(LIB_SHORT_NAME, LIB_VERSION)
 
 if VERSION < LIB_MIN_COMMON_VERSION:

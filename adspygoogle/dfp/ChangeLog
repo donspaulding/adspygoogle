@@ -1,3 +1,8 @@
+9.7.1:
+- Bumped the common library version to 3.0.12. Error parsing now works correctly
+  for both XML parsers with pretty_xml on or off. All combinations of XML parser
+  to pretty_xml now return the same, correct errors.
+
 9.7.0:
 - Added support for v201302.
 

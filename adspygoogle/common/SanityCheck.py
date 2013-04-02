@@ -89,7 +89,7 @@ def ValidateConfigXmlParser(xml_parser):
   Raises:
     ValidationError: The given XML parser is not supported by this library.
   """
-  if (not isinstance(xml_parser, str) or
+  if (not isinstance(xml_parser, basestring) or
       not IsConfigUserInputValid(xml_parser, [PYXML, ETREE])):
     msg = ('Invalid input for %s \'%s\', expecting %s or %s of type <str>.'
            % (type(xml_parser), xml_parser, PYXML, ETREE))

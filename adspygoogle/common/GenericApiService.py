@@ -477,8 +477,6 @@ class GenericApiService(object):
     if is_fault:
       try:
         fault = buf.GetFaultAsDict()
-        if 'detail' in fault and fault['detail'] is None:
-          fault = buf.GetFaultAsDictWhenOtherFails()
         if not fault: msg = error['data']
       except Exception:
         fault = None

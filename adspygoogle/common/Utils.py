@@ -406,7 +406,7 @@ def BoolTypeConvert(bool_type, target=bool):
       return 'y'
     else:
       return 'n'
-  elif isinstance(bool_type, str):
+  elif isinstance(bool_type, basestring):
     if bool_type.lower() in '1 y yes t true'.split():
       return target(True)
     elif bool_type.lower() in '0 n no f false'.split():

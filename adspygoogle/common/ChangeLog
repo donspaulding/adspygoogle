@@ -1,3 +1,9 @@
+3.0.12:
+- The fix for issue 51 caused problems for fault parsing in other places. It has
+  been replaced with a better fix.
+- Changed some isinstance(obj, str) calls to isinstance(obj, basestring). This
+  resolves issue 58.
+
 3.0.11:
 - The library now enforces the argument ordering specified in the schema for all
   RPC calls. This resolves issues 56 and 57.

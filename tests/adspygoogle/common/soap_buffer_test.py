@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2012 Google Inc. All Rights Reserved.
+# Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,101 +26,85 @@ sys.path.insert(0, os.path.join('..', '..', '..'))
 from adspygoogle.common.SoapBuffer import SoapBuffer
 
 
-OUTGOING_HTTP_HEADERS_BLOCK = (
-    '*** Outgoing HTTP headers **********************************************\n'
-    'POST /v1.19/api/dfa-api/login HTTP/1.0\n'
-    'Host:advertisersapitest.doubleclick.net\n'
-    'User-agent:SOAPpy 0.12.0 (pywebsvcs.sf.net),gzip\n'
-    'Content-length:621\n'
-    'Accept-Encoding:gzip\n'
-    'SOAPAction:"authenticate"\n'
-    '************************************************************************\n'
-    )
-
-OUTGOING_SOAP_BLOCK = (
-    '*** Outgoing SOAP ******************************************************\n'
-    '<?xml version="1.0" encoding="UTF-8"?>\n'
-    '<SOAP-ENV:Envelope '
-    'SOAP-ENV:encodingStyle="''http://schemas.xmlsoap.org/soap/encoding/" '
-    'xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">\n'
-    '<SOAP-ENV:Header>\n'
-    '<RequestHeader>\n'
-    '<MyHeader>hello soap!</applicationName>\n'
-    '</RequestHeader>\n'
-    '</SOAP-ENV:Header>\n'
-    '<SOAP-ENV:Body>\n'
-    '<dfa:authenticate xmlns:dfa="http://www.doubleclick.net/dfa-api/v1.19">\n'
-    '<username>api.jdilallo</username>\n'
-    '<token>\n' + ('*' * 85) +'\nxxxxx\n</token>\n'
-    '</dfa:authenticate>\n'
-    '</SOAP-ENV:Body>\n'
-    '</SOAP-ENV:Envelope>\n'
-    '************************************************************************\n'
-    )
-
-INCOMING_HTTP_HEADERS_BLOCK = (
-    '*** Incoming HTTP headers **********************************************\n'
-    'HTTP/1.? 200 OK\n'
-    'Content-Type: text/xml; charset=utf-8\n'
-    'Content-Encoding: gzip\n'
-    '************************************************************************\n'
-    )
-
-INCOMING_SOAP_BLOCK = (
-    '*** Incoming SOAP ******************************************************\n'
-    '<?xml version="1.0" encoding="UTF-8"?>\n'
-    '<soapenv:Envelope '
-    'xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" '
-    'xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
-    'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n'
-    '<soapenv:Header>\n'
-    '<ns1:ResponseHeader soapenv:mustUnderstand="0" '
-    'xmlns:ns1="http://www.doubleclick.net/dfa-api/v1.19">\n'
-    '<ns1:requestId>50d50367-4d13-47a0-92ab-7748da032064</ns1:requestId>\n'
-    '</ns1:ResponseHeader>\n'
-    '</soapenv:Header>\n'
-    '<soapenv:Body>\n'
-    '<ns2:authenticateResponse '
-    'soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" '
-    'xmlns:ns2="http://www.doubleclick.net/dfa-api/v1.19">\n'
-    '<authenticateReturn href="#id0"/>\n'
-    '</ns2:authenticateResponse>\n'
-    '<multiRef id="id0" soapenc:root="0" '
-    'soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" '
-    'xmlns:ns3="http://www.doubleclick.net/dfa-api/v1.19" '
-    'xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" '
-    'xsi:type="ns3:UserProfile">\n'
-    '<email xsi:type="soapenc:string">' + ('*' * 72) + 'test@test.com</email>\n'
-    '<name xsi:type="soapenc:string">api.jdilallo</name>\n'
-    '</multiRef>\n'
-    '</soapenv:Body>\n'
-    '</soapenv:Envelope>\n'
-    '************************************************************************\n'
-    )
+# Location of a cached buffer to parse.
+BUFFER_FILE_LOCATION = os.path.join('data', 'soap_buffer.txt')
+TEST_BUFFER = open(BUFFER_FILE_LOCATION).read()
 
 
 class SoapBufferTest(unittest.TestCase):
 
   """Tests for the adspygoogle.common.SoapBuffer module."""
 
-  def testIssue48Regression(self):
-    """Regression test for issue 48 on the issue tracker.
+  def testGetFaultAsDict_PyXML_PrettyOff(self):
+    """Tests the GetFaultAsDict function."""
+    self._RunGetFaultAsDict(SoapBuffer('1', False))
 
-    Tests to make sure that if your SOAP message contains a line of asterisks
-    72 or longer in a row, the SOAP buffer can still parse it. If you have
-    a line in the SOAP messages containing only exactly 72 asterisks, the
-    library will still fail.
-    """
-    buf = SoapBuffer()
-    buf.write(OUTGOING_HTTP_HEADERS_BLOCK)
-    buf.write(OUTGOING_SOAP_BLOCK)
-    buf.write(INCOMING_HTTP_HEADERS_BLOCK)
-    buf.write(INCOMING_SOAP_BLOCK)
+  def testGetFaultAsDict_PyXML_PrettyOn(self):
+    """Tests the GetFaultAsDict function."""
+    self._RunGetFaultAsDict(SoapBuffer('1', True))
 
-    self.assertEqual(OUTGOING_HTTP_HEADERS_BLOCK.strip(), buf.GetHeadersOut())
-    self.assertEqual(OUTGOING_SOAP_BLOCK.strip(), buf.GetSoapOut())
-    self.assertEqual(INCOMING_HTTP_HEADERS_BLOCK.strip(), buf.GetHeadersIn())
-    self.assertEqual(INCOMING_SOAP_BLOCK.strip(), buf.GetSoapIn())
+  def testGetFaultAsDict_ETree_PrettyOff(self):
+    """Tests the GetFaultAsDict function."""
+    self._RunGetFaultAsDict(SoapBuffer('2', False))
+
+  def testGetFaultAsDict_ETree_PrettyOn(self):
+    """Tests the GetFaultAsDict function."""
+    self._RunGetFaultAsDict(SoapBuffer('2', True))
+
+  def _RunGetFaultAsDict(self, buffer_):
+    """Tests the GetFaultAsDict function."""
+    buffer_.write(TEST_BUFFER)
+
+    expected_output = {
+        'faultcode': 'soap:Server',
+        'detail': {
+            'type': 'ApiException',
+            'errors': [{
+                'externalPolicyDescription': ('Please correct the '
+                                              'capitalization in the following '
+                                              'phrase(s): '
+                                              '\'AAAAAAAAAAAAAAAAAAAAA\''),
+                'trigger': None,
+                'key': {
+                    'violatingText': 'AAAAAAAAAAAAAAAAAAAAA',
+                    'policyName': 'capitalization'
+                },
+                'errorString': 'PolicyViolationError.POLICY_ERROR',
+                'violatingParts': {
+                    'index': '0',
+                    'length': '21'
+                },
+                'type': 'PolicyViolationError',
+                'isExemptable': 'true',
+                'externalPolicyName': ('[Capitalization] Excessive '
+                                       'capitalization'),
+                'externalPolicyUrl': None,
+                'fieldPath': 'operations[0].operand.ad.headline'
+            }],
+            'message': ('[AdPolicyError{super=PolicyViolationError.POLICY_ERROR'
+                        ' @ operations[0].operand.ad.headline, '
+                        'key=PolicyViolationKey{policyName=capitalization,'
+                        'violatingText=AAAAAAAAAAAAAAAAAAAAA}, '
+                        'externalPolicyName=[Capitalization] Excessive '
+                        'capitalization, externalPolicyUrl=, '
+                        'externalPolicyDescription=Please correct the '
+                        'capitalization in the following phrase(s): '
+                        '\'AAAAAAAAAAAAAAAAAAAAA\', isExemtable=true, '
+                        'violatingParts=[Part{index=0, length=21}]}]]')
+        },
+        'faultstring': ('[AdPolicyError{super=PolicyViolationError.POLICY_ERROR'
+                        ' @ operations[0].operand.ad.headline, '
+                        'key=PolicyViolationKey{policyName=capitalization,'
+                        'violatingText=AAAAAAAAAAAAAAAAAAAAA}, '
+                        'externalPolicyName=[Capitalization] Excessive '
+                        'capitalization, externalPolicyUrl=, '
+                        'externalPolicyDescription=Please correct the '
+                        'capitalization in the following phrase(s): '
+                        '\'AAAAAAAAAAAAAAAAAAAAA\', isExemtable=true, '
+                        'violatingParts=[Part{index=0, length=21}]}]]')
+    }
+
+    self.assertEqual(expected_output, buffer_.GetFaultAsDict())
 
 
 if __name__ == '__main__':

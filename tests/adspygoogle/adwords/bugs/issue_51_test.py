@@ -23,7 +23,6 @@ deserialize AdWords errors.
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import os
-import StringIO
 import sys
 import unittest
 sys.path.insert(0, os.path.join('..', '..', '..'))
@@ -32,23 +31,37 @@ import mock
 from oauth2client.client import OAuth2Credentials
 
 from adspygoogle import AdWordsClient
-from adspygoogle.adwords.AdWordsErrors import AdWordsError
+from adspygoogle.adwords.AdWordsErrors import AdWordsRequestError
 from adspygoogle.adwords.AdWordsSoapBuffer import AdWordsSoapBuffer
 
 
-
-# Location of a cached WSDL to generate a service proxy from.
-WSDL_FILE_LOCATION = os.path.join('..', 'data', 'campaign_service.wsdl')
 
 # Location of a cached buffer to parse.
 BUFFER_FILE_LOCATION = os.path.join('..', 'data', 'issue51_buffer.txt')
 
 
 class Issue51Test(unittest.TestCase):
+
   """Tests for Issue 51."""
 
-  def testParseError(self):
+  def testParseError_PyXML_PrettyOff(self):
     """Tests that the SOAP buffer parses AdWords errors correctly."""
+    self._RunTestWithBuffer(AdWordsSoapBuffer('1', False))
+
+  def testParseError_PyXML_PrettyOn(self):
+    """Tests that the SOAP buffer parses AdWords errors correctly."""
+    self._RunTestWithBuffer(AdWordsSoapBuffer('1', True))
+
+  def testParseError_ETree_PrettyOff(self):
+    """Tests that the SOAP buffer parses AdWords errors correctly."""
+    self._RunTestWithBuffer(AdWordsSoapBuffer('2', False))
+
+  def testParseError_ETree_PrettyOn(self):
+    """Tests that the SOAP buffer parses AdWords errors correctly."""
+    self._RunTestWithBuffer(AdWordsSoapBuffer('2', True))
+
+  def _RunTestWithBuffer(self, buffer_):
+    """Tests error parsing using the given AdWordsSoapBuffer."""
     client = AdWordsClient(headers={
         'userAgent': 'USER_AGENT',
         'developerToken': 'DEVELOPER_TOKEN',
@@ -58,19 +71,33 @@ class Issue51Test(unittest.TestCase):
             'uri', 'user_agent')
     })
 
-    wsdl_data = open(WSDL_FILE_LOCATION).read()
-    with mock.patch('urllib.urlopen') as mock_urlopen:
-      mock_urlopen.return_value = StringIO.StringIO(wsdl_data)
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
       service = client.GetCampaignService()
 
-    buf = AdWordsSoapBuffer('1', False)
-    buf.write(open(BUFFER_FILE_LOCATION).read())
+    buffer_.write(open(BUFFER_FILE_LOCATION).read())
 
     try:
-      service._HandleLogsAndErrors(buf, '', '', {'data': 'datum'})
-    except AdWordsError, e:
-      if 'Unable to parse incoming SOAP XML.' in str(e):
-        self.fail('Failed to parse the error properly')
+      service._HandleLogsAndErrors(buffer_, '', '', {'data': 'datum'})
+    except AdWordsRequestError, e:
+      self.assertEqual(-1, e.code)
+      self.assertEqual(1, len(e.errors))
+      error_detail = e.errors[0]
+      self.assertEqual('Please correct the capitalization in the following '
+                       'phrase(s): \'AAAAAAAAAAAAAAAAAAAAA\'',
+                       error_detail.externalPolicyDescription)
+      self.assertEqual('[Capitalization] Excessive capitalization',
+                       error_detail.externalPolicyName)
+      self.assertEqual(None, error_detail.externalPolicyUrl)
+      self.assertEqual('true', error_detail.isExemptable)
+      self.assertEqual('operations[0].operand.ad.headline',
+                       error_detail.fieldPath)
+      self.assertEqual('PolicyViolationError', error_detail.type)
+      self.assertEqual(None, error_detail.trigger)
+      self.assertEqual({'policyName': 'capitalization',
+                        'violatingText': 'AAAAAAAAAAAAAAAAAAAAA'},
+                       error_detail.key)
+      self.assertEqual({'index': '0', 'length': '21'},
+                       error_detail.violatingParts)
 
 
 if __name__ == '__main__':

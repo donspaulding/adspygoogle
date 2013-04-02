@@ -191,7 +191,7 @@ class GenericDfpService(GenericApiService):
             error_type = fault['detail']['errors'][0]['type']
             if error_type in ERRORS: raise ERRORS[str(error_type)](fault)
 
-        if isinstance(fault, str):
+        if isinstance(fault, basestring):
           raise DfpError(fault)
         elif isinstance(fault, dict):
           raise DfpApiError(fault)

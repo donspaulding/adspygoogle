@@ -231,14 +231,10 @@ class GenericAdWordsService(GenericApiService):
       if fault:
         # Raise a specific error, subclass of AdWordsApiError.
         if 'detail' in fault and fault['detail']:
-          if 'code' in fault['detail']:
-            code = int(fault['detail']['code'])
-            if code in ERRORS: raise ERRORS[code](fault)
-          elif 'errors' in fault['detail']:
+          if 'errors' in fault['detail']:
             error_type = fault['detail']['errors'][0]['type']
             if error_type in ERRORS: raise ERRORS[str(error_type)](fault)
-
-        if isinstance(fault, str):
+        if isinstance(fault, basestring):
           raise AdWordsError(fault)
         elif isinstance(fault, dict):
           raise AdWordsApiError(fault)
