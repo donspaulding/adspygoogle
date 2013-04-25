@@ -86,28 +86,22 @@ class AdWordsClientValidationTest(unittest.TestCase):
     client = AdWordsClient(headers=headers)
     self.assertEquals(client._headers['authToken'], 'MyToken')
 
-  def testOAuthCredentialsOnly(self):
+  def testOAuth2CredentialsOnly(self):
     """Tests that specifying solely oauth_credentials works."""
     headers = DEFAULT_HEADERS.copy()
-    headers['oauth_credentials'] = {
-        'oauth_consumer_key': 'anonymous',
-        'oauth_consumer_secret': 'anonymous'
-    }
+    headers['oauth2credentials'] = 'credential!'
     client = AdWordsClient(headers=headers)
-    self.assertTrue(client.oauth_credentials)
+    self.assertTrue(client.oauth2credentials)
 
   def testOAuthCredentialsOthersBlank(self):
     """Tests that oauth_credentials with other auth blank works."""
     headers = DEFAULT_HEADERS.copy()
-    headers['oauth_credentials'] = {
-        'oauth_consumer_key': 'anonymous',
-        'oauth_consumer_secret': 'anonymous'
-    }
+    headers['oauth2credentials'] = 'credential!'
     headers['email'] = ''
     headers['password'] = ''
     headers['authToken'] = ''
     client = AdWordsClient(headers=headers)
-    self.assertTrue(client.oauth_credentials)
+    self.assertTrue(client.oauth2credentials)
 
   def testNonStrictThrowsValidationError(self):
     """Tests that even when using non-strict mode, we still raise a
@@ -159,15 +153,6 @@ class AdWordsClientServiceTest(unittest.TestCase):
                                          'userAgent': ' ',
                                          'developerToken': ' '})
 
-  def testGetBulkMutateJobService_notAllowed(self):
-    self.assertRaises(ValidationError, self.client.GetBulkMutateJobService,
-                      version='v201209')
-
-  def testGetBulkMutateJobService_allowed(self):
-    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
-      service = self.client.GetBulkMutateJobService(version='v201206')
-      self.assertEquals('BulkMutateJobService', service._service_name)
-
   def testGetBudgetService(self):
     with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
       service = self.client.GetBudgetService()
@@ -179,7 +164,7 @@ class AdWordsClientServiceTest(unittest.TestCase):
 
   def testGetInfoService_allowed(self):
     with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
-      service = self.client.GetInfoService(version='v201206')
+      service = self.client.GetInfoService(version='v201209')
       self.assertEquals('InfoService', service._service_name)
 
   def testGetAdGroupFeedService(self):
@@ -216,6 +201,11 @@ class AdWordsClientServiceTest(unittest.TestCase):
     with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
       service = self.client.GetSharedSetService()
       self.assertEquals('SharedSetService', service._service_name)
+
+  def testGetSharedCriterionService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetSharedCriterionService()
+      self.assertEquals('SharedCriterionService', service._service_name)
 
 
 if __name__ == '__main__':

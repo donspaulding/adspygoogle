@@ -102,8 +102,7 @@ class GenericAdWordsService(GenericApiService):
     if ((('authToken' not in self._headers and
           'auth_token_epoch' not in self._config) or
          int(now - self._config['auth_token_epoch']) >= AUTH_TOKEN_EXPIRE) and
-        not (self._headers.get('oauth_credentials') or
-             self._headers.get('oauth2credentials'))):
+        not self._headers.get('oauth2credentials')):
       if ('email' not in self._headers or not self._headers['email'] or
           'password' not in self._headers or not self._headers['password']):
         raise ValidationError('Required authentication headers, \'email\' and '
@@ -124,8 +123,7 @@ class GenericAdWordsService(GenericApiService):
     request_header_data = {}
     for key in GenericAdWordsService._POSSIBLE_ADWORDS_REQUEST_HEADERS:
       if (key in GenericAdWordsService._OAUTH_IGNORE_HEADERS
-          and (self._headers.get('oauth_credentials') or
-               self._headers.get('oauth2credentials'))):
+          and self._headers.get('oauth2credentials')):
         continue
       if key in self._headers and self._headers[key]:
         value = self._headers[key]

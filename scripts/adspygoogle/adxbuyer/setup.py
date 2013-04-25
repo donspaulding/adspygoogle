@@ -30,9 +30,8 @@ from adspygoogle.adxbuyer import LIB_VERSION
 
 
 PACKAGES = ['adspygoogle', 'adspygoogle.common', 'adspygoogle.common.https',
-            'adspygoogle.common.soappy', 'adspygoogle.common.oauth',
-            'adspygoogle.adxbuyer', 'adspygoogle.SOAPpy',
-            'adspygoogle.SOAPpy.wstools']
+            'adspygoogle.common.soappy', 'adspygoogle.adxbuyer',
+            'adspygoogle.SOAPpy', 'adspygoogle.SOAPpy.wstools']
 PACKAGE_DATA = {'adspygoogle.adxbuyer': [os.path.join('data', '*')]}
 
 

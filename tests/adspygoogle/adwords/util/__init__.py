@@ -20,8 +20,8 @@ __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
 from adspygoogle.common import Utils
 from tests.adspygoogle.adwords import HTTP_PROXY
-from tests.adspygoogle.adwords import SERVER_V201206 as SERVER
-from tests.adspygoogle.adwords import VERSION_V201206 as VERSION
+from tests.adspygoogle.adwords import SERVER_V201209 as SERVER
+from tests.adspygoogle.adwords import VERSION_V201209 as VERSION
 
 
 def CreateTestCampaign(client):

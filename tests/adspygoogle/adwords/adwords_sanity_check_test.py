@@ -30,16 +30,14 @@ from adspygoogle.common.Errors import ValidationError
 class AdWordsSanityCheckTest(unittest.TestCase):
   """Tests for AdWordsSanityCheck."""
 
-  def testValidateService_bmjsAllowed(self):
-    AdWordsSanityCheck.ValidateService('BulkMutateJobService', 'v201206')
-    AdWordsSanityCheck.ValidateService('BulkMutateJobService', 'v201109_1')
-    AdWordsSanityCheck.ValidateService('BulkMutateJobService', 'v201109')
+  def testValidateService_infoAllowed(self):
+    AdWordsSanityCheck.ValidateService('InfoService', 'v201209')
 
-  def testValidateService_bmjsNotAllowed(self):
+  def testValidateService_infoNotAllowed(self):
     self.assertRaises(ValidationError, AdWordsSanityCheck.ValidateService,
-                      'BulkMutateJobService', 'v201209')
+                      'InfoService', 'v201302')
     self.assertRaises(ValidationError, AdWordsSanityCheck.ValidateService,
-                      'BulkMutateJobService', 'v201301')
+                      'InfoService', 'v201433')
 
 
 if __name__ == '__main__':

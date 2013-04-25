@@ -29,7 +29,6 @@ from adspygoogle.adwords import DEFAULT_API_VERSION
 from adspygoogle.adwords import LIB_SHORT_NAME
 from adspygoogle.adwords import LIB_SIG
 from adspygoogle.adwords import REQUIRED_SOAP_HEADERS
-from adspygoogle.adwords.AdWordsErrors import AdWordsError
 from adspygoogle.adwords.GenericAdWordsService import GenericAdWordsService
 from adspygoogle.adwords.ReportDownloader import ReportDownloader
 from adspygoogle.common import SanityCheck
@@ -71,15 +70,9 @@ class AdWordsClient(Client):
         'authToken': '...',
         'clientCustomerId': '1234567890',
         'userAgent': 'GoogleTest',
-        'developerToken': 'johndoe@example.com++USD',
+        'developerToken': 'ABcdeFGH93KL-NOPQ_STUv.',
         'validateOnly': 'n',
         'partialFailure': 'n',
-        'oauth_credentials': {
-          'oauth_consumer_key': ...,
-          'oauth_consumer_secret': ...,
-          'oauth_token': ...,
-          'oauth_token_secret': ...
-        },
         'oauth2credentials': 'See use_oauth2.py'.
       }
       config = {
@@ -176,9 +169,8 @@ class AdWordsClient(Client):
     if self._headers.get('authToken'):
       # If they have a non-empty authToken, set the epoch and skip the rest.
       self._config['auth_token_epoch'] = time.time()
-    elif (self._headers.get('oauth_credentials') or
-          self._headers.get('oauth2credentials')):
-      # If they have oauth_credentials, that's also fine.
+    elif self._headers.get('oauth2credentials'):
+      # If they have oauth2credentials, that's also fine.
       pass
     elif (self._headers.get('email') and self._headers.get('password')
           and not self._headers.get('authToken')):
@@ -196,7 +188,7 @@ class AdWordsClient(Client):
         raise ValidationError('Was not able to obtain an AuthToken for '
                               'provided email and password, see root_cause.', e)
     else:
-      # We need either oauth_credentials OR authToken.
+      # We need either oauth2credentials OR authToken.
       raise ValidationError('Authentication data is missing.')
 
     # Insert library's signature into user agent.
@@ -695,39 +687,6 @@ class AdWordsClient(Client):
     }
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'BudgetOrderService')
-
-  def GetBulkMutateJobService(self, server='https://adwords.google.com',
-                              version=None, http_proxy=None):
-    """Call API method in BulkMutateJobService.
-
-    Args:
-      [optional]
-      server: str API server to access for this API call. The only supported
-              server is currently 'https://adwords.google.com'.
-      version: str API version to use.
-      http_proxy: str HTTP proxy to use.
-
-    Returns:
-      GenericAdWordsService New instance of BulkMutateJobService object.
-    """
-    headers = self.__GetAuthCredentialsForAccessLevel()
-
-    if version is None:
-      version = DEFAULT_API_VERSION
-    if Utils.BoolTypeConvert(self._config['strict']):
-      AdWordsSanityCheck.ValidateServer(server, version)
-    AdWordsSanityCheck.ValidateService('BulkMutateJobService', version)
-
-    # Load additional configuration data.
-    op_config = {
-        'server': server,
-        'version': version,
-        'group': 'cm',
-        'default_group': 'cm',
-        'http_proxy': http_proxy
-    }
-    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
-                                 self.__logger, 'BulkMutateJobService')
 
   def GetMutateJobService(self, server='https://adwords.google.com',
                               version=None, http_proxy=None):
@@ -1369,6 +1328,38 @@ class AdWordsClient(Client):
     }
     return ReportDownloader(headers, self._config, op_config, self.__logger)
 
+  def GetSharedCriterionService(self, server='https://adwords.google.com',
+                                version=None, http_proxy=None):
+    """Creates an object used to call methods in the SharedCriterionService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of SharedCriterionService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'cm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'SharedCriterionService')
+
   def GetSharedSetService(self, server='https://adwords.google.com',
                           version=None, http_proxy=None):
     """Creates an object used to call methods in the SharedSetService.
@@ -1560,14 +1551,3 @@ class AdWordsClient(Client):
     }
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'DataService')
-
-  def _GetOAuthScope(self, server='https://adwords.google.com'):
-    """Retrieves the OAuth Scope to use.
-
-    Args:
-      server: str API server to access for this API call. The only supported
-              server is currently 'https://adwords.google.com'.
-    Returns:
-      str Full scope to use for OAuth.
-    """
-    return server + '/api/adwords/'

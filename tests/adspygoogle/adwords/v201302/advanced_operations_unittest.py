@@ -25,6 +25,8 @@ import unittest
 
 from examples.adspygoogle.adwords.v201302.advanced_operations import add_click_to_download_ad
 from examples.adspygoogle.adwords.v201302.advanced_operations import add_site_links
+from examples.adspygoogle.adwords.v201302.advanced_operations import create_and_attach_shared_keyword_set
+from examples.adspygoogle.adwords.v201302.advanced_operations import find_and_remove_criteria_from_shared_set
 from tests.adspygoogle.adwords import client
 from tests.adspygoogle.adwords import util
 from tests.adspygoogle.adwords import SERVER_V201302
@@ -54,6 +56,11 @@ class AdvancedOperations(unittest.TestCase):
   def testAddSiteLink(self):
     """Test whether we can get account alerts."""
     add_site_links.main(client, self.campaign_id)
+
+  def testAddAndRemoveSharedCriteria(self):
+    """Tests whether we can create, attach, and remove a shared keyword set."""
+    create_and_attach_shared_keyword_set.main(client, self.campaign_id)
+    find_and_remove_criteria_from_shared_set.main(client, self.campaign_id)
 
 
 if __name__ == '__main__':

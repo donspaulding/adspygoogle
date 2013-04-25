@@ -34,7 +34,7 @@ LIB_SHORT_NAME = 'AwApi-Python'
 LIB_URL = 'http://code.google.com/p/google-api-ads-python'
 LIB_AUTHOR = 'Stan Grinberg'
 LIB_AUTHOR_EMAIL = 'api.sgrinberg@gmail.com'
-LIB_VERSION = '15.7.1'
+LIB_VERSION = '15.8.0'
 LIB_MIN_COMMON_VERSION = '3.0.12'
 LIB_SIG = GenerateLibSig(LIB_SHORT_NAME, LIB_VERSION)
 
@@ -44,7 +44,7 @@ if VERSION < LIB_MIN_COMMON_VERSION:
   raise MissingPackageError(msg)
 
 # Tuple of strings representing API versions.
-API_VERSIONS = ('v201206', 'v201209', 'v201302')
+API_VERSIONS = ('v201209', 'v201302')
 DEFAULT_API_VERSION = API_VERSIONS[-1]
 
 # Accepted combinations of headers which user has to provide. Either one of
@@ -52,7 +52,6 @@ DEFAULT_API_VERSION = API_VERSIONS[-1]
 REQUIRED_SOAP_HEADERS = (('email', 'password', 'userAgent', 'developerToken'),
                          ('email', 'password', 'userAgent', 'developerToken'),
                          ('authToken', 'userAgent', 'developerToken'),
-                         ('oauth_credentials', 'userAgent', 'developerToken'),
                          ('oauth2credentials', 'userAgent', 'developerToken'))
 
 AUTH_TOKEN_SERVICE = 'adwords'

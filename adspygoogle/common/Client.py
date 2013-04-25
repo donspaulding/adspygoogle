@@ -259,67 +259,6 @@ class Client(object):
     """
     pass
 
-  def RequestOAuthToken(self, server, callbackurl=None, applicationname=None):
-    """Obtains an OAuth Request Token from Google.
-
-    Args:
-      server: str The API server that requests will be made to.
-      callbackurl: str Optional callback url.
-      applicationname: str Optional name of the application to display on the
-                       authorization redirect page.
-    """
-    scope = self._GetOAuthScope(server)
-    self.oauth_credentials = self.oauth_handler.GetRequestToken(
-        self.oauth_credentials, scope, applicationname=applicationname,
-        callbackurl=callbackurl)
-
-  def GetOAuthAuthorizationUrl(self):
-    """Gets the OAuth authorization URL for the OAuth token.
-
-    Returns:
-      str The URL that will allow the user to authorize the token.
-    """
-    return self.oauth_handler.GetAuthorizationUrl(self.oauth_credentials)
-
-  def _GetOAuthScope(self, server):
-    """Gets the OAuth scope for this user.
-
-    Must be overridden by implementors.
-
-    Args:
-      server: str The API server that requests will be made to.
-    Returns:
-      str The scope to use when requesting an OAuth token.
-    """
-    raise NotImplementedError
-
-  def UpgradeOAuthToken(self, verifier):
-    """Upgrades the authorized OAuth token.
-
-    Args:
-      verifier: str The verifier string returning from authorizing the token.
-    """
-    self.oauth_credentials = self.oauth_handler.GetAccessToken(
-        self.oauth_credentials, verifier)
-
-  def __SetOAuthCredentials(self, credentials):
-    """Sets the OAuth credentials into the config.
-
-    Args:
-      credentials: dict OAuth credentials.
-    """
-    self._headers['oauth_credentials'] = credentials
-
-  def __GetOAuthCredentials(self):
-    """Retrieves the OAuth credentials from the config.
-
-    Returns:
-      dict The OAuth credentials.
-    """
-    return self._headers['oauth_credentials']
-
-  oauth_credentials = property(__GetOAuthCredentials, __SetOAuthCredentials)
-
   def __SetOAuth2Credentials(self, credentials):
     """Sets the OAuth2 credentials into the config.
 
@@ -337,45 +276,6 @@ class Client(object):
     return self._headers['oauth2credentials']
 
   oauth2credentials = property(__GetOAuth2Credentials, __SetOAuth2Credentials)
-
-  def __SetOAuthHandler(self, oauth_handler):
-    """Sets the config to use the specified OAuth Handler.
-
-    Args:
-      oauth_handler: OAuthHandler The OAuthHandler to use for OAuth.
-    """
-    self._config['oauth_handler'] = oauth_handler
-
-  def __GetOAuthHandler(self):
-    """Returns the currently set OAuthHandler.
-
-    Returns:
-      OAuthHandler The OAuthHandler to use for OAuth.
-    """
-    return self._config['oauth_handler']
-
-  oauth_handler = property(__GetOAuthHandler, __SetOAuthHandler)
-
-  def __SetUsingOAuth(self, is_using):
-    """Deprecated - set oauth_credentials field instead.
-
-    Args:
-      is_using: boolean Whether the client is using OAuth or not.
-    """
-    warnings.warn('Set a value in the oauth_credentials field to enable OAuth.',
-                  DeprecationWarning, stacklevel=2)
-
-  def __GetUsingOAuth(self):
-    """Deprecated - test field oauth_credentials instead.
-
-    Returns:
-      boolean Whether this client is using OAuth or not
-    """
-    warnings.warn('Evaluate the oauth_credentials field for truth instead.',
-                  DeprecationWarning, stacklevel=2)
-    return self._headers.get('oauth_credentials')
-
-  use_oauth = property(__GetUsingOAuth, __SetUsingOAuth)
 
   def __SetCaCertsFile(self, ca_certs_file):
     """Sets the certificates file to use for validating SSL certificates.

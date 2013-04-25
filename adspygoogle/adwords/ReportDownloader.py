@@ -43,7 +43,6 @@ SERVICE_NAME = 'ReportDefinitionService'
 DOWNLOAD_URL_BASE = '/api/adwords/reportdownload'
 REPORT_ID='?__rd=%s'
 VERSIONED='/%s'
-OLD_ERROR_REGEX = r'^!!!([-\d]+)\|\|\|([-\d]+)\|\|\|(.*)\?\?\?'
 ATTRIBUTES_REGEX = r'( )?[\w:-]+="[\w:\[\]-]+"'
 ERROR_TYPE_REGEX = r'(?s)<type>(.*?)</type>'
 ERROR_TRIGGER_REGEX = r'(?s)<trigger>(.*?)</trigger>'
@@ -182,7 +181,7 @@ class ReportDownloader(object):
     """
     url = self.__GenerateUrl()
     self.__ReloadAuthToken()
-    headers = self.__GenerateHeaders(return_micros, url)
+    headers = self.__GenerateHeaders(return_micros)
     headers['Content-Type'] = 'application/x-www-form-urlencoded'
     headers['Content-Length'] = str(len(report_payload))
     return self.__MakeRequest(url, headers, fileobj, payload=report_payload)
@@ -247,7 +246,7 @@ class ReportDownloader(object):
     """
     self.__ReloadAuthToken()
     url = self.__GenerateUrl(report_definition_id)
-    headers = self.__GenerateHeaders(return_micros, url)
+    headers = self.__GenerateHeaders(return_micros)
     return self.__MakeRequest(url, headers, fileobj)
 
   def __GenerateUrl(self, report_definition_id=None):
@@ -265,13 +264,11 @@ class ReportDownloader(object):
       url.append(REPORT_ID % report_definition_id)
     return ''.join(url)
 
-  def __GenerateHeaders(self, return_micros, url):
+  def __GenerateHeaders(self, return_micros):
     """Generates the headers to use for the report download.
 
     Args:
       return_micros: bool whether or not to use micros for money.
-      url: str URL the report will be downloaded from, needed if OAuth is
-           enabled.
 
     Returns:
       dict Dictionary containing all the headers for the request
@@ -281,14 +278,7 @@ class ReportDownloader(object):
       headers['clientCustomerId'] = self._headers['clientCustomerId']
 
     # Handle OAuth (if enabled) and ClientLogin
-    if self._headers.get('oauth_credentials'):
-      signedrequestparams = (self._config['oauth_handler']
-          .GetSignedRequestParameters(self._headers['oauth_credentials'],
-                                      self._op_config['server'] + url))
-      headers['Authorization'] = ('OAuth ' +
-          self._config['oauth_handler']
-          .FormatParametersForHeader(signedrequestparams))
-    elif self._headers.get('oauth2credentials'):
+    if self._headers.get('oauth2credentials'):
       self._headers['oauth2credentials'].apply(headers)
     else:
       headers['Authorization'] = ('GoogleLogin %s' %
@@ -355,12 +345,7 @@ class ReportDownloader(object):
           response = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()),
                                    mode='rb')
         error = response.read()
-        if self._op_config['version'] <= 'v201206':
-          match = re.search(OLD_ERROR_REGEX, error)
-          if match:
-            error = match.group(3)
-        else:
-          self.__CheckForXmlError(response_code, error)
+        self.__CheckForXmlError(response_code, error)
         raise AdWordsError('%s %s' % (str(e), error))
       except urllib2.URLError, e:
         response = e
@@ -386,12 +371,11 @@ class ReportDownloader(object):
 
   def __ReloadAuthToken(self):
     """Ensures we have a valid auth_token in our headers."""
+    # Do not need an AuthToken if OAuth is enabled.
+    if self._headers.get('oauth2credentials'): return
     # Load/set authentication token. If authentication token has expired,
     # regenerate it.
     now = time.time()
-    # Do not need an AuthToken if OAuth is enabled.
-    if (self._headers.get('oauth_credentials') or
-        self._headers.get('oauth2credentials')): return
     if (('authToken' not in self._headers and
          'auth_token_epoch' not in self._config) or
         int(now - self._config['auth_token_epoch']) >= AUTH_TOKEN_EXPIRE):

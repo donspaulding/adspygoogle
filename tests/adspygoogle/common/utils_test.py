@@ -26,6 +26,11 @@ sys.path.insert(0, os.path.join('..', '..', '..'))
 from adspygoogle.common import Utils
 
 
+# Location of a cached 502 to parse.
+BUFFER_FILE_LOCATION = os.path.join('data', 'http_error_502.html')
+TEST_502 = open(BUFFER_FILE_LOCATION).read()
+
+
 class UtilsTest(unittest.TestCase):
 
   """Tests for the adspygoogle.common.Utils module."""
@@ -76,6 +81,14 @@ class UtilsTest(unittest.TestCase):
     """Tests the BoolTypeConvert function."""
     self.assertRaises(LookupError, Utils.BoolTypeConvert, '3')
     self.assertRaises(LookupError, Utils.BoolTypeConvert, u'Yessum')
+
+  def testGetErrorFromHtml(self):
+    """Test whether we can handle and report 502 errors."""
+    trigger_msg = ('502 Server Error. The server encountered a temporary error'
+                   ' and could not complete yourrequest. Please try again in 30'
+                   ' seconds.')
+
+    self.assertEqual(trigger_msg, Utils.GetErrorFromHtml(TEST_502))
 
 
 if __name__ == '__main__':

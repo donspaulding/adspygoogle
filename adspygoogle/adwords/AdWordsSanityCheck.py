@@ -21,13 +21,11 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 from adspygoogle.common.Errors import ValidationError
 
 DEPRECATED_AFTER = {
-    'BulkMutateJobService': 'v201206',
     'InfoService': 'v201209'
 }
 
 # A map of the supported servers for each version.
 _VERSION_SERVER_MAP = {
-    'v201206': ('https://adwords.google.com',),
     'v201209': ('https://adwords.google.com',),
     'v201302': ('https://adwords.google.com',)
 }

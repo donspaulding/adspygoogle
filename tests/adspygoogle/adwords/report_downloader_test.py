@@ -26,8 +26,10 @@ import unittest
 import urllib2
 
 import mock
+from oauth2client.client import OAuth2Credentials
 
 from adspygoogle import AdWordsClient
+from adspygoogle.adwords import LIB_SIG
 from adspygoogle.adwords.AdWordsErrors import AdWordsError
 from adspygoogle.adwords.AdWordsErrors import AdWordsReportError
 from adspygoogle.adwords.util import XsdToWsdl
@@ -43,6 +45,14 @@ class ReportDownloaderTest(unittest.TestCase):
                                     'userAgent': ' ',
                                     'developerToken': ' '})
     self.service = client.GetReportDownloader()
+
+    credentials = OAuth2Credentials(
+        'ACCESS_TOKEN', 'client_id', 'client_secret', 'refresh_token', None,
+        'uri', 'user_agent')
+    client_oauth2 = AdWordsClient(headers={'oauth2credentials': credentials,
+                                           'userAgent': ' ',
+                                           'developerToken': ' '})
+    self.service_oauth2 = client_oauth2.GetReportDownloader()
 
   def _ThrowErrorFromMakeRequest(self, payload_contents):
     """A test helper function to mock receiving an error during __MakeRequest.
@@ -67,16 +77,6 @@ class ReportDownloaderTest(unittest.TestCase):
     urllib2.urlopen = mock.Mock(side_effect=RaiseMyError)
 
     self.service._ReportDownloader__MakeRequest('url', payload='nothing')
-
-  def testHandleLegacyError(self):
-    self.service._op_config['version'] = 'v201206'
-    error_message = ('AuthenticationError.CUSTOMER_NOT_FOUND @ ; '
-                     'trigger:\'6495984802\' Service[ReportInfoService.get]')
-    payload = '!!!2|||-1|||%s???' % error_message
-    try:
-      self._ThrowErrorFromMakeRequest(payload)
-    except AdWordsError, e:
-      self.assertTrue(error_message in str(e))
 
   def testHandleXmlError(self):
     self.service._op_config['version'] = 'v201209'
@@ -120,6 +120,25 @@ class ReportDownloaderTest(unittest.TestCase):
   def testCheckForXmlError_noError(self):
     self.service._ReportDownloader__CheckForXmlError(
         '400', 'This is not an error XML message')
+
+  def testGenerateHeaders_oAuth2(self):
+    expected_headers = {
+        'User-Agent': ' %s,gzip' % LIB_SIG,
+        'Authorization': 'Bearer ACCESS_TOKEN',
+        'returnMoneyInMicros': 'false',
+        'developerToken': ' ',
+        'Content-Encoding': 'gzip',
+        'Accept-Encoding': 'gzip'
+    }
+
+    self.assertEqual(
+        expected_headers,
+        self.service_oauth2._ReportDownloader__GenerateHeaders(False))
+
+  def testReloadAuthToken_oAuth2(self):
+    with mock.patch('time.time') as mock_time:
+      self.service_oauth2._ReportDownloader__ReloadAuthToken()
+      self.assertFalse(mock_time.called)
 
 
 if __name__ == '__main__':

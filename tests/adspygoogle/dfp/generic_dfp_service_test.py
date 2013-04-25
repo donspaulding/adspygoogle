@@ -29,7 +29,7 @@ from adspygoogle.dfp.DfpErrors import DfpError
 from adspygoogle.dfp.GenericDfpService import GenericDfpService
 
 
-class UtilsTest(unittest.TestCase):
+class GenericDfpServiceTest(unittest.TestCase):
 
   """Tests for the adspygoogle.dfp.GenericDfpService module."""
 
