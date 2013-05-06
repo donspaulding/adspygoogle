@@ -2,6 +2,9 @@
 - Removing support for v201206.
 - Removing support for OAuth 1.0a. (Please use OAuth 2.0)
 - Added examples for shared sets.
+- Added support and examples for AdGroupBidModifierService.
+- Added an example for upgrading legacy sitelinks.
+- Moved the set_campaign_enhanced.py example into the migration folder.
 
 15.7.1:
 - Bumped the common library version to 3.0.12. Error parsing now works correctly

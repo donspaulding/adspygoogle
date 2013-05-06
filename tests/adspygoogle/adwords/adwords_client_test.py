@@ -207,6 +207,11 @@ class AdWordsClientServiceTest(unittest.TestCase):
       service = self.client.GetSharedCriterionService()
       self.assertEquals('SharedCriterionService', service._service_name)
 
+  def testGetAdGroupBidModifierService(self):
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = self.client.GetAdGroupBidModifierService()
+      self.assertEquals('AdGroupBidModifierService', service._service_name)
+
 
 if __name__ == '__main__':
   unittest.main()

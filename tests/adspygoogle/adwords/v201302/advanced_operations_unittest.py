@@ -23,10 +23,12 @@ import sys
 sys.path.insert(0, os.path.join('..', '..', '..', '..'))
 import unittest
 
+from examples.adspygoogle.adwords.v201302.advanced_operations import add_ad_group_bid_modifier
 from examples.adspygoogle.adwords.v201302.advanced_operations import add_click_to_download_ad
 from examples.adspygoogle.adwords.v201302.advanced_operations import add_site_links
 from examples.adspygoogle.adwords.v201302.advanced_operations import create_and_attach_shared_keyword_set
 from examples.adspygoogle.adwords.v201302.advanced_operations import find_and_remove_criteria_from_shared_set
+from examples.adspygoogle.adwords.v201302.advanced_operations import get_ad_group_bid_modifier
 from tests.adspygoogle.adwords import client
 from tests.adspygoogle.adwords import util
 from tests.adspygoogle.adwords import SERVER_V201302
@@ -61,6 +63,10 @@ class AdvancedOperations(unittest.TestCase):
     """Tests whether we can create, attach, and remove a shared keyword set."""
     create_and_attach_shared_keyword_set.main(client, self.campaign_id)
     find_and_remove_criteria_from_shared_set.main(client, self.campaign_id)
+
+  def testAddAndRetrieveAdGroupBidModifier(self):
+    add_ad_group_bid_modifier.main(client, self.ad_group_id, '1.5')
+    get_ad_group_bid_modifier.main(client)
 
 
 if __name__ == '__main__':
