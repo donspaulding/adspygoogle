@@ -1,3 +1,15 @@
+3.1.0:
+- Support for OAuth 2.0 has been improved and is now the preferred way of
+  authenticating. Using ClientLogin will result in DeprecationWarnings. You can
+  turn off these warnings - see README.common for instructions.
+- OAuth 2.0 credentials will now be automatically refreshed before they expire.
+- Added a utilty script in the scripts/common/ folder which can be used to
+  generate reusable OAuth 2.0 refresh tokens.
+- Switched the AuthToken module to use urllib2.urlopen instead of
+  urllib.urlopen. This resolves issue 69.
+- Instances of GenericApiService will no longer share the same SOAPpy.SOAPConfig
+  object. This resolves issue 67.
+
 3.0.12:
 - The fix for issue 51 caused problems for fault parsing in other places. It has
   been replaced with a better fix.

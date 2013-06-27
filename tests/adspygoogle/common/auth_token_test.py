@@ -24,15 +24,16 @@ sys.path.insert(0, os.path.join('..', '..', '..'))
 
 import StringIO
 import unittest
-import urllib
+import urllib2
 import urlparse
+import warnings
 
 from adspygoogle.common import AuthToken
 from adspygoogle.common.Errors import AuthTokenError
 from adspygoogle.common.Errors import CaptchaError
 
 
-OLD_URLLIB_URLOPEN = urllib.urlopen
+OLD_URLLIB_URLOPEN = urllib2.urlopen
 
 
 class AuthTokenTest(unittest.TestCase):
@@ -40,28 +41,28 @@ class AuthTokenTest(unittest.TestCase):
   """Tests for the adspygoogle.common.AuthToken module."""
 
   def tearDown(self):
-    urllib.urlopen = OLD_URLLIB_URLOPEN
+    urllib2.urlopen = OLD_URLLIB_URLOPEN
 
   def CreateFakeUrlopen(self, expected_url, expected_data, response_to_return,
                         error=None):
-    """Creates a mock of the urllib.urlopen function.
+    """Creates a mock of the urllib2.urlopen function.
 
     Args:
-      expected_url: str The expected URL handed to urllib.urlopen.
+      expected_url: str The expected URL handed to urllib2.urlopen.
       expected_data: dict The expected values in the query string handed to
-                    urllib.urlopen.
+                    urllib2.urlopen.
       response_to_return: file A file-like object which is the response returned
-                          from our mock of urllib.urlopen
+                          from our mock of urllib2.urlopen
       error: Error An error that should be raised instead of completing
              successfully. If an error is provided, it will override any
              response_to_return provided.
 
     Returns:
-      function A mock of the urllib.urlopen function.
+      function A mock of the urllib2.urlopen function.
     """
 
     def FakeUrlopen(url, data):
-      """Mock of the urllib.urlopen function."""
+      """Mock of the urllib2.urlopen function."""
       self.assertEqual(url, expected_url)
       data = urlparse.parse_qs(data)
       self.assertEquals(len(data.keys()), len(expected_data))
@@ -98,8 +99,8 @@ class AuthTokenTest(unittest.TestCase):
         'accountType': 'GOOGLE'
     }
 
-    urllib.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
-                                            fake_client_login_response)
+    urllib2.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
+                                             fake_client_login_response)
 
     token = AuthToken.AuthToken(email, password, service, lib_sig, proxy)
 
@@ -134,8 +135,8 @@ class AuthTokenTest(unittest.TestCase):
         'logincaptcha': login_captcha
     }
 
-    urllib.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
-                                            fake_client_login_response)
+    urllib2.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
+                                             fake_client_login_response)
 
     token = AuthToken.AuthToken(email, password, service, lib_sig, proxy,
                                 login_token, login_captcha)
@@ -168,8 +169,8 @@ class AuthTokenTest(unittest.TestCase):
         'accountType': 'GOOGLE'
     }
 
-    urllib.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
-                                            fake_client_login_response)
+    urllib2.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
+                                             fake_client_login_response)
 
     try:
       AuthToken.AuthToken(email, password, service, lib_sig, proxy)
@@ -200,8 +201,8 @@ class AuthTokenTest(unittest.TestCase):
         'accountType': 'GOOGLE'
     }
 
-    urllib.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
-                                            fake_client_login_response)
+    urllib2.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
+                                             fake_client_login_response)
 
     try:
       AuthToken.AuthToken(email, password, service, lib_sig, proxy)
@@ -232,8 +233,8 @@ class AuthTokenTest(unittest.TestCase):
         'accountType': 'GOOGLE'
     }
 
-    urllib.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
-                                            fake_client_login_response)
+    urllib2.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
+                                             fake_client_login_response)
 
     try:
       AuthToken.AuthToken(email, password, service, lib_sig, proxy)
@@ -262,8 +263,8 @@ class AuthTokenTest(unittest.TestCase):
         'accountType': 'GOOGLE'
     }
 
-    urllib.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
-                                            fake_client_login_response)
+    urllib2.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
+                                             fake_client_login_response)
 
     try:
       AuthToken.AuthToken(email, password, service, lib_sig, proxy)
@@ -291,7 +292,7 @@ class AuthTokenTest(unittest.TestCase):
         'accountType': 'GOOGLE'
     }
 
-    urllib.urlopen = self.CreateFakeUrlopen(
+    urllib2.urlopen = self.CreateFakeUrlopen(
         expected_url, expected_data, None, error=expected_error)
 
     try:
@@ -299,6 +300,40 @@ class AuthTokenTest(unittest.TestCase):
       self.fail('Exception should have been thrown.')
     except AuthTokenError, e:
       self.assertEqual(e.msg, expected_error)
+
+  def testDeprecationWarning(self):
+    """Ensure that the DeprecationWarning is thrown."""
+    fake_sid = '1a2b3c45'
+    fake_lsid = '2b3c4e56'
+    fake_auth = '3c4d5e67'
+    fake_client_login_response = StringIO.StringIO(
+        ''.join(['SID=', fake_sid, '\nLSID=', fake_lsid, '\nAuth=', fake_auth]))
+
+    email = 'api.jdilallo@gmail.com'
+    password = 'fake_password'
+    service = 'adwords'
+    lib_sig = 'AwApi-Python-15.3.0 (Python 2.6)'
+    proxy = None
+
+    expected_url = 'https://www.google.com/accounts/ClientLogin'
+    expected_data = {
+        'Email': email,
+        'Passwd': password,
+        'service': service,
+        'source': 'Google-%s' % lib_sig,
+        'accountType': 'GOOGLE'
+    }
+
+    urllib2.urlopen = self.CreateFakeUrlopen(expected_url, expected_data,
+                                             fake_client_login_response)
+
+    with warnings.catch_warnings(record=True) as captured_warnings:
+      AuthToken.AuthToken(email, password, service, lib_sig, proxy)
+
+      self.assertEqual(len(captured_warnings), 1)
+      warning = captured_warnings[0]
+      self.assertTrue(issubclass(warning.category, DeprecationWarning))
+      self.assertEqual(str(warning.message), AuthToken._DEPRECATION_WARNING)
 
 
 if __name__ == '__main__':

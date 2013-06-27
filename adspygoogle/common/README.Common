@@ -82,11 +82,29 @@ take advantage of. They include:
   xml_parser, debug, xml_log, and request_log.
 
 
+How do I silence DeprecationWarnings?
+-------------------------------------
+Using ClientLogin or legacy DFA passwords will result in DeprecationWarnings. If
+you would like to silence these warnings, you can do so by adding the following
+to your code:
+
+  import warnings
+  warnings.simplefilter('ignore', DeprecationWarning)
+
+You should update your application to use OAuth 2.0 at your earliest
+convenience.
+
+
 Where do I submit bug reports and/or feature requests?
 ---------------------------------------------------
 
-Use the issue tracker at
-http://code.google.com/p/google-api-ads-python/issues/list.
+Use the issue tracker at:
+  http://code.google.com/p/google-api-ads-python/issues/list.
+
+Make sure to subscribe to our Google Plus page for API change announcements and
+other news:
+
+  https://plus.google.com/+GoogleAdsDevelopers
 
 
 External Dependencies:
@@ -101,6 +119,8 @@ External Dependencies:
                            (part of the Python v2.5+)
                            or
       lxml v2.2+           -- http://codespeak.net/lxml/index.html
+    - oauth2client         -- http://code.google.com/p/google-api-python-client/downloads/list
+                           (only if using oauth2)
     - Epydoc               -- http://epydoc.sourceforge.net/
                            (only if you will be generating docs)
 

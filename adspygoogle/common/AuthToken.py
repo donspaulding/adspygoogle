@@ -21,9 +21,14 @@ __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 import os
 import urllib
 import urllib2
+import warnings
 
 from adspygoogle.common.Errors import AuthTokenError
 from adspygoogle.common.Errors import CaptchaError
+
+
+_DEPRECATION_WARNING = 'ClientLogin is deprecated. Please use OAuth 2.0'
+warnings.filterwarnings('always', _DEPRECATION_WARNING, DeprecationWarning)
 
 
 class AuthToken(object):
@@ -62,6 +67,7 @@ class AuthToken(object):
 
   def __Login(self):
     """Fetch Auth token and SID, LSID cookies from Google Account auth."""
+    warnings.warn(_DEPRECATION_WARNING, DeprecationWarning, stacklevel=5)
     if self.__proxy: os.environ['http_proxy'] = self.__proxy
     url = 'https://www.google.com/accounts/ClientLogin'
     data = [('Email', self.__email),
@@ -73,7 +79,7 @@ class AuthToken(object):
       data.append(('logintoken', self.__login_token))
       data.append(('logincaptcha', self.__login_captcha))
     try:
-      fh = urllib.urlopen(url, urllib.urlencode(data))
+      fh = urllib2.urlopen(url, urllib.urlencode(data))
       data = self.__ParseResponse(fh)
       try:
         if 'SID' in data or 'LSID' in data or 'Auth' in data:

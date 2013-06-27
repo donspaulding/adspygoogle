@@ -18,6 +18,8 @@
 
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
+import warnings
+
 from adspygoogle import SOAPpy
 from adspygoogle.common import Utils
 from adspygoogle.common.Errors import Error
@@ -32,6 +34,11 @@ from adspygoogle.dfa.DfaErrors import DfaAuthenticationError
 from adspygoogle.dfa.DfaSoapBuffer import DfaSoapBuffer
 
 
+_DEPRECATION_WARNING = ('Legacy DFA passwords are deprecated. Please use '
+                        'OAuth 2.0')
+warnings.filterwarnings('always', _DEPRECATION_WARNING, DeprecationWarning)
+
+
 class GenericDfaService(GenericApiService):
 
   """Wrapper for any DFA web service."""
@@ -40,8 +47,11 @@ class GenericDfaService(GenericApiService):
   # in an extra layer of XML element tags.
   _WRAP_LISTS = True
   # The _BUFFER_CLASS is the subclass of SoapBuffer that should be used to track
-  # all SOAP interactions
+  # all SOAP interactions.
   _BUFFER_CLASS = DfaSoapBuffer
+  # The _TOKEN_EXPIRED_ERROR_MESSAGE is returned by the DFA API when a DFA token
+  # needs to be refreshed.
+  _TOKEN_EXPIRED_ERROR_MESSAGE = 'Authentication token has expired.'
 
   def __init__(self, headers, config, op_config, lock, logger, service_name):
     """Inits GenericDfaService.
@@ -73,12 +83,38 @@ class GenericDfaService(GenericApiService):
     }
     self._soappyservice.soapproxy.methodattrs = methodattrs
 
+  def _WrapSoapCall(self, soap_call_function):
+    """Gives the service a chance to wrap a call in a product-specific function.
+
+    DFA uses this function to listen for expired DDMM tokens and refresh them.
+    Calls which fail due to expired tokens will be retried.
+
+    Args:
+      soap_call_function: function The function to make a SOAP call.
+
+    Returns:
+      function A new function wrapping the input function which listens for
+      token expired errors and retries the failed call.
+    """
+
+    def RefreshTokenIfExpired(*args, **kargs):
+      try:
+        return soap_call_function(*args, **kargs)
+      except DfaAuthenticationError, e:
+        if e.message == self._TOKEN_EXPIRED_ERROR_MESSAGE:
+          self._GenerateToken()
+          return soap_call_function(*args, **kargs)
+        else:
+          raise e
+
+    return RefreshTokenIfExpired
+
   def _SetHeaders(self):
     """Sets the SOAP headers for this service's requests."""
     soap_headers = SOAPpy.Types.headerType()
     if self._service_name != 'login':
       if 'AuthToken' not in self._headers or not self._headers['AuthToken']:
-        self.__GenerateToken()
+        self._GenerateToken()
       wsse_header = SOAPpy.Types.structType(
           data={
               'UsernameToken': {
@@ -100,14 +136,8 @@ class GenericDfaService(GenericApiService):
     DFA overrides the default implementation because only the login service
     should have this header.
     """
-    if self._service_name == 'login' and self._headers.get('oauth2credentials'):
-      self._headers['oauth2credentials'].apply(
-          self._soappyservice.soapproxy.transport.additional_headers)
-    else:
-      if ('Authorization' in
-          self._soappyservice.soapproxy.transport.additional_headers):
-        del self._soappyservice.soapproxy.transport.additional_headers[
-            'Authorization']
+    if self._service_name == 'login':
+      super(GenericDfaService, self)._ReadyOAuth()
 
   def _GetMethodInfo(self, method_name):
     """Pulls all of the relevant data about a method from a SOAPpy service.
@@ -208,6 +238,9 @@ class GenericDfaService(GenericApiService):
         # Raise a specific error, subclass of DfaApiError.
         if fault['detail'] is None: del fault['detail']
         if 'detail' in fault:
+          if ('google' in fault['detail'] and
+              'doubleclick' not in fault['detail']):
+            fault['detail']['doubleclick'] = fault['detail']['google']
           if ('doubleclick' in fault['detail'] and
               'errorCode' in fault['detail']['doubleclick']):
             code = int(fault['detail']['doubleclick']['errorCode'])
@@ -223,7 +256,7 @@ class GenericDfaService(GenericApiService):
       if error: e = error
       raise Error(e)
 
-  def __GenerateToken(self):
+  def _GenerateToken(self):
     """Attempts to generate a token for the WSSE security header.
 
     Raises:
@@ -232,6 +265,8 @@ class GenericDfaService(GenericApiService):
     """
     if ('Username' in self._headers and
         ('Password' in self._headers or 'oauth2credentials' in self._headers)):
+      if not self._headers.get('oauth2credentials'):
+        warnings.warn(_DEPRECATION_WARNING, DeprecationWarning, stacklevel=5)
       # Ensure the 'raw_response' config value is off while generating tokens.
       old_raw_response = self._config['raw_response']
       self._config['raw_response'] = 'n'

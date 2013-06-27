@@ -18,6 +18,7 @@
 
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
+import datetime
 import os
 import sys
 import unittest
@@ -117,6 +118,80 @@ class GenericApiServiceTest(unittest.TestCase):
 
       mock_https.endheaders.assert_called_once_with()
       mock_https.send.assert_called_once_with(message)
+
+  def testReadyOAuth_usingOAuth_refresh(self):
+    credentials = mock.Mock()
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = ConcreteGenericApiService(
+          {'oauth2credentials': credentials},
+          {'xml_parser': '2', 'pretty_xml': 'y', 'wrap_in_tuple': 'y'},
+          {'http_proxy': None, 'server': 'www.myurl.com'}, mock.Mock(),
+          mock.Mock(), '', '', True, '', '', '')
+
+    rvals = {
+        'token_expiry': datetime.datetime(1980, 1, 1, 12)
+    }
+    credentials.configure_mock(**rvals)
+
+    service._ReadyOAuth()
+
+    credentials.refresh.assert_called_once_with(mock.ANY)
+    credentials.apply.assert_called_once_with(mock.ANY)
+
+  def testReadyOAuth_usingOAuth_noRefresh(self):
+    credentials = mock.Mock()
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = ConcreteGenericApiService(
+          {'oauth2credentials': credentials},
+          {'xml_parser': '2', 'pretty_xml': 'y', 'wrap_in_tuple': 'y'},
+          {'http_proxy': None, 'server': 'www.myurl.com'}, mock.Mock(),
+          mock.Mock(), '', '', True, '', '', '')
+
+    rvals = {
+        'token_expiry': datetime.datetime.utcnow() + datetime.timedelta(hours=5)
+    }
+    credentials.configure_mock(**rvals)
+
+    service._ReadyOAuth()
+
+    self.assertFalse(credentials.refresh.called)
+    credentials.apply.assert_called_once_with(mock.ANY)
+
+  def testRefreshCredentialIfNecessary_refresh(self):
+    credentials = mock.Mock()
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = ConcreteGenericApiService(
+          {'oauth2credentials': credentials},
+          {'xml_parser': '2', 'pretty_xml': 'y', 'wrap_in_tuple': 'y'},
+          {'http_proxy': None, 'server': 'www.myurl.com'}, mock.Mock(),
+          mock.Mock(), '', '', True, '', '', '')
+
+    rvals = {
+        'token_expiry': datetime.datetime(1980, 1, 1, 12)
+    }
+    credentials.configure_mock(**rvals)
+
+    service._RefreshCredentialIfNecessary(credentials)
+
+    credentials.refresh.assert_called_once_with(mock.ANY)
+
+  def testRefreshCredentialIfNecessary_noRefresh(self):
+    credentials = mock.Mock()
+    with mock.patch('adspygoogle.SOAPpy.WSDL.Proxy'):
+      service = ConcreteGenericApiService(
+          {'oauth2credentials': credentials},
+          {'xml_parser': '2', 'pretty_xml': 'y', 'wrap_in_tuple': 'y'},
+          {'http_proxy': None, 'server': 'www.myurl.com'}, mock.Mock(),
+          mock.Mock(), '', '', True, '', '', '')
+
+    rvals = {
+        'token_expiry': datetime.datetime.utcnow() + datetime.timedelta(hours=5)
+    }
+    credentials.configure_mock(**rvals)
+
+    service._RefreshCredentialIfNecessary(credentials)
+
+    self.assertFalse(credentials.refresh.called)
 
 
 if __name__ == '__main__':

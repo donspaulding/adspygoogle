@@ -2,15 +2,15 @@
 <!-- Generated file, do not edit -->
 <!-- Copyright 2013 Google Inc. All Rights Reserved -->
 <wsdl:definitions
-  targetNamespace="https://www.google.com/apis/ads/publisher/v201302"
-  xmlns:tns="https://www.google.com/apis/ads/publisher/v201302"
+  targetNamespace="https://www.google.com/apis/ads/publisher/%(version)s"
+  xmlns:tns="https://www.google.com/apis/ads/publisher/%(version)s"
   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
   xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <wsdl:types>
     <schema elementFormDefault="qualified" jaxb:version="1.0"
-      targetNamespace="https://www.google.com/apis/ads/publisher/v201302"
+      targetNamespace="https://www.google.com/apis/ads/publisher/%(version)s"
       xmlns="http://www.w3.org/2001/XMLSchema"
-      xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="https://www.google.com/apis/ads/publisher/v201302">
+      xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="https://www.google.com/apis/ads/publisher/%(version)s">
       <annotation>
         <appinfo>
           <jaxb:globalBindings typesafeEnumMaxMembers="999999"/>
@@ -59,7 +59,7 @@
           <documentation>
             The API error base class that provides details about an error that occurred
             while processing a service request.
-            
+
             &lt;p&gt;The OGNL field path is provided for parsers to identify the request data
             element that may have caused the error.&lt;/p&gt;
           </documentation>
@@ -588,7 +588,7 @@
         <annotation>
           <documentation>
             The credentials for the {@code ClientLogin} API authentication protocol.
-            
+
             See {@link http://code.google.com/apis/accounts/docs/AuthForInstalledApps.html}.
           </documentation>
         </annotation>
@@ -892,7 +892,7 @@
                     The value for this field. The appropriate type of {@code Value} is
                     determined by the {@link CustomField#dataType} of the {@code CustomField}
                     that this conforms to.
-                    
+
                     &lt;table&gt;
                     &lt;tr&gt;&lt;th&gt;{@link CustomFieldDataType}&lt;/th&gt;&lt;th&gt;{@link Value} type&lt;/th&gt;&lt;/tr&gt;
                     &lt;tr&gt;&lt;td&gt;{@link CustomFieldDataType#STRING STRING}&lt;/td&gt;&lt;td&gt;{@link TextValue}&lt;/td&gt;&lt;/tr&gt;
@@ -2022,7 +2022,7 @@
                 &lt;td&gt;16&lt;/td&gt;&lt;td&gt;15&lt;/td&gt;&lt;td&gt;16&lt;/td&gt;
                 &lt;/tr&gt;
                 &lt;/table&gt;
-                
+
                 This field can only be edited by certain networks, otherwise a
                 {@link PermissionError} will occur.
               </documentation>
@@ -2680,7 +2680,7 @@
         <annotation>
           <documentation>
             The credentials for the {@code OAuth} authentication protocol.
-            
+
             See {@link http://oauth.net/}.
           </documentation>
         </annotation>
@@ -3431,7 +3431,7 @@
                 The resulting custom targeting tree would be of the form:
                 &lt;/p&gt;
                 &lt;br/&gt;
-                &lt;img src="http://chart.apis.google.com/chart?cht=gv&amp;chl=digraph{customTargeting_LogicalOperator_OR-%3ECustomCriteriaSet_LogicalOperator_AND_1-%3ECustomCriteria_1;CustomCriteriaSet_LogicalOperator_AND_1-%3Eellipsis1;customTargeting_LogicalOperator_OR-%3Eellipsis2;ellipsis1[label=%22...%22,shape=none,fontsize=32];ellipsis2[label=%22...%22,shape=none,fontsize=32]}&amp;chs=450x200"/&gt;
+                &lt;img src="http://chart.apis.google.com/chart?cht=gv&amp;chl=digraph{"/&gt;
               </documentation>
             </annotation>
           </element>
@@ -7064,7 +7064,7 @@
         <annotation>
           <documentation>
             Creates a new {@link LineItem}.
-            
+
             These fields are required:
             &lt;ul&gt;
             &lt;li&gt;{@link LineItem#costPerUnit}&lt;/li&gt;
@@ -7078,7 +7078,7 @@
             &lt;li&gt;{@link LineItem#creativePlaceholders}&lt;/li&gt;
             &lt;li&gt;{@link LineItem#targeting}&lt;/li&gt;
             &lt;/ul&gt;
-            
+
             @param lineItem the line item to create
             @return the line item with its ID filled in
           </documentation>
@@ -7107,7 +7107,7 @@
         <annotation>
           <documentation>
             Creates new {@link LineItem} objects.
-            
+
             @param lineItems the line items to create
             @return the created line items with their IDs filled in
           </documentation>
@@ -7130,7 +7130,7 @@
         <annotation>
           <documentation>
             Returns the {@link LineItem} uniquely identified by the given ID.
-            
+
             @param lineItemId the ID of the line item, which must already exist
             @return the {@code LineItem} uniquely identified by the given ID
           </documentation>
@@ -7154,7 +7154,7 @@
             Gets a {@link LineItemPage} of {@link LineItem} objects that satisfy the
             given {@link Statement#query}. The following fields are supported for
             filtering:
-            
+
             &lt;table&gt;
             &lt;tr&gt;
             &lt;th scope="col"&gt;PQL Property&lt;/th&gt; &lt;th scope="col"&gt;Object Property&lt;/th&gt;
@@ -7200,7 +7200,7 @@
             &lt;td&gt;{@link LineItem#creationDateTime}&lt;/td&gt;
             &lt;/tr&gt;
             &lt;/table&gt;
-            
+
             @param filterStatement a Publisher Query Language statement used to filter
             a set of line items.
             @return the line items that match the given filter
@@ -7224,7 +7224,7 @@
           <documentation>
             Performs actions on {@link LineItem} objects that match the given
             {@link Statement#query}.
-            
+
             @param lineItemAction the action to perform
             @param filterStatement a Publisher Query Language statement used to filter
             a set of line items
@@ -7249,7 +7249,7 @@
         <annotation>
           <documentation>
             Updates the specified {@link LineItem}.
-            
+
             @param lineItem the line item to update
             @return the updated line item
           </documentation>
@@ -7271,7 +7271,7 @@
         <annotation>
           <documentation>
             Updates the specified {@link LineItem} objects.
-            
+
             @param lineItems the line items to update
             @return the updated line items
           </documentation>
@@ -7349,16 +7349,16 @@
     <wsdl:documentation>
       Provides methods for creating, updating and retrieving {@link LineItem}
       objects.
-      
+
       &lt;p&gt;Line items define the campaign. For example, line items define:
       &lt;ul&gt;
       &lt;li&gt;a budget
       &lt;li&gt;a span of time to run
       &lt;li&gt;ad unit targeting
       &lt;/ul&gt;
-      
+
       &lt;p&gt;In short, line items connect all of the elements of an ad campaign.
-      
+
       &lt;p&gt;Line items and creatives can be associated with each other through
       {@link LineItemCreativeAssociation} objects. An ad unit will host a creative
       through both this association and the {@link LineItem#targeting} to it.
@@ -7366,7 +7366,7 @@
     <wsdl:operation name="createLineItem">
       <wsdl:documentation>
         Creates a new {@link LineItem}.
-        
+
         These fields are required:
         &lt;ul&gt;
         &lt;li&gt;{@link LineItem#costPerUnit}&lt;/li&gt;
@@ -7380,7 +7380,7 @@
         &lt;li&gt;{@link LineItem#creativePlaceholders}&lt;/li&gt;
         &lt;li&gt;{@link LineItem#targeting}&lt;/li&gt;
         &lt;/ul&gt;
-        
+
         @param lineItem the line item to create
         @return the line item with its ID filled in
       </wsdl:documentation>
@@ -7391,7 +7391,7 @@
     <wsdl:operation name="createLineItems">
       <wsdl:documentation>
         Creates new {@link LineItem} objects.
-        
+
         @param lineItems the line items to create
         @return the created line items with their IDs filled in
       </wsdl:documentation>
@@ -7402,7 +7402,7 @@
     <wsdl:operation name="getLineItem">
       <wsdl:documentation>
         Returns the {@link LineItem} uniquely identified by the given ID.
-        
+
         @param lineItemId the ID of the line item, which must already exist
         @return the {@code LineItem} uniquely identified by the given ID
       </wsdl:documentation>
@@ -7415,7 +7415,7 @@
         Gets a {@link LineItemPage} of {@link LineItem} objects that satisfy the
         given {@link Statement#query}. The following fields are supported for
         filtering:
-        
+
         &lt;table&gt;
         &lt;tr&gt;
         &lt;th scope="col"&gt;PQL Property&lt;/th&gt; &lt;th scope="col"&gt;Object Property&lt;/th&gt;
@@ -7461,7 +7461,7 @@
         &lt;td&gt;{@link LineItem#creationDateTime}&lt;/td&gt;
         &lt;/tr&gt;
         &lt;/table&gt;
-        
+
         @param filterStatement a Publisher Query Language statement used to filter
         a set of line items.
         @return the line items that match the given filter
@@ -7474,7 +7474,7 @@
       <wsdl:documentation>
         Performs actions on {@link LineItem} objects that match the given
         {@link Statement#query}.
-        
+
         @param lineItemAction the action to perform
         @param filterStatement a Publisher Query Language statement used to filter
         a set of line items
@@ -7487,7 +7487,7 @@
     <wsdl:operation name="updateLineItem">
       <wsdl:documentation>
         Updates the specified {@link LineItem}.
-        
+
         @param lineItem the line item to update
         @return the updated line item
       </wsdl:documentation>
@@ -7498,7 +7498,7 @@
     <wsdl:operation name="updateLineItems">
       <wsdl:documentation>
         Updates the specified {@link LineItem} objects.
-        
+
         @param lineItems the line items to update
         @return the updated line items
       </wsdl:documentation>
@@ -7624,7 +7624,7 @@
   </wsdl:binding>
   <wsdl:service name="LineItemService">
     <wsdl:port binding="tns:LineItemServiceSoapBinding" name="LineItemServiceInterfacePort">
-      <wsdlsoap:address location="https://www.google.com/apis/ads/publisher/v201302/LineItemService"/>
+      <wsdlsoap:address location="https://www.google.com/apis/ads/publisher/%(version)s/LineItemService"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

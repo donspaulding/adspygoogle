@@ -18,6 +18,7 @@
 
 __author__ = 'api.sgrinberg@gmail.com (Stan Grinberg)'
 
+import datetime
 import os
 import pickle
 import warnings
@@ -46,6 +47,12 @@ _DEFAULT_CONFIG = {
     'access': '',
     'wrap_in_tuple': 'y'
 }
+
+# The _OAUTH_2_AUTH_KEYS are the keys in the authentication dictionary that are
+# used to construct an OAuth 2.0 credential.
+_OAUTH_2_AUTH_KEYS = set(['clientId', 'clientSecret', 'refreshToken'])
+# The web address for generating OAuth 2.0 credentials at Google.
+_GOOGLE_OAUTH2_ENDPOINT = 'https://accounts.google.com/o/oauth2/token'
 
 
 class Client(object):
@@ -92,6 +99,16 @@ class Client(object):
     if not auth:
       msg = 'Authentication data is missing.'
       raise ValidationError(msg)
+
+    if _OAUTH_2_AUTH_KEYS.issubset(set(auth.keys())):
+      from oauth2client.client import OAuth2Credentials
+      auth['oauth2credentials'] = OAuth2Credentials(
+          None, auth['clientId'], auth['clientSecret'], auth['refreshToken'],
+          datetime.datetime(1980, 1, 1, 12), _GOOGLE_OAUTH2_ENDPOINT,
+          'Google Ads* Python Client Library')
+      for auth_key in _OAUTH_2_AUTH_KEYS:
+        del auth[auth_key]
+
     return auth
 
   def _WriteUpdatedAuthValue(self, key, new_value):

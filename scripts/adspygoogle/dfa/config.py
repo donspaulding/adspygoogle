@@ -55,7 +55,8 @@ print """
 All requests to the non-LoginService that are sent to
 the DFA API web services must include SOAP header
 elements. Currently accepted header elements are
-Username and Password.
+Username and OAuth 2.0 access token. We use clientId,
+clientSecret, and refreshToken to enable this feature.
 
 To overwrite an existing header element, explicitly
 type new value (or 'none' to clear) at the prompt.
@@ -63,7 +64,14 @@ The default behavior is to keep old values.
 -~----------~----~----~----~------~----~------~--~---\n"""
 prompts = (('Your DFA account\'s username', 'Username',
             'auth'),
-           ('Login password', 'Password', 'auth'),
+           ('OAuth 2.0 client ID (retrieved from '
+            'code.google.com/apis/console under the API Access tab)',
+            'clientId', 'auth'),
+           ('OAuth 2.0 client secret (retrieved from '
+            'code.google.com/apis/console under the API Access tab)',
+            'clientSecret', 'auth'),
+           ('OAuth 2.0 refresh token (if you don\'t already have one, run '
+            'scripts/common/generate_refresh_token.py', 'refreshToken', 'auth'),
            ('Select XML parser [1=PyXML (recommended), 2=ElementTree]',
             'xml_parser', 'config'),
            ('Enable debugging mode', 'debug', 'config'),

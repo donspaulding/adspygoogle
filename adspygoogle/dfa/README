@@ -113,8 +113,13 @@ Step-by-step guide for accessing the DoubleClick network:
 Where do I submit bug reports and/or feature requests?
 ------------------------------------------------------
 
-Use the issue tracker at
-http://code.google.com/p/google-api-ads-python/issues/list.
+Use the issue tracker at:
+  http://code.google.com/p/google-api-ads-python/issues/list.
+
+Make sure to subscribe to our Google Plus page for API change announcements and
+other news:
+
+  https://plus.google.com/+GoogleAdsDevelopers
 
 
 External Dependencies:

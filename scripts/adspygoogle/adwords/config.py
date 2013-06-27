@@ -53,8 +53,12 @@ print """
 --~--~---------~--~----~------------~-------~--~----~
 All requests that are sent to the AdWords API web
 services must include SOAP header elements. Currently
-accepted header elements are email, password,
-clientCustomerId, userAgent, and developerToken.
+accepted header elements are clientCustomerId, userAgent,
+and developerToken.
+
+All requests must use OAuth 2.0 for authentication. We
+use clientId, clientSecret, and refreshToken to enable
+this feature.
 
 For the userAgent header, the client library name
 and its version is automatically prefixed. Supply
@@ -65,8 +69,14 @@ To overwrite an existing header element, explicitly
 type new value (or 'none' to clear) at the prompt.
 The default behavior is to keep old values.
 -~----------~----~----~----~------~----~------~--~---\n"""
-prompts = (('Your AdWords account\'s login email', 'email', 'auth'),
-           ('Login password', 'password', 'auth'),
+prompts = (('OAuth 2.0 client ID (retrieved from '
+            'code.google.com/apis/console under the API Access tab)',
+            'clientId', 'auth'),
+           ('OAuth 2.0 client secret (retrieved from '
+            'code.google.com/apis/console under the API Access tab)',
+            'clientSecret', 'auth'),
+           ('OAuth 2.0 refresh token (if you don\'t already have one, run '
+            'scripts/common/generate_refresh_token.py', 'refreshToken', 'auth'),
            ('Login client customer id', 'clientCustomerId', 'auth'),
            ('User agent', 'userAgent', 'auth'),
            ('Developer token', 'developerToken', 'auth'),

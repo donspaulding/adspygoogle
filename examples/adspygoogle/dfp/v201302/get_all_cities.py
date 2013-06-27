@@ -44,18 +44,17 @@ pql_service = client.GetService(
 # For criteria that do not have a "targetable" property, that predicate
 # may be left off, i.e. just "SELECT * FROM Browser_Groups LIMIT 500"
 select_statement = {'query':
-                    'SELECT * FROM Country WHERE targetable = true LIMIT 500'}
+                    'SELECT * FROM City WHERE targetable = true LIMIT 500'}
 
 # Get cities by statement.
 result_set = pql_service.Select(select_statement)[0]
 
 # Display results.
 if result_set:
-  column_labels = [label.values()[0] for label in result_set['columnTypes']]
+  column_labels = [label['labelName'] for label in result_set['columnTypes']]
   print 'Columns are: %s' % ', '.join(column_labels)
   for row in result_set['rows']:
-    values = [value.values()[1] for value in row['values']
-              if len(value.values()) > 1]
-    print 'Values are: %s' % ', '.join(values)
+    values = [value.get('value', '') for value in row['values']]
+    print 'Values are: %s' % ', '.join(values).encode('utf-8')
 else:
   print 'No results found.'

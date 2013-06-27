@@ -40,7 +40,7 @@ class ClientTest(unittest.TestCase):
     """Initialize a Client to test with."""
     self.client = Client()
 
-  def testLoadAuthCredentials(self):
+  def testLoadAuthCredentials_ClientLogin(self):
     """Tests the _LoadAuthCredentials function."""
     _, filename = tempfile.mkstemp()
     auth_credentials = {
@@ -50,9 +50,40 @@ class ClientTest(unittest.TestCase):
     with open(filename, 'w') as handle:
       pickle.dump(auth_credentials, handle)
 
-    Client.auth_pkl = filename
-    self.assertEqual(self.client._LoadAuthCredentials(), auth_credentials)
-    Client.auth_pkl = ''
+    try:
+      Client.auth_pkl = filename
+      self.assertEqual(self.client._LoadAuthCredentials(), auth_credentials)
+    finally:
+      Client.auth_pkl = ''
+
+  def testLoadAuthCredentials_OAuth2(self):
+    """Tests the _LoadAuthCredentials function."""
+    _, filename = tempfile.mkstemp()
+    client_id = 'id1234id',
+    client_secret = 'shhh,itsasecret',
+    refresh_token = '1/not_a_refresh_token'
+    auth_credentials = {
+        'clientId': client_id,
+        'clientSecret': client_secret,
+        'refreshToken': refresh_token
+    }
+    with open(filename, 'w') as handle:
+      pickle.dump(auth_credentials, handle)
+
+    try:
+      Client.auth_pkl = filename
+      read_credentials = self.client._LoadAuthCredentials()
+      self.assertEqual(read_credentials['oauth2credentials'].refresh_token,
+                       refresh_token)
+      self.assertEqual(read_credentials['oauth2credentials'].client_secret,
+                       client_secret)
+      self.assertEqual(read_credentials['oauth2credentials'].client_id,
+                       client_id)
+      self.assertTrue('clientId' not in read_credentials)
+      self.assertTrue('clientSecret' not in read_credentials)
+      self.assertTrue('refreshToken' not in read_credentials)
+    finally:
+      Client.auth_pkl = ''
 
   def testLoadAuthCredentials_noPickle(self):
     """Tests the _LoadAuthCredentials function."""
@@ -72,13 +103,15 @@ class ClientTest(unittest.TestCase):
     with open(filename, 'w') as handle:
       pickle.dump(auth_credentials, handle)
 
-    Client.auth_pkl = filename
-    self.client._WriteUpdatedAuthValue('password', 'new password')
+    try:
+      Client.auth_pkl = filename
+      self.client._WriteUpdatedAuthValue('password', 'new password')
 
-    with open(filename, 'r') as handle:
-      self.assertEqual(pickle.load(handle),
-                       {'username': 'Joseph', 'password': 'new password'})
-    Client.auth_pkl = ''
+      with open(filename, 'r') as handle:
+        self.assertEqual(pickle.load(handle),
+                         {'username': 'Joseph', 'password': 'new password'})
+    finally:
+      Client.auth_pkl = ''
 
   def testLoadConfigValues(self):
     """Tests the _LoadConfigValues function."""
@@ -90,9 +123,11 @@ class ClientTest(unittest.TestCase):
     with open(filename, 'w') as handle:
       pickle.dump(config_values, handle)
 
-    Client.config_pkl = filename
-    self.assertEqual(self.client._LoadConfigValues(), config_values)
-    Client.config_pkl = ''
+    try:
+      Client.config_pkl = filename
+      self.assertEqual(self.client._LoadConfigValues(), config_values)
+    finally:
+      Client.config_pkl = ''
 
   def testLoadConfigValues_noPickle(self):
     """Tests the _LoadConfigValues function."""

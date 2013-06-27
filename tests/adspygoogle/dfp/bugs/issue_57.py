@@ -88,7 +88,7 @@ class Issue57IntegrationTest(unittest.TestCase):
       adspygoogle.dfp.GenericDfpService.GenericDfpService A service proxy
       for the LineItemService.
     """
-    wsdl_data = open(WSDL_FILE_LOCATION).read()
+    wsdl_data = open(WSDL_FILE_LOCATION).read() % {'version': DEFAULT_API_VERSION}
     with mock.patch('urllib.urlopen') as mock_urlopen:
       mock_urlopen.return_value = StringIO.StringIO(wsdl_data)
       return client.GetLineItemService()

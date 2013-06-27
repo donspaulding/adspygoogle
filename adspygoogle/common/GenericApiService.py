@@ -18,6 +18,7 @@
 
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
+import datetime
 import httplib
 import sys
 import time
@@ -34,6 +35,16 @@ from adspygoogle.common.Logger import Logger
 from adspygoogle.SOAPpy.wstools.WSDLTools import WSDLError
 
 sys_stdout_monkey_lock = threading.Lock()
+# We will refresh an OAuth 2.0 credential _OAUTH2_REFRESH_MINUTES_IN_ADVANCE
+# minutes in advance of it's expiration.
+_OAUTH2_REFRESH_MINUTES_IN_ADVANCE = 5
+# Reference SOAPpy.SOAPConfig object. Instances of GenericApiService will use
+# a SOAPConfig copy constructor to have their own instance of SOAPConfig which
+# starts off identical to this one.
+_SOAP_CONFIG = SOAPpy.SOAPConfig(
+    typed=0, namespaceStyle='2001', returnFaultInfo=1, dumpHeadersIn=1,
+    dumpHeadersOut=1, dumpSOAPIn=1, dumpSOAPOut=1)
+
 
 class GenericApiService(object):
 
@@ -52,6 +63,7 @@ class GenericApiService(object):
 
   _TakeActionOnSoapCall
   _TakeActionOnPackedArgs
+  _WrapSoapCall
   """
 
   def __init__(self, headers, config, op_config, lock, logger, service_name,
@@ -100,21 +112,26 @@ class GenericApiService(object):
     wsdl_url = service_url + '?wsdl'
     try:
       self._soappyservice = SOAPpy.WSDL.Proxy(
-          wsdl_url, noroot=1, http_proxy=self._op_config['http_proxy'])
+          wsdl_url, noroot=1, http_proxy=self._op_config['http_proxy'],
+          config=self._GetSoapConfig())
     except WSDLError:
       raise Error('Unable to locate WSDL at path \'%s\'' % wsdl_url)
     else:
       for method_key in self._soappyservice.methods:
         self._soappyservice.methods[method_key].location = service_url
 
-      self._soappyservice.soapproxy.config.typed = 0
-      self._soappyservice.soapproxy.config.namespaceStyle = '2001'
-      self._soappyservice.soapproxy.config.returnFaultInfo = 1
-      self._soappyservice.soapproxy.config.dumpHeadersIn = 1
-      self._soappyservice.soapproxy.config.dumpHeadersOut = 1
-      self._soappyservice.soapproxy.config.dumpSOAPIn = 1
-      self._soappyservice.soapproxy.config.dumpSOAPOut = 1
-      self._soappyservice.soapproxy.config.argsOrdering = {}
+  def _GetSoapConfig(self):
+    """Creates a new SOAPpy.SOAPConfig for this service to use.
+
+    This method is necessary to ensure that each SOAPConfig has a unique
+    argsOrdering dictionary.
+
+    Returns:
+      SOAPpy.SOAPConfig A new SOAPConfig for this service to use.
+    """
+    config = SOAPpy.SOAPConfig(config=_SOAP_CONFIG)
+    config.argsOrdering = {}
+    return config
 
   def __getattr__(self, name):
     """Takes an attribute name and tries to create a SOAP call proxy around it.
@@ -133,7 +150,7 @@ class GenericApiService(object):
       SOAP operation in this service.
     """
     if name not in self._method_proxies:
-      self._method_proxies[name] = self._CreateMethod(name)
+      self._method_proxies[name] = self._WrapSoapCall(self._CreateMethod(name))
     return self._method_proxies[name]
 
   def __dir__(self):
@@ -141,6 +158,23 @@ class GenericApiService(object):
     dir_list = ['CallRawMethod']
     dir_list.extend(self._soappyservice.methods.keys())
     return dir_list
+
+  def _WrapSoapCall(self, call_function):
+    """Gives the service a chance to wrap a call in a product-specific function.
+
+    If a product needs to wrap the call to a SOAP service, for example to listen
+    for specific errors and retry failed calls, then its extending service class
+    must override this method.
+
+    Args:
+      call_function: function The function to make a SOAP call.
+
+    Returns:
+      function The function to make a SOAP call. For some products, this will be
+      the input function. For others, it may be a new function wrapping the
+      input function.
+    """
+    return call_function
 
   def _SetHeaders(self):
     """Sets the SOAP headers for this service's requests.
@@ -213,8 +247,12 @@ class GenericApiService(object):
     return ksoap_args
 
   def _ReadyOAuth(self):
-    """If OAuth is on, sets the transport handler to add OAuth HTTP header."""
+    """If OAuth is on, sets the transport handler to add OAuth HTTP header.
+
+    This method refreshes OAuth 2.0 credentials as necessary.
+    """
     if self._headers.get('oauth2credentials'):
+      self._RefreshCredentialIfNecessary(self._headers['oauth2credentials'])
       self._headers['oauth2credentials'].apply(
           self._soappyservice.soapproxy.transport.additional_headers)
     else:
@@ -222,6 +260,14 @@ class GenericApiService(object):
           self._soappyservice.soapproxy.transport.additional_headers):
         del self._soappyservice.soapproxy.transport.additional_headers[
             'Authorization']
+
+  def _RefreshCredentialIfNecessary(self, credential):
+    """Checks if the credential needs refreshing and refreshes if necessary."""
+    if (credential.token_expiry is not None and credential.token_expiry -
+        datetime.datetime.utcnow() <
+        datetime.timedelta(minutes=_OAUTH2_REFRESH_MINUTES_IN_ADVANCE)):
+      import httplib2
+      self._headers['oauth2credentials'].refresh(httplib2.Http())
 
   def _ReadyCompression(self):
     """Sets whether the HTTP transport layer should use compression."""

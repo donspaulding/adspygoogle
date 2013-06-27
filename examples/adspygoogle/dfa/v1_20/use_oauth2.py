@@ -16,8 +16,16 @@
 
 """This example demonstrates how to authenticate using OAuth2.
 
-This example is meant to be run from the command line and requires
-user input.
+This example is intended for users who wish to use the oauth2client library
+directly. Using a workflow similar to the example here, you can take advantage
+of the oauth2client in a broader range of contexts than caching your refresh
+token using the config.py scripts allows.
+
+You can avoid having to use the oauth2client library directly by using the Ads
+Python Client Library's config.py script to cache a client ID, client secret,
+and refresh token for reuse.
+
+This example is intended to be run from the command line as it takes user input.
 """
 
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
@@ -47,7 +55,8 @@ def main(user_profile_name, oauth2_client_id, oauth2_client_secret):
       client_id=oauth2_client_id,
       client_secret=oauth2_client_secret,
       scope='https://www.googleapis.com/auth/dfatrafficking',
-      user_agent='oauth2 code example')
+      user_agent='oauth2 code example',
+      redirect_uri='urn:ietf:wg:oauth:2.0:oob')
 
   # Get the authorization URL to direct the user to.
   authorize_url = flow.step1_get_authorize_url()

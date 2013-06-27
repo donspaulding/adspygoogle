@@ -54,10 +54,13 @@ print """
 --~--~---------~--~----~------------~-------~--~----~
 All requests that are sent to the DFP API web services
 must include SOAP header elements. Currently accepted
-header elements are email, password, networkCode, and
-applicationName. Detailed descriptions of these
-properties can be found at:
+header elements are networkCode and applicationName.
+Detailed descriptions of these properties can be found at:
 https://developers.google.com/doubleclick-publishers/docs/soap_xml
+
+All requests must use OAuth 2.0 for authentication. We
+use clientId, clientSecret, and refreshToken to enable
+this feature.
 
 Starting in v201203, networkCodes are required for
 all calls other than GetAllNetworks and
@@ -73,9 +76,14 @@ To overwrite an existing header element, explicitly
 type new value (or 'none' to clear) at the prompt.
 The default behavior is to keep old values.
 -~----------~----~----~----~------~----~------~--~---\n"""
-prompts = (('Your DFP account\'s login email', 'email',
-            'auth'),
-           ('Login password', 'password', 'auth'),
+prompts = (('OAuth 2.0 client ID (retrieved from '
+            'code.google.com/apis/console under the API Access tab)',
+            'clientId', 'auth'),
+           ('OAuth 2.0 client secret (retrieved from '
+            'code.google.com/apis/console under the API Access tab)',
+            'clientSecret', 'auth'),
+           ('OAuth 2.0 refresh token (if you don\'t already have one, run '
+            'scripts/common/generate_refresh_token.py', 'refreshToken', 'auth'),
            ('Network code', 'networkCode', 'auth'),
            ('Application name', 'applicationName', 'auth'),
            ('Select XML parser [1=PyXML, 2=ElementTree]', 'xml_parser',

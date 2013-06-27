@@ -131,12 +131,12 @@ Auth=DQAAAGgA...dk3fA5N'''
     headers['password'] = 'password'
     client = None
     try:
-      with mock.patch('urllib.urlopen') as mock_urlopen:
+      with mock.patch('urllib2.urlopen') as mock_urlopen:
         mock_urlopen.return_value = StringIO.StringIO(self.CAPTCHA_CHALLENGE)
         client = AdWordsClient(headers=headers)
       self.fail('Expected a CaptchaError to be thrown')
     except ValidationError, e:
-      with mock.patch('urllib.urlopen') as mock_urlopen:
+      with mock.patch('urllib2.urlopen') as mock_urlopen:
         mock_urlopen.return_value = StringIO.StringIO(self.SUCCESS)
         client = AdWordsClient(headers=headers,
                                login_token=e.root_cause.captcha_token,

@@ -19,8 +19,11 @@
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
 import os
+import pickle
+import shutil
 import StringIO
 import sys
+import tempfile
 import unittest
 from xml.etree import ElementTree
 sys.path.insert(0, os.path.join('..', '..', '..'))
@@ -75,20 +78,25 @@ EXPECTED_PAGE = {
          'frequencyCap': {'impressions': '0'}, 'id': '91019082'}
     ]}
 
-# Values used for the user agent, developer token, client customer ID, and
-# OAuth2 access token in our test code.
+# Values used in our test code.
+ACCESS_TOKEN = 'a1b2c3d4e5'
+CLIENT_ID = 'id1234id'
+CLIENT_SECRET = 'shhh,itsasecret'
+REFRESH_TOKEN = '1/not_a_refresh_token'
+OAUTH_URI = 'uri'
 USER_AGENT = 'Integration Test'
 DEVELOPER_TOKEN = 'devtoken'
 CLIENT_CUSTOMER_ID = 'CCID123'
-ACCESS_TOKEN = 'a1b2c3d4e5'
 
 
 class AdWordsIntegrationTest(unittest.TestCase):
 
   """Tests end-to-end usage of the AdWords library."""
 
-  def testEndToEnd(self):
+  def testWithPassedInCredential(self):
     """Tests the entire workflow of making a request against AdWords.
+
+    Uses a credential passed in to the constructor.
 
     Since this library is tightly integrated with SOAPpy, this test mocks out
     the HTTP level rather than the SOAPpy proxy level.
@@ -106,8 +114,70 @@ class AdWordsIntegrationTest(unittest.TestCase):
     # deserialize to the expected output. Also check that we correctly interpret
     # the operation and unit costs.
     self.assertEquals(EXPECTED_PAGE, page)
-    self.assertEquals(5, client.GetUnits())
     self.assertEquals(8, client.GetOperations())
+
+  def testWithCachedRefreshToken(self):
+    """Tests the entire workflow of making a request against AdWords.
+
+    Uses a cached refresh token to generate a credential.
+
+    Since this library is tightly integrated with SOAPpy, this test mocks out
+    the HTTP level rather than the SOAPpy proxy level.
+    """
+    directory = self._CreateConfigPickles()
+
+    try:
+      with mock.patch(
+          'oauth2client.client.OAuth2Credentials.refresh') as mock_refresh:
+        client = AdWordsClient(path=directory)
+
+        self.assertEquals(CLIENT_ID, client.oauth2credentials.client_id)
+        self.assertEquals(CLIENT_SECRET, client.oauth2credentials.client_secret)
+        self.assertEquals(REFRESH_TOKEN, client.oauth2credentials.refresh_token)
+
+        def SetAccessToken(unused_http):
+          client.oauth2credentials.access_token = ACCESS_TOKEN
+        mock_refresh.side_effect = SetAccessToken
+
+        campaign_service = self._CreateCampaignService(client)
+        page = self._MakeSoapRequest(campaign_service)
+
+        # Assert that the serialized objects returned in the SOAP response
+        # deserialize to the expected output. Also check that we correctly
+        # interpret the operations.
+        self.assertEquals(EXPECTED_PAGE, page)
+        self.assertEquals(8, client.GetOperations())
+        client.oauth2credentials.refresh.assert_called_once_with(mock.ANY)
+    finally:
+      shutil.rmtree(directory)
+
+  def _CreateConfigPickles(self):
+    """Creates configuration pickles for testing use of cached values.
+
+    Returns:
+      string The directory the pickles were stored in.
+    """
+    directory = tempfile.mkdtemp()
+    auth_credentials = {
+        'clientId': CLIENT_ID,
+        'clientSecret': CLIENT_SECRET,
+        'refreshToken': REFRESH_TOKEN,
+        'userAgent': USER_AGENT,
+        'developerToken': DEVELOPER_TOKEN,
+        'clientCustomerId': CLIENT_CUSTOMER_ID
+    }
+    config = {
+        'compress': False
+    }
+    with open(os.path.join(directory, AdWordsClient.auth_pkl_name),
+              'w') as handle:
+      pickle.dump(auth_credentials, handle)
+
+    with open(os.path.join(directory, AdWordsClient.config_pkl_name),
+              'w') as handle:
+      pickle.dump(config, handle)
+
+    return directory
 
   def _CreateOAuth2Credential(self):
     """Creates an OAuth2 Credential for use authenticating against AdWords.
@@ -121,8 +191,8 @@ class AdWordsIntegrationTest(unittest.TestCase):
       authenticate against AdWords.
     """
     return OAuth2Credentials(
-        ACCESS_TOKEN, 'client_id', 'client_secret', 'refresh_token', None,
-        'uri', 'user_agent')
+        ACCESS_TOKEN, CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, None,
+        OAUTH_URI, USER_AGENT)
 
   def _CreateAdWordsClient(self, oauth2_credential):
     """Creates an AdWordsClient using the given OAuth2 credential.
