@@ -98,7 +98,9 @@ Step-by-step guide for accessing the DoubleClick network:
    Example,
 
    Your DFA account's username: JoeShmoe@dfa
-   Login password: secret
+   OAuth 2.0 client ID: xxxxxxxxxxxxxx
+   OAuth 2.0 client secret: xxxxxxxxxxxxxx
+   OAuth 2.0 refresh token: xxxxxxxxxxxxxx
 
    Select XML parser [1=PyXML, 2=ElementTree]: 1
    Enable debugging mode [y/n]: n

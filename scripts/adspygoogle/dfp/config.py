@@ -25,7 +25,6 @@ import pickle
 from adspygoogle.common import SanityCheck
 from adspygoogle.common.Errors import InvalidInputError
 from adspygoogle.common.Logger import Logger
-from adspygoogle.dfp import REQUIRED_SOAP_HEADERS
 
 
 HOME = os.path.expanduser('~')
@@ -127,9 +126,6 @@ for prompt_msg, header, source in prompts:
         msg = 'Possible values are \'y\' or \'n\'.'
         raise InvalidInputError(msg)
     config[header] = res
-
-# Raise an exception, if required headers are missing.
-SanityCheck.ValidateRequiredHeaders(auth, REQUIRED_SOAP_HEADERS)
 
 # Load new authentication credentials into dfp_api_auth.pkl.
 try:

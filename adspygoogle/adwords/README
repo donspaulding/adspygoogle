@@ -87,8 +87,9 @@ Step-by-step guide for accessing the API using test accounts:
    at: https://developers.google.com/adwords/api/docs/headers
    Example,
 
-   Your AdWords account's login email: joe.shmoe@gmail.com
-   Login password: secret
+   OAuth 2.0 client ID: xxxxxxxxxxxxxx
+   OAuth 2.0 client secret: xxxxxxxxxxxxxx
+   OAuth 2.0 refresh token: xxxxxxxxxxxxxx
    Login client customer id: 123-456-7890
    User agent: GoogleTest
    Developer token: ABcdeFGH93KL-NOPQ_STUv
