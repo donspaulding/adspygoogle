@@ -1,8 +1,9 @@
-15.8.1:
+15.9.0:
 - Bumped the common library version to 3.1.0. Support for OAuth 2.0 has been
   improved and is now the preferred way of authenticating. Using ClientLogin
   will result in DeprecationWarnings. You can turn off these warnings - see
   README.common for instructions.
+- Added support for v201306.
 
 15.8.0:
 - Removing support for v201206.

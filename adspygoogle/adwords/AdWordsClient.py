@@ -624,6 +624,38 @@ class AdWordsClient(Client):
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'AdParamService')
 
+  def GetAdwordsUserListService(self, server='https://adwords.google.com',
+                                version=None, http_proxy=None):
+    """Call API method in AdwordsUserListService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of AdwordsUserListService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'rm',
+        'default_group': 'rm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'AdwordsUserListService')
+
   def GetAlertService(self, server='https://adwords.google.com', version=None,
                       http_proxy=None):
     """Call API method in AlertService.
@@ -655,6 +687,38 @@ class AdWordsClient(Client):
     }
     return GenericAdWordsService(headers, self._config, op_config, self.__lock,
                                  self.__logger, 'AlertService')
+
+  def GetBiddingStrategyService(self, server='https://adwords.google.com',
+                                version=None, http_proxy=None):
+    """Call API method in BiddingStrategyService.
+
+    Args:
+      [optional]
+      server: str API server to access for this API call. The only supported
+              server is currently 'https://adwords.google.com'.
+      version: str API version to use.
+      http_proxy: str HTTP proxy to use.
+
+    Returns:
+      GenericAdWordsService New instance of BiddingStrategyService object.
+    """
+    headers = self.__GetAuthCredentialsForAccessLevel()
+
+    if version is None:
+      version = DEFAULT_API_VERSION
+    if Utils.BoolTypeConvert(self._config['strict']):
+      AdWordsSanityCheck.ValidateServer(server, version)
+
+    # Load additional configuration data.
+    op_config = {
+        'server': server,
+        'version': version,
+        'group': 'cm',
+        'default_group': 'cm',
+        'http_proxy': http_proxy
+    }
+    return GenericAdWordsService(headers, self._config, op_config, self.__lock,
+                                 self.__logger, 'BiddingStrategyService')
 
   def GetBudgetService(self, server='https://adwords.google.com',
                        version=None, http_proxy=None):
@@ -1508,6 +1572,7 @@ class AdWordsClient(Client):
       version = DEFAULT_API_VERSION
     if Utils.BoolTypeConvert(self._config['strict']):
       AdWordsSanityCheck.ValidateServer(server, version)
+    AdWordsSanityCheck.ValidateService('UserListService', version)
 
     # Load additional configuration data.
     op_config = {
