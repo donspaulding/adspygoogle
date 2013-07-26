@@ -18,6 +18,9 @@
 <cm:fields>Id</cm:fields>
 <cm:fields>Name</cm:fields>
 <cm:fields>Status</cm:fields>
+<cm:predicates xsi3:type="cm:Predicate">
+<cm:field></cm:field>
+</cm:predicates>
 <cm:paging xsi3:type="cm:Paging">
 <cm:startIndex>100</cm:startIndex>
 <cm:numberResults>100</cm:numberResults>

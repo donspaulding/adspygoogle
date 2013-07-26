@@ -48,7 +48,7 @@ class AdvancedOperations(unittest.TestCase):
   def setUp(self):
     """Prepare unittest."""
     if not self.loaded:
-      self.campaign_id = util.CreateTestEnhancedCampaign(client)
+      self.campaign_id = util.CreateTestCampaign(client)
       self.ad_group_id = util.CreateTestAdGroup(client, self.campaign_id)
 
   def testAddClickToDownloadAd(self):

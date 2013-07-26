@@ -142,7 +142,7 @@ def _PackDictForSoappy(obj, xmlns, type_name, soappy_service, wrap_lists,
     type_name = obj_contained_type
 
   for key in obj:
-    if key == type_key or not obj[key]:
+    if key == type_key or obj[key] is None:
       continue
     ns_prefix = prefix_function(SoappyUtils.GetComplexFieldNamespaceByFieldName(
         key, type_name, xmlns, soappy_service))

@@ -20,8 +20,33 @@ __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
 from adspygoogle.common import Utils
 from tests.adspygoogle.adwords import HTTP_PROXY
-from tests.adspygoogle.adwords import SERVER_V201209 as SERVER
-from tests.adspygoogle.adwords import VERSION_V201209 as VERSION
+from tests.adspygoogle.adwords import SERVER_V201306 as SERVER
+from tests.adspygoogle.adwords import VERSION_V201306 as VERSION
+
+
+def CreateTestBudget(client):
+  """Creates a budget to run tests with.
+
+  Args:
+    client: AdWordsClient client to obtain services from.
+
+  Returns:
+    int Budget ID
+  """
+  budget_service = client.GetBudgetService(SERVER, VERSION, HTTP_PROXY)
+  budget = {
+      'name': 'Budget #%s' % Utils.GetUniqueName(),
+      'amount': {
+          'microAmount': '50000000'
+      },
+      'deliveryMethod': 'STANDARD',
+      'period': 'DAILY'
+  }
+  budget_operations = [{
+      'operator': 'ADD',
+      'operand': budget
+  }]
+  return budget_service.Mutate(budget_operations)[0]['value'][0]['budgetId']
 
 
 def CreateTestCampaign(client):
@@ -39,61 +64,15 @@ def CreateTestCampaign(client):
       'operand': {
           'name': 'Campaign #%s' % Utils.GetUniqueName(),
           'status': 'PAUSED',
-          'biddingStrategy': {
-              'type': 'ManualCPC'
+          'biddingStrategyConfiguration': {
+              'biddingStrategyType': 'MANUAL_CPC',
+              'biddingScheme': {
+                  'xsi_type': 'ManualCpcBiddingScheme',
+                  'enhancedCpcEnabled': 'false'
+              }
           },
           'budget': {
-              'period': 'DAILY',
-              'amount': {
-                  'microAmount': '10000000'
-              },
-              'deliveryMethod': 'STANDARD'
-          },
-          'settings': [
-              {
-                  'xsi_type': 'KeywordMatchSetting',
-                  'optIn': 'false'
-              }
-          ]
-      }
-  }]
-  return campaign_service.Mutate(
-      operations)[0]['value'][0]['id']
-
-
-def CreateTestEnhancedCampaign(client):
-  """Creates an enhanced campaign to run tests with.
-
-  While both legacy and enhanced campaigns exist, use this to test enhanced-only
-  features. Eventually, this method won't be needed.
-
-  Args:
-    client: AdWordsClient client to obtain services from.
-
-  Returns:
-    int CampaignId
-  """
-  campaign_service = client.GetCampaignService(SERVER, VERSION, HTTP_PROXY)
-  operations = [{
-      'operator': 'ADD',
-      'operand': {
-          'name': 'Campaign #%s' % Utils.GetUniqueName(),
-          'status': 'PAUSED',
-          'forwardCompatibilityMap': [
-              {
-                  'key': 'Campaign.enhanced',
-                  'value': 'true'
-              }
-          ],
-          'biddingStrategy': {
-              'type': 'ManualCPC'
-          },
-          'budget': {
-              'period': 'DAILY',
-              'amount': {
-                  'microAmount': '10000000'
-              },
-              'deliveryMethod': 'STANDARD'
+              'budgetId': CreateTestBudget(client)
           },
           'settings': [
               {
@@ -122,15 +101,14 @@ def CreateTestRTBCampaign(client):
       'operand': {
           'name': 'Campaign #%s' % Utils.GetUniqueName(),
           'status': 'PAUSED',
-          'biddingStrategy': {
-              'type': 'ManualCPM'
+          'biddingStrategyConfiguration': {
+              'biddingStrategyType': 'MANUAL_CPM',
+              'biddingScheme': {
+                  'xsi_type': 'ManualCpmBiddingScheme',
+              }
           },
           'budget': {
-              'period': 'DAILY',
-              'amount': {
-                  'microAmount': '10000000'
-              },
-              'deliveryMethod': 'STANDARD'
+              'budgetId': CreateTestBudget(client)
           },
           'settings': [{
               'xsi_type': 'RealTimeBiddingSetting',
@@ -162,13 +140,18 @@ def CreateTestAdGroup(client, campaign_id):
           'campaignId': campaign_id,
           'name': 'AdGroup #%s' % Utils.GetUniqueName(),
           'status': 'ENABLED',
-          'bids': {
-              'type': 'ManualCPCAdGroupBids',
-              'keywordMaxCpc': {
-                  'amount': {
-                      'microAmount': '1000000'
+          'biddingStrategyConfiguration': {
+              'bids': [
+                  {
+                      'xsi_type': 'CpcBid',
+                      'bid': {
+                          'microAmount': '1000000'
+                      },
+                      'contentBid': {
+                          'microAmount': '2000000'
+                      }
                   }
-              }
+              ]
           }
       }
   }]
@@ -193,13 +176,15 @@ def CreateTestCPMAdGroup(client, campaign_id):
           'campaignId': campaign_id,
           'name': 'AdGroup #%s' % Utils.GetUniqueName(),
           'status': 'ENABLED',
-          'bids': {
-              'type': 'ManualCPMAdGroupBids',
-              'maxCpm': {
-                  'amount': {
-                      'microAmount': '1000000'
+          'biddingStrategyConfiguration': {
+              'bids': [
+                  {
+                      'xsi_type': 'CpmBid',
+                      'bid': {
+                          'microAmount': '1000000'
+                      },
                   }
-              }
+              ]
           }
       }
   }]

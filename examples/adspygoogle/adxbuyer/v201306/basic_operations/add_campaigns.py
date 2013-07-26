@@ -62,8 +62,11 @@ def main(client):
       'operand': {
           'name': 'Interplanetary Cruise #%s' % Utils.GetUniqueName(),
           'status': 'PAUSED',
-          'biddingStrategy': {
-              'xsi_type': 'ManualCPM'
+          'biddingStrategyConfiguration': {
+              'biddingStrategyType': 'MANUAL_CPM',
+              'biddingScheme': {
+                  'xsi_type': 'ManualCpmBiddingScheme',
+              }
           },
           'endDate': (datetime.datetime.now() +
                       datetime.timedelta(365)).strftime('%Y%m%d'),
@@ -96,8 +99,11 @@ def main(client):
       'operand': {
           'name': 'Interplanetary Cruise Banners #%s' % Utils.GetUniqueName(),
           'status': 'PAUSED',
-          'biddingStrategy': {
-              'xsi_type': 'ManualCPM'
+          'biddingStrategyConfiguration': {
+              'biddingStrategyType': 'MANUAL_CPM',
+              'biddingScheme': {
+                  'xsi_type': 'ManualCpmBiddingScheme',
+              }
           },
           'endDate': (datetime.datetime.now() +
                       datetime.timedelta(365)).strftime('%Y%m%d'),

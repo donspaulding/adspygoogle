@@ -49,13 +49,15 @@ def main(client, ad_group_id, criterion_id):
               'xsi_type': 'Placement',
               'id': criterion_id,
           },
-          'bids': {
-              'xsi_type': 'ManualCPMAdGroupCriterionBids',
-              'maxCpm': {
-                  'amount': {
-                      'microAmount': '500000'
+          'biddingStrategyConfiguration': {
+              'bids': [
+                  {
+                      'xsi_type': 'CpmBid',
+                      'bid': {
+                          'microAmount': '1000000'
+                      },
                   }
-              }
+              ]
           }
       }
   }]

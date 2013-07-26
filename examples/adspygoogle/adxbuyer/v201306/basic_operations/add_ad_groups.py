@@ -45,13 +45,15 @@ def main(client, campaign_id):
           'campaignId': campaign_id,
           'name': 'Earth to Mars Cruises #%s' % Utils.GetUniqueName(),
           'status': 'ENABLED',
-          'bids': {
-              'xsi_type': 'ManualCPMAdGroupBids',
-              'maxCpm': {
-                  'amount': {
-                      'microAmount': '10000000'
+          'biddingStrategyConfiguration': {
+              'bids': [
+                  {
+                      'xsi_type': 'CpmBid',
+                      'bid': {
+                          'microAmount': '1000000'
+                      },
                   }
-              }
+              ]
           }
       }
   }, {
@@ -60,13 +62,15 @@ def main(client, campaign_id):
           'campaignId': campaign_id,
           'name': 'Earth to Venus Cruises #%s' % Utils.GetUniqueName(),
           'status': 'ENABLED',
-          'bids': {
-              'xsi_type': 'ManualCPMAdGroupBids',
-              'maxCpm': {
-                  'amount': {
-                      'microAmount': '10000000'
+          'biddingStrategyConfiguration': {
+              'bids': [
+                  {
+                      'xsi_type': 'CpmBid',
+                      'bid': {
+                          'microAmount': '1000000'
+                      },
                   }
-              }
+              ]
           }
       }
   }]

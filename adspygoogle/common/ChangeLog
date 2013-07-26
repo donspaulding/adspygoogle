@@ -1,3 +1,8 @@
+3.1.1:
+- Changed the MessageHandler module to allow values which evaluate to false
+  (such as empty strings) to be packed into SOAP requests. We now only disallow
+  packing None into the requests.
+
 3.1.0:
 - Support for OAuth 2.0 has been improved and is now the preferred way of
   authenticating. Using ClientLogin will result in DeprecationWarnings. You can

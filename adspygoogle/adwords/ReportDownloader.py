@@ -18,6 +18,7 @@
 
 __author__ = 'api.kwinter@gmail.com (Kevin Winter)'
 
+import datetime
 import gzip
 import re
 import StringIO
@@ -48,6 +49,9 @@ ERROR_TYPE_REGEX = r'(?s)<type>(.*?)</type>'
 ERROR_TRIGGER_REGEX = r'(?s)<trigger>(.*?)</trigger>'
 ERROR_FIELD_PATH_REGEX = r'(?s)<fieldPath>(.*?)</fieldPath>'
 BUF_SIZE = 4096
+# We will refresh an OAuth 2.0 credential _OAUTH2_REFRESH_MINUTES_IN_ADVANCE
+# minutes in advance of it's expiration.
+_OAUTH2_REFRESH_MINUTES_IN_ADVANCE = 5
 
 
 class ReportDownloader(object):
@@ -180,7 +184,7 @@ class ReportDownloader(object):
       str Report data if no fileobj, otherwise None.
     """
     url = self.__GenerateUrl()
-    self.__ReloadAuthToken()
+    self._CheckAuthentication()
     headers = self.__GenerateHeaders(return_micros)
     headers['Content-Type'] = 'application/x-www-form-urlencoded'
     headers['Content-Length'] = str(len(report_payload))
@@ -244,7 +248,7 @@ class ReportDownloader(object):
     Returns:
       str Report data if no fileobj, otherwise None.
     """
-    self.__ReloadAuthToken()
+    self._CheckAuthentication()
     url = self.__GenerateUrl(report_definition_id)
     headers = self.__GenerateHeaders(return_micros)
     return self.__MakeRequest(url, headers, fileobj)
@@ -369,10 +373,23 @@ class ReportDownloader(object):
       if field_path: field_path = field_path.group(1)
       raise AdWordsReportError(response_code, error_type, trigger, field_path)
 
+  def _CheckAuthentication(self):
+    """Ensures we have authentication values ready to make the request."""
+    if self._headers.get('oauth2credentials'):
+      self._RefreshCredentialIfNecessary(self._headers['oauth2credentials'])
+    else:
+      self.__ReloadAuthToken()
+
+  def _RefreshCredentialIfNecessary(self, credential):
+    """Checks if the credential needs refreshing and refreshes if necessary."""
+    if (credential.token_expiry is not None and credential.token_expiry -
+        datetime.datetime.utcnow() <
+        datetime.timedelta(minutes=_OAUTH2_REFRESH_MINUTES_IN_ADVANCE)):
+      import httplib2
+      self._headers['oauth2credentials'].refresh(httplib2.Http())
+
   def __ReloadAuthToken(self):
     """Ensures we have a valid auth_token in our headers."""
-    # Do not need an AuthToken if OAuth is enabled.
-    if self._headers.get('oauth2credentials'): return
     # Load/set authentication token. If authentication token has expired,
     # regenerate it.
     now = time.time()

@@ -18,6 +18,7 @@
 
 __author__ = 'api.jdilallo@gmail.com (Joseph DiLallo)'
 
+import datetime
 import os
 import StringIO
 import sys
@@ -32,7 +33,6 @@ from adspygoogle import AdWordsClient
 from adspygoogle.adwords import LIB_SIG
 from adspygoogle.adwords.AdWordsErrors import AdWordsError
 from adspygoogle.adwords.AdWordsErrors import AdWordsReportError
-from adspygoogle.adwords.util import XsdToWsdl
 
 
 class ReportDownloaderTest(unittest.TestCase):
@@ -40,19 +40,21 @@ class ReportDownloaderTest(unittest.TestCase):
 
   def setUp(self):
     """Prepare unittest."""
-    XsdToWsdl.CreateWsdlFromXsdUrl = mock.Mock()
-    client = AdWordsClient(headers={'authToken': ' ',
-                                    'userAgent': ' ',
-                                    'developerToken': ' '})
-    self.service = client.GetReportDownloader()
+    with mock.patch('adspygoogle.adwords.util.XsdToWsdl.CreateWsdlFromXsdUrl'):
+      client = AdWordsClient(headers={'authToken': ' ',
+                                      'userAgent': ' ',
+                                      'developerToken': ' ',
+                                      'email': ' ',
+                                      'password': ' '})
+      self.service = client.GetReportDownloader()
 
-    credentials = OAuth2Credentials(
-        'ACCESS_TOKEN', 'client_id', 'client_secret', 'refresh_token', None,
-        'uri', 'user_agent')
-    client_oauth2 = AdWordsClient(headers={'oauth2credentials': credentials,
-                                           'userAgent': ' ',
-                                           'developerToken': ' '})
-    self.service_oauth2 = client_oauth2.GetReportDownloader()
+      credentials = OAuth2Credentials(
+          'ACCESS_TOKEN', 'client_id', 'client_secret', 'refresh_token', None,
+          'uri', 'user_agent')
+      client_oauth2 = AdWordsClient(headers={'oauth2credentials': credentials,
+                                             'userAgent': ' ',
+                                             'developerToken': ' '})
+      self.service_oauth2 = client_oauth2.GetReportDownloader()
 
   def _ThrowErrorFromMakeRequest(self, payload_contents):
     """A test helper function to mock receiving an error during __MakeRequest.
@@ -135,10 +137,48 @@ class ReportDownloaderTest(unittest.TestCase):
         expected_headers,
         self.service_oauth2._ReportDownloader__GenerateHeaders(False))
 
-  def testReloadAuthToken_oAuth2(self):
-    with mock.patch('time.time') as mock_time:
-      self.service_oauth2._ReportDownloader__ReloadAuthToken()
-      self.assertFalse(mock_time.called)
+  def testCheckAuthentication_usingOAuth_refresh(self):
+    credentials = mock.Mock()
+    self.service_oauth2._headers['oauth2credentials'] = credentials
+    rvals = {
+        'token_expiry': datetime.datetime(1980, 1, 1, 12)
+    }
+    credentials.configure_mock(**rvals)
+
+    self.service_oauth2._CheckAuthentication()
+
+    self.assertTrue(credentials.refresh.called)
+
+  def testCheckAuthentication_usingOAuth_noRefresh(self):
+    credentials = mock.Mock()
+    self.service_oauth2._headers['oauth2credentials'] = credentials
+    rvals = {
+        'token_expiry': datetime.datetime.utcnow() + datetime.timedelta(hours=5)
+    }
+    credentials.configure_mock(**rvals)
+
+    self.service_oauth2._CheckAuthentication()
+
+    self.assertFalse(credentials.refresh.called)
+
+  def testCheckAuthentication_clientLogin_refresh(self):
+    old_token = self.service._headers['authToken']
+    old_epoch = self.service._config['auth_token_epoch']
+    del self.service._headers['authToken']
+    del self.service._config['auth_token_epoch']
+    try:
+      with mock.patch('adspygoogle.common.Utils.GetAuthToken'
+                     ) as mock_get_token:
+        self.service._CheckAuthentication()
+        self.assertTrue(mock_get_token.called)
+    finally:
+      self.service._headers['authToken'] = old_token
+      self.service._config['auth_token_epoch'] = old_epoch
+
+  def testCheckAuthentication_clientLogin_noRefresh(self):
+    with mock.patch('adspygoogle.common.Utils.GetAuthToken') as mock_get_token:
+      self.service._CheckAuthentication()
+      self.assertFalse(mock_get_token.called)
 
 
 if __name__ == '__main__':

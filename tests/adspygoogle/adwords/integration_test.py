@@ -268,7 +268,10 @@ class AdWordsIntegrationTest(unittest.TestCase):
         'paging': {
             'startIndex': '100',
             'numberResults': '100'
-        }
+        },
+        'predicates': [{
+            'field': ''
+        }]
     }
 
     with mock.patch('httplib.HTTPS') as mock_https:
